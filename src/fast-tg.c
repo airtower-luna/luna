@@ -9,34 +9,13 @@
 #include <arpa/inet.h>
 
 #include "server.h"
+#include "client.h"
 
 /* default server port (can be changed by -p command line argument) */
 #define DEFAULT_PORT 4567
 
 /* exit code for invalid command line arguments */
 #define EXIT_INVALID 1
-
-
-
-int run_client(struct sockaddr_in6 *addr)
-{
-	int sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-	if (sock == -1)
-		perror("Error while creating socket");
-
-	if (connect(sock, (struct sockaddr *) addr, sizeof(*addr)) == -1)
-		perror("Error setting destination");
-
-	int seq = 0;
-	for (int i = 0; i < 5; i++)
-	{
-		seq = htonl(i);
-		if (send(sock, &seq, sizeof(seq), 0) == -1)
-			perror("Error while sending");
-	}
-
-	close(sock);
-}
 
 
 
