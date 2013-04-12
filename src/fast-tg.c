@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (client)
-		return run_client(&addr);
+		return run_client(&addr, 1000, 4, 20);
 	if (server)
 		return run_server(&addr);
 }
