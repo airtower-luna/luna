@@ -37,7 +37,9 @@ int run_server(struct sockaddr_in6 *addr)
 
 	/* timestamp related data */
 	struct timeval ptime;
+	struct timeval stime;
 	char *tsstr = calloc(T_TIME_BUF, sizeof(char));
+	char *tscstr = calloc(T_TIME_BUF, sizeof(char));
 	/* *tm will be used to point to localtime's statically
 	 * allocated memory, does not need to be allocated/freed
 	 * manually */
@@ -49,6 +51,7 @@ int run_server(struct sockaddr_in6 *addr)
 		addrlen = addrbuf_size;
 		recvlen = recvfrom(sock, buf, buflen, 0,
 				   (struct sockaddr *) addrbuf, &addrlen);
+		gettimeofday(&stime, NULL);
 		ioctl(sock, SIOCGSTAMP, &ptime); // TODO: error check
 
 		if (addrlen > addrbuf_size)
@@ -59,11 +62,14 @@ int run_server(struct sockaddr_in6 *addr)
 		seq = ntohl(*((int *) buf));
 		tm = localtime(&(ptime.tv_sec));
 		strftime(tsstr, T_TIME_BUF, "%T", tm); // TODO: error check
-		printf("Received packet %i (%i bytes) from %s, port %i at %s.%06ld.\n",
-		       seq, (int) recvlen, addrstr, sourceport, tsstr, ptime.tv_usec);
+		tm = localtime(&(stime.tv_sec));
+		strftime(tscstr, T_TIME_BUF, "%T", tm); // TODO: error check
+		printf("Received packet %i (%i bytes) from %s, port %i at %s.%06ld (kernel), %s.%06ld (user space).\n",
+		       seq, (int) recvlen, addrstr, sourceport, tsstr, ptime.tv_usec, tscstr, stime.tv_usec);
 	}
 
 	free(tsstr);
+	free(tscstr);
 	free(addrbuf);
 	free(addrstr);
 	free(buf);
