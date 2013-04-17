@@ -15,7 +15,11 @@
 
 /* size of the buffer for one message */
 #define MSG_BUF_SIZE 1500
-/* length for address string */
+/* size of the buffer for one sockaddr struct (IPv6 sockaddr is the
+ * largest one we should expect) */
+#define ADDRBUF_SIZE sizeof(struct sockaddr_in6)
+/* length for address and port strings (probably a bit longer than
+ * required) */
 #define ADDR_STR_LEN 100
 /* buffer size for time string (%T of strftime) */
 #define T_TIME_BUF 10
@@ -46,11 +50,10 @@ int run_server(struct addrinfo *addr)
 	void *buf = malloc(buflen);
 	ssize_t recvlen = 0;
 	int seq = 0;
-	int addrbuf_size = sizeof(struct sockaddr_in6);
-	struct sockaddr_in6 *addrbuf = malloc(addrbuf_size);
+	struct sockaddr *addrbuf = malloc(ADDRBUF_SIZE);
 	socklen_t addrlen = 0;
 	char *addrstr = malloc(ADDR_STR_LEN);
-	uint16_t sourceport = 0;
+	char *portstr = malloc(ADDR_STR_LEN);
 
 	/* timestamp related data */
 	struct timeval ptime;
@@ -65,30 +68,31 @@ int run_server(struct addrinfo *addr)
 	int work = 1; // could be changed by SIGTERM later
 	while (work)
 	{
-		addrlen = addrbuf_size;
-		recvlen = recvfrom(sock, buf, buflen, 0,
-				   (struct sockaddr *) addrbuf, &addrlen);
-		gettimeofday(&stime, NULL);
+		addrlen = ADDRBUF_SIZE;
+		recvlen = recvfrom(sock, buf, buflen, 0, addrbuf, &addrlen);
 		ioctl(sock, SIOCGSTAMP, &ptime); // TODO: error check
 
-		if (addrlen > addrbuf_size)
+		if (addrlen > ADDRBUF_SIZE)
 			fprintf(stderr, "recv: addr buffer too small!\n");
-		inet_ntop(AF_INET6, &(addrbuf->sin6_addr), addrstr, ADDR_STR_LEN); // TODO: error check
-		sourceport = ntohs(addrbuf->sin6_port);
+		/* Create strings for source address and port, disable
+		 * name resolution (would require DNS requests). */
+		getnameinfo(addrbuf, addrlen,
+			    addrstr, ADDR_STR_LEN,
+			    portstr, ADDR_STR_LEN,
+			    NI_DGRAM | NI_NUMERICHOST | NI_NUMERICSERV); // TODO: error check
 
 		seq = ntohl(*((int *) buf));
 		tm = localtime(&(ptime.tv_sec));
 		strftime(tsstr, T_TIME_BUF, "%T", tm); // TODO: error check
-		tm = localtime(&(stime.tv_sec));
-		strftime(tscstr, T_TIME_BUF, "%T", tm); // TODO: error check
-		printf("Received packet %i (%i bytes) from %s, port %i at %s.%06ld (kernel), %s.%06ld (user space).\n",
-		       seq, (int) recvlen, addrstr, sourceport, tsstr, ptime.tv_usec, tscstr, stime.tv_usec);
+		printf("Received packet %i (%i bytes) from %s, port %s at %s.%06ld.\n",
+		       seq, (int) recvlen, addrstr, portstr, tsstr, ptime.tv_usec);
 	}
 
 	free(tsstr);
 	free(tscstr);
 	free(addrbuf);
 	free(addrstr);
+	free(portstr);
 	free(buf);
 	close(sock);
 }
