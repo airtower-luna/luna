@@ -13,6 +13,9 @@
 #include "server.h"
 #include "client.h"
 
+/* valid command line options for getopt */
+#define CLI_OPTS "sc:p:"
+
 /* default server port (can be changed by -p command line argument),
  * and it's length (ASCII bytes including terminating null byte) */
 #define DEFAULT_PORT 4567
@@ -42,13 +45,14 @@ int main(int argc, char *argv[])
 	addrhints.ai_canonname = NULL;
 	addrhints.ai_next = NULL;
 
-	int opt = getopt(argc, argv, "sc:p:");
 	int server = 0;
 	int client = 0;
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
 	char *host = NULL;
-	while (opt != -1)
+	for (int opt = getopt(argc, argv, CLI_OPTS);
+	     opt != -1;
+	     opt = getopt(argc, argv, CLI_OPTS))
 	{
 		switch (opt)
 		{
@@ -77,7 +81,6 @@ int main(int argc, char *argv[])
 		default:
 			break;
 		}
-		opt = getopt(argc, argv, "scp:");
 	}
 
 	if (port == NULL)
