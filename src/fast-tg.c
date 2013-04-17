@@ -21,12 +21,6 @@
 
 int main(int argc, char *argv[])
 {
-	struct sockaddr_in6 addr;
-	memset(&addr, 0, sizeof(addr));
-	addr.sin6_family = AF_INET6;
-	addr.sin6_port = htons(DEFAULT_PORT);
-	addr.sin6_addr = in6addr_loopback;
-
 	struct addrinfo addrhints;
 	addrhints.ai_family = AF_UNSPEC;
 	addrhints.ai_socktype = SOCK_DGRAM;
@@ -50,7 +44,6 @@ int main(int argc, char *argv[])
 		switch (opt)
 		{
 		case 'p':
-			addr.sin6_port = htons(atoi(optarg)); // TODO: error check
 			port = strdup(optarg);
 			break;
 		case 's': // act as server
@@ -60,7 +53,6 @@ int main(int argc, char *argv[])
 				exit(EXIT_INVALID);
 			}
 			server = 1;
-			addr.sin6_addr = in6addr_any;
 			addrhints.ai_family = AF_INET6;
 			break;
 		case 'c': // act as client
