@@ -13,8 +13,10 @@
 #include "server.h"
 #include "client.h"
 
-/* default server port (can be changed by -p command line argument) */
+/* default server port (can be changed by -p command line argument),
+ * and it's length (ASCII bytes including terminating null byte) */
 #define DEFAULT_PORT 4567
+#define DEFAULT_PORT_LEN 6 /* enough for all valid port numbers */
 
 /* exit code for invalid command line arguments */
 #define EXIT_INVALID 1
@@ -46,17 +48,12 @@ int resolve_ipv6(char *host, struct sockaddr_in6 *addr)
 			gai_strerror(error));
         }
 	// TODO: check that res->ai_family is AF_INET6
-	printf("test\n");
 	if (res != NULL && res->ai_addrlen == sizeof(struct sockaddr_in6))
 	{
-		printf("test2\n");
 		addr->sin6_addr = ((struct sockaddr_in6 *) res->ai_addr)->sin6_addr;
-		printf("test3\n");
 	}
 
-	printf("end\n");
 	freeaddrinfo(res);
-	printf("end2\n");
 	return 0;
 }
 
@@ -70,15 +67,30 @@ int main(int argc, char *argv[])
 	addr.sin6_port = htons(DEFAULT_PORT);
 	addr.sin6_addr = in6addr_loopback;
 
+	struct addrinfo addrhints;
+	addrhints.ai_family = AF_UNSPEC;
+	addrhints.ai_socktype = SOCK_DGRAM;
+	addrhints.ai_protocol = IPPROTO_UDP;
+	//	addrhints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG;
+	addrhints.ai_flags = AI_V4MAPPED;
+	addrhints.ai_addrlen = 0;
+	addrhints.ai_addr = NULL;
+	addrhints.ai_canonname = NULL;
+	addrhints.ai_next = NULL;
+
 	int opt = getopt(argc, argv, "sc:p:");
 	int server = 0;
 	int client = 0;
+	/* port and host will be allocated by strdup, free'd below. */
+	char *port = NULL;
+	char *host = NULL;
 	while (opt != -1)
 	{
 		switch (opt)
 		{
 		case 'p':
 			addr.sin6_port = htons(atoi(optarg)); // TODO: error check
+			port = strdup(optarg);
 			break;
 		case 's': // act as server
 			if (client != 0)
@@ -95,7 +107,7 @@ int main(int argc, char *argv[])
 				fprintf(stderr, "Select client or server mode, never both!\n");
 				exit(EXIT_INVALID);
 			}
-			resolve_ipv6(optarg, &addr);
+			host = strdup(optarg);
 			client = 1;
 			break;
 		default:
@@ -104,8 +116,39 @@ int main(int argc, char *argv[])
 		opt = getopt(argc, argv, "scp:");
 	}
 
+	if (port == NULL)
+	{
+		port = malloc(DEFAULT_PORT_LEN);
+		snprintf(port, DEFAULT_PORT_LEN, "%u", DEFAULT_PORT);
+	}
+
+	if (server)
+		addrhints.ai_flags |= AI_PASSIVE;
+	else
+		if (host == NULL)
+		{
+			fprintf(stderr, "You must either use server mode or specify a server to send to (-c HOST)!\n");
+			exit(EXIT_INVALID);
+		}
+
+	struct addrinfo *res = NULL;
+	int error = 0;
+	error = getaddrinfo(host, port, &addrhints, &res);
+	if (error != 0)
+	{
+		fprintf(stderr, "Error in getaddrinfo for \"%s\": %s\n", host,
+			gai_strerror(error));
+	}
+
+	free(host);
+	free(port);
+
 	if (client)
-		return run_client(&addr, 1000, 4, 20);
+		return run_client(res, 1000, 4, 20);
 	if (server)
 		return run_server(&addr);
+
+	/* TODO: after client and server use addrinfo, move this to
+	 * after their socket init */
+	freeaddrinfo(res);
 }

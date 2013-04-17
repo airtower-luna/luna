@@ -1,11 +1,13 @@
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <errno.h>
+#include <netinet/in.h>
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 
 
 
@@ -15,7 +17,7 @@
  * size: packet size in bytes (must be at least 4)
  * count: number of packets to send
  */
-int run_client(struct sockaddr_in6 *addr, int interval, size_t size, int count)
+int run_client(struct addrinfo *addr, int interval, size_t size, int count)
 {
 	/* Ensure that size is at least 4, otherwise segfault or
 	 * memory corruption might occur. */
@@ -23,12 +25,17 @@ int run_client(struct sockaddr_in6 *addr, int interval, size_t size, int count)
 		size = 4;
 	char *buf = malloc(size); // TODO: error check
 
-	int sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-	if (sock == -1)
-		perror("Error while creating socket");
+	struct addrinfo *rp;
+	int sock;
+	for (rp = addr; rp != NULL; rp = rp->ai_next)
+	{
+		sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+		if (sock == -1)
+			continue; // didn't work, try next address
 
-	if (connect(sock, (struct sockaddr *) addr, sizeof(*addr)) == -1)
-		perror("Error setting destination");
+		if (connect(sock, rp->ai_addr, rp->ai_addrlen) != -1)
+			break; // connected (well, it's UDP, but...
+	}
 
 	int *seq = (int *) buf;
 	/* sleep times */
