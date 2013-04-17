@@ -10,19 +10,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "fast-tg.h"
 #include "server.h"
 #include "client.h"
 
 /* valid command line options for getopt */
 #define CLI_OPTS "sc:p:"
-
-/* default server port (can be changed by -p command line argument),
- * and it's length (ASCII bytes including terminating null byte) */
-#define DEFAULT_PORT 4567
-#define DEFAULT_PORT_LEN 6 /* enough for all valid port numbers */
-
-/* exit code for invalid command line arguments */
-#define EXIT_INVALID 1
 
 
 
