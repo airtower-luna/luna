@@ -27,7 +27,8 @@ int run_client(struct addrinfo *addr, int interval, size_t size, int count)
 {
 	if (size < MIN_PACKET_SIZE)
 		size = MIN_PACKET_SIZE;
-	char *buf = malloc(size); // TODO: error check
+	char *buf = malloc(size);
+	CHKALLOC(buf);
 
 	struct addrinfo *rp;
 	int sock;

@@ -5,4 +5,11 @@
 
 /* exit code for invalid command line arguments */
 #define EXIT_INVALID 1
+/* exit code for network problems */
 #define EXIT_NETFAIL 2
+/* exit code for memory errors */
+#define EXIT_MEMFAIL 3
+
+/* macro and function to check if memory allocation was successful */
+#define CHKALLOC(a) chkalloc(a, __FILE__, __LINE__)
+void chkalloc(void *ptr, char *file, int line);

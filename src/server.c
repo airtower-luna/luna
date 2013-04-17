@@ -48,12 +48,16 @@ int run_server(struct addrinfo *addr)
 
 	size_t buflen = MSG_BUF_SIZE;
 	void *buf = malloc(buflen);
+	CHKALLOC(buf);
 	ssize_t recvlen = 0;
 	int seq = 0;
 	struct sockaddr *addrbuf = malloc(ADDRBUF_SIZE);
+	CHKALLOC(addrbuf);
 	socklen_t addrlen = 0;
 	char *addrstr = malloc(ADDR_STR_LEN);
+	CHKALLOC(addrstr);
 	char *portstr = malloc(ADDR_STR_LEN);
+	CHKALLOC(portstr);
 
 	/* timestamp related data */
 	struct timeval ptime;
@@ -83,7 +87,7 @@ int run_server(struct addrinfo *addr)
 
 		seq = ntohl(*((int *) buf));
 		tm = localtime(&(ptime.tv_sec));
-		strftime(tsstr, T_TIME_BUF, "%T", tm); // TODO: error check
+		strftime(tsstr, T_TIME_BUF, "%T", tm);
 		printf("Received packet %i (%i bytes) from %s, port %s at %s.%06ld.\n",
 		       seq, (int) recvlen, addrstr, portstr, tsstr, ptime.tv_usec);
 	}

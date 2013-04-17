@@ -17,6 +17,17 @@
 /* valid command line options for getopt */
 #define CLI_OPTS "sc:p:"
 
+void chkalloc(void *ptr, char *file, int line)
+{
+	if (ptr == NULL)
+	{
+		fprintf(stderr,
+			"Could not allocate required memory in %s, line %i!\n",
+			file, line);
+		exit(EXIT_MEMFAIL);
+	}
+}
+
 
 
 int main(int argc, char *argv[])
@@ -45,6 +56,7 @@ int main(int argc, char *argv[])
 		{
 		case 'p':
 			port = strdup(optarg);
+			CHKALLOC(port);
 			break;
 		case 's': // act as server
 			if (client != 0)
@@ -62,6 +74,7 @@ int main(int argc, char *argv[])
 				exit(EXIT_INVALID);
 			}
 			host = strdup(optarg);
+			CHKALLOC(host);
 			client = 1;
 			break;
 		default:
@@ -72,6 +85,7 @@ int main(int argc, char *argv[])
 	if (port == NULL)
 	{
 		port = malloc(DEFAULT_PORT_LEN);
+		CHKALLOC(port);
 		snprintf(port, DEFAULT_PORT_LEN, "%u", DEFAULT_PORT);
 	}
 
