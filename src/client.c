@@ -11,6 +11,10 @@
 
 #include "fast-tg.h"
 
+/* Minimum packet size as required for our payload. Larger sizes are
+ * possible as long as the UDP stacks permits them. */
+#define MIN_PACKET_SIZE 4
+
 
 
 /*
@@ -21,10 +25,8 @@
  */
 int run_client(struct addrinfo *addr, int interval, size_t size, int count)
 {
-	/* Ensure that size is at least 4, otherwise segfault or
-	 * memory corruption might occur. */
-	if (size < 4)
-		size = 4;
+	if (size < MIN_PACKET_SIZE)
+		size = MIN_PACKET_SIZE;
 	char *buf = malloc(size); // TODO: error check
 
 	struct addrinfo *rp;
