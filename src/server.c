@@ -1,13 +1,17 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/time.h>
 #include <time.h>
 #include <unistd.h>
+
+#include "fast-tg.h"
 
 /* size of the buffer for one message */
 #define MSG_BUF_SIZE 1500
@@ -16,14 +20,26 @@
 /* buffer size for time string (%T of strftime) */
 #define T_TIME_BUF 10
 
-int run_server(struct sockaddr_in6 *addr)
+int run_server(struct addrinfo *addr)
 {
-	int sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
-	if (sock == -1)
-		perror("Error while creating socket");
+	int sock;
+	struct addrinfo *rp;
+	for (rp = addr; rp != NULL; rp = rp->ai_next)
+	{
+		sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
+		if (sock == -1)
+			continue; // didn't work, try next address
 
-	if (bind(sock, (struct sockaddr *) addr, sizeof(*addr)) == -1)
-		perror("Error binding port");
+		if (bind(sock, rp->ai_addr, rp->ai_addrlen) == 0)
+			break; // connected (well, it's UDP, but...)
+
+		close(sock);
+	}
+	if (rp == NULL)
+	{
+		fprintf(stderr, "Could not bind listening socket.\n");
+		exit(EXIT_NETFAIL);
+	}
 
 	size_t buflen = MSG_BUF_SIZE;
 	void *buf = malloc(buflen);

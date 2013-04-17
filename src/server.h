@@ -3,6 +3,6 @@
 
 #include <netinet/in.h>
 
-int run_server(struct sockaddr_in6 *addr);
+int run_server(struct addrinfo *addr);
 
 #endif /* __FTG_SERVER_H_ */

@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
 			}
 			server = 1;
 			addr.sin6_addr = in6addr_any;
+			addrhints.ai_family = AF_INET6;
 			break;
 		case 'c': // act as client
 			if (server != 0)
@@ -106,7 +107,7 @@ int main(int argc, char *argv[])
 	if (client)
 		return run_client(res, 1000, 4, 20);
 	if (server)
-		return run_server(&addr);
+		return run_server(res);
 
 	/* TODO: after client and server use addrinfo, move this to
 	 * after their socket init */
