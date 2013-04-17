@@ -23,42 +23,6 @@
 
 
 
-/*
- * Resolve the hostname to an IPv6 address, write the resulting
- * address to the provided the provided structure.
- */
-int resolve_ipv6(char *host, struct sockaddr_in6 *addr)
-{
-	struct addrinfo hints;
-	hints.ai_family = AF_INET6;
-	hints.ai_socktype = 0;
-	hints.ai_protocol = 0;
-	hints.ai_flags = AI_V4MAPPED;
-	hints.ai_addrlen = 0;
-	hints.ai_addr = NULL;
-	hints.ai_canonname = NULL;
-	hints.ai_next = NULL;
-
-	struct addrinfo *res = NULL;
-	int error = 0;
-	error = getaddrinfo(host, "2345", &hints, &res);
-        if (error != 0)
-        {
-		fprintf(stderr, "Error in getaddrinfo for \"%s\": %s\n", host,
-			gai_strerror(error));
-        }
-	// TODO: check that res->ai_family is AF_INET6
-	if (res != NULL && res->ai_addrlen == sizeof(struct sockaddr_in6))
-	{
-		addr->sin6_addr = ((struct sockaddr_in6 *) res->ai_addr)->sin6_addr;
-	}
-
-	freeaddrinfo(res);
-	return 0;
-}
-
-
-
 int main(int argc, char *argv[])
 {
 	struct sockaddr_in6 addr;
