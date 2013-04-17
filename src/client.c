@@ -9,6 +9,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "fast-tg.h"
+
 
 
 /*
@@ -34,8 +36,14 @@ int run_client(struct addrinfo *addr, int interval, size_t size, int count)
 			continue; // didn't work, try next address
 
 		if (connect(sock, rp->ai_addr, rp->ai_addrlen) != -1)
-			break; // connected (well, it's UDP, but...
+			break; // connected (well, it's UDP, but...)
 	}
+	if (rp == NULL)
+	{
+		fprintf(stderr, "Could not create socket.\n");
+		exit(EXIT_NETFAIL);
+	}
+	freeaddrinfo(addr); // no longer required
 
 	int *seq = (int *) buf;
 	/* sleep times */

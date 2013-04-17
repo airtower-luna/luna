@@ -92,6 +92,8 @@ int main(int argc, char *argv[])
 			exit(EXIT_INVALID);
 		}
 
+	/* res will be allocated by getaddrinfo and free'd in
+	 * client/server functions. */
 	struct addrinfo *res = NULL;
 	int error = 0;
 	error = getaddrinfo(host, port, &addrhints, &res);
@@ -108,8 +110,4 @@ int main(int argc, char *argv[])
 		return run_client(res, 1000, 4, 20);
 	if (server)
 		return run_server(res);
-
-	/* TODO: after client and server use addrinfo, move this to
-	 * after their socket init */
-	freeaddrinfo(res);
 }

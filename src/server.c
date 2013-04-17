@@ -40,6 +40,7 @@ int run_server(struct addrinfo *addr)
 		fprintf(stderr, "Could not bind listening socket.\n");
 		exit(EXIT_NETFAIL);
 	}
+	freeaddrinfo(addr); // no longer required
 
 	size_t buflen = MSG_BUF_SIZE;
 	void *buf = malloc(buflen);
