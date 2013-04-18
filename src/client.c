@@ -40,6 +40,8 @@ int run_client(struct addrinfo *addr, int interval, size_t size, int count)
 
 		if (connect(sock, rp->ai_addr, rp->ai_addrlen) != -1)
 			break; // connected (well, it's UDP, but...)
+
+		close(sock);
 	}
 	if (rp == NULL)
 	{
