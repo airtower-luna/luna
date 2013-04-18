@@ -24,7 +24,7 @@
 /* buffer size for time string (%T of strftime) */
 #define T_TIME_BUF 10
 
-int run_server(struct addrinfo *addr)
+int run_server(struct addrinfo *addr, int inet6_only)
 {
 	int sock;
 	struct addrinfo *rp;
@@ -33,6 +33,14 @@ int run_server(struct addrinfo *addr)
 		sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
 		if (sock == -1)
 			continue; // didn't work, try next address
+
+		if (rp->ai_family == AF_INET6)
+			if (setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY,
+				       &inet6_only, sizeof(inet6_only)) != 0)
+			{
+				perror("setsockopt IPV6_V6ONLY");
+				exit(EXIT_NETFAIL);
+			}
 
 		if (bind(sock, rp->ai_addr, rp->ai_addrlen) == 0)
 			break; // connected (well, it's UDP, but...)

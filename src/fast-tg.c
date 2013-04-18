@@ -15,7 +15,7 @@
 #include "client.h"
 
 /* valid command line options for getopt */
-#define CLI_OPTS "sc:p:"
+#define CLI_OPTS "sc:p:46"
 
 void chkalloc(void *ptr, char *file, int line)
 {
@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
 
 	int server = 0;
 	int client = 0;
+	int inet6_only = 0;
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
 	char *host = NULL;
@@ -66,7 +67,6 @@ int main(int argc, char *argv[])
 				exit(EXIT_INVALID);
 			}
 			server = 1;
-			addrhints.ai_family = AF_INET6;
 			break;
 		case 'c': // act as client
 			if (server != 0)
@@ -78,6 +78,13 @@ int main(int argc, char *argv[])
 			host = strdup(optarg);
 			CHKALLOC(host);
 			client = 1;
+			break;
+		case '4': // IPv4 only
+			addrhints.ai_family = AF_INET;
+			break;
+		case '6': // IPv6 only
+			addrhints.ai_family = AF_INET6;
+			inet6_only = 1;
 			break;
 		default:
 			break;
@@ -92,7 +99,11 @@ int main(int argc, char *argv[])
 	}
 
 	if (server)
+	{
 		addrhints.ai_flags |= AI_PASSIVE;
+		if (addrhints.ai_family != AF_INET)
+			addrhints.ai_family = AF_INET6;
+	}
 	else
 		if (host == NULL)
 		{
@@ -117,6 +128,7 @@ int main(int argc, char *argv[])
 
 	if (client)
 		return run_client(res, 1000, 4, 20);
+
 	if (server)
-		return run_server(res);
+		return run_server(res, inet6_only);
 }
