@@ -61,7 +61,8 @@ int main(int argc, char *argv[])
 		case 's': // act as server
 			if (client != 0)
 			{
-				fprintf(stderr, "Select client or server mode, never both!\n");
+				fprintf(stderr, "Select client or server mode, "
+					"never both!\n");
 				exit(EXIT_INVALID);
 			}
 			server = 1;
@@ -70,7 +71,8 @@ int main(int argc, char *argv[])
 		case 'c': // act as client
 			if (server != 0)
 			{
-				fprintf(stderr, "Select client or server mode, never both!\n");
+				fprintf(stderr, "Select client or server mode, "
+					"never both!\n");
 				exit(EXIT_INVALID);
 			}
 			host = strdup(optarg);
@@ -94,7 +96,8 @@ int main(int argc, char *argv[])
 	else
 		if (host == NULL)
 		{
-			fprintf(stderr, "You must either use server mode or specify a server to send to (-c HOST)!\n");
+			fprintf(stderr, "You must either use server mode or "
+				"specify a server to send to (-c HOST)!\n");
 			exit(EXIT_INVALID);
 		}
 
@@ -105,8 +108,8 @@ int main(int argc, char *argv[])
 	error = getaddrinfo(host, port, &addrhints, &res);
 	if (error != 0)
 	{
-		fprintf(stderr, "Error in getaddrinfo for \"%s\": %s\n", host,
-			gai_strerror(error));
+		fprintf(stderr, "Error in getaddrinfo for \"%s\": %s\n",
+			host, gai_strerror(error));
 	}
 
 	free(host);

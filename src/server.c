@@ -17,7 +17,7 @@
 #define MSG_BUF_SIZE 1500
 /* size of the buffer for one sockaddr struct (IPv6 sockaddr is the
  * largest one we should expect) */
-#define ADDRBUF_SIZE sizeof(struct sockaddr_in6)
+#define ADDRBUF_SIZE (sizeof(struct sockaddr_in6))
 /* length for address and port strings (probably a bit longer than
  * required) */
 #define ADDR_STR_LEN 100
@@ -88,8 +88,10 @@ int run_server(struct addrinfo *addr)
 		seq = ntohl(*((int *) buf));
 		tm = localtime(&(ptime.tv_sec));
 		strftime(tsstr, T_TIME_BUF, "%T", tm);
-		printf("Received packet %i (%i bytes) from %s, port %s at %s.%06ld.\n",
-		       seq, (int) recvlen, addrstr, portstr, tsstr, ptime.tv_usec);
+		printf("Received packet %i (%i bytes) from %s, port %s at "
+		       "%s.%06ld.\n",
+		       seq, (int) recvlen, addrstr, portstr, tsstr,
+		       ptime.tv_usec);
 	}
 
 	free(tsstr);
