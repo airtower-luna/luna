@@ -19,7 +19,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65])
-AC_INIT([hied], [0.1], [fiona2.klute@uni-dortmund.de])
+AC_INIT([fast-tg], [0.1], [fiona2.klute@uni-dortmund.de])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/fast-tg.c])
 AC_CONFIG_HEADERS([config.h])
