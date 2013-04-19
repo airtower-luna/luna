@@ -10,6 +10,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "fast-tg.h"
@@ -34,6 +35,13 @@ void chkalloc(void *ptr, char *file, int line)
 
 int main(int argc, char *argv[])
 {
+	struct timespec timeres = {0, 0};
+	if (clock_getres(CLOCK_MONOTONIC, &timeres) == -1)
+		perror("Could not get clock resolution");
+	else
+		printf("Kernel clock resolution: %ld.%09lds\n",
+		       timeres.tv_sec, timeres.tv_nsec);
+
 	struct addrinfo addrhints;
 	addrhints.ai_family = AF_UNSPEC;
 	addrhints.ai_socktype = SOCK_DGRAM;
