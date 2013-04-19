@@ -137,7 +137,10 @@ int main(int argc, char *argv[])
 	free(port);
 
 	if (client)
-		return run_client(res, 1000, 4, 20);
+	{
+		struct timespec interval = {0, 1000000};
+		return run_client(res, &interval, 4, 20);
+	}
 
 	if (server)
 		return run_server(res, inet6_only);

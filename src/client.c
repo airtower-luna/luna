@@ -25,7 +25,8 @@
  * size: packet size in bytes (must be at least 4)
  * count: number of packets to send
  */
-int run_client(struct addrinfo *addr, int interval, size_t size, int count)
+int run_client(struct addrinfo *addr, struct timespec *interval,
+	       size_t size, int count)
 {
 	if (size < MIN_PACKET_SIZE)
 		size = MIN_PACKET_SIZE;
@@ -53,15 +54,19 @@ int run_client(struct addrinfo *addr, int interval, size_t size, int count)
 	freeaddrinfo(addr); // no longer required
 
 	int *seq = (int *) buf;
-	/* sleep times */
-	struct timespec req = {interval / 1000000, interval * 1000};
+	/* timespecs for the timer */
+	struct timespec nexttick = {0, 0};
 	struct timespec rem = {0, 0};
+	clock_gettime(CLOCK_MONOTONIC, &nexttick);
+
 	for (int i = 0; i < count; i++)
 	{
 		*seq = htonl(i);
+		timespecadd(&nexttick, interval, &nexttick);
+		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,
+				&nexttick, &rem); // TODO: error check
 		if (send(sock, buf, size, 0) == -1)
 			perror("Error while sending");
-		nanosleep(&req, &rem); // TODO: error check
 	}
 
 	close(sock);

@@ -13,3 +13,16 @@
 /* macro and function to check if memory allocation was successful */
 #define CHKALLOC(a) chkalloc(a, __FILE__, __LINE__)
 void chkalloc(void *ptr, char *file, int line);
+
+/* based on timeradd in <sys/time.h> */
+#define timespecadd(a, b, result)					\
+	do								\
+	{								\
+		(result)->tv_sec = (a)->tv_sec + (b)->tv_sec;		\
+		(result)->tv_nsec = (a)->tv_nsec + (b)->tv_nsec;	\
+		if ((result)->tv_nsec >= 1000000000)			\
+		{							\
+			++(result)->tv_sec;				\
+			(result)->tv_nsec -= 1000000000;		\
+		}							\
+	} while (0)
