@@ -3,6 +3,10 @@
 
 #include <netinet/in.h>
 
-int run_server(struct addrinfo *addr, int inet6_only);
+/* option flags for the server */
+#define SERVER_IPV6_ONLY 1
+#define SERVER_TSV_OUTPUT 2
+
+int run_server(struct addrinfo *addr, int flags);
 
 #endif /* __FTG_SERVER_H_ */

@@ -18,7 +18,7 @@
 #include "client.h"
 
 /* valid command line options for getopt */
-#define CLI_OPTS "sc:p:46"
+#define CLI_OPTS "sc:p:46T"
 
 void chkalloc(void *ptr, char *file, int line)
 {
@@ -33,7 +33,7 @@ void chkalloc(void *ptr, char *file, int line)
 
 
 
-int main(int argc, char *argv[])
+void printtimeres()
 {
 	struct timespec timeres = {0, 0};
 	if (clock_getres(CLOCK_MONOTONIC, &timeres) == -1)
@@ -41,7 +41,12 @@ int main(int argc, char *argv[])
 	else
 		printf("Kernel clock resolution: %ld.%09lds\n",
 		       timeres.tv_sec, timeres.tv_nsec);
+}
 
+
+
+int main(int argc, char *argv[])
+{
 	struct addrinfo addrhints;
 	addrhints.ai_family = AF_UNSPEC;
 	addrhints.ai_socktype = SOCK_DGRAM;
@@ -55,7 +60,7 @@ int main(int argc, char *argv[])
 
 	int server = 0;
 	int client = 0;
-	int inet6_only = 0;
+	int flags = 0;
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
 	char *host = NULL;
@@ -94,12 +99,18 @@ int main(int argc, char *argv[])
 			break;
 		case '6': // IPv6 only
 			addrhints.ai_family = AF_INET6;
-			inet6_only = 1;
+			flags |= SERVER_IPV6_ONLY;
+			break;
+		case 'T': // tab separated value output
+			flags |= SERVER_TSV_OUTPUT;
 			break;
 		default:
 			break;
 		}
 	}
+
+	if (!(flags & SERVER_TSV_OUTPUT))
+		printtimeres();
 
 	if (port == NULL)
 	{
@@ -143,5 +154,5 @@ int main(int argc, char *argv[])
 	}
 
 	if (server)
-		return run_server(res, inet6_only);
+		return run_server(res, flags);
 }
