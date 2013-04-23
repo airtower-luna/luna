@@ -87,7 +87,7 @@ int run_server(struct addrinfo *addr, int flags)
 	struct tm *tm;
 
 	if (flags & SERVER_TSV_OUTPUT)
-		printf("# time source port sequence size\n");
+		printf("# time\tsource\tport\tsequence\tsize\n");
 
 	int work = 1; // could be changed by SIGTERM later
 	while (work)
@@ -106,16 +106,17 @@ int run_server(struct addrinfo *addr, int flags)
 			    NI_DGRAM | NI_NUMERICHOST | NI_NUMERICSERV); // TODO: error check
 
 		seq = ntohl(*((int *) buf));
-		tm = localtime(&(ptime.tv_sec));
 		if (flags & SERVER_TSV_OUTPUT)
 		{
+			tm = localtime(&(ptime.tv_sec));
 			strftime(tsstr, T_TIME_BUF, "%s", tm);
 			printf("%s.%06ld\t%s\t%s\t%i\t%i\n",
-			       tsstr, ptime.tv_usec, addrstr, portstr,
-			       seq, (int) recvlen);
+			       tsstr, ptime.tv_usec,
+			       addrstr, portstr, seq, (int) recvlen);
 		}
 		else
 		{
+			tm = localtime(&(ptime.tv_sec));
 			strftime(tsstr, T_TIME_BUF, "%T", tm);
 			printf("Received packet %i (%i bytes) from %s, port %s "
 			       "at %s.%06ld.\n",
