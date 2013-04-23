@@ -80,7 +80,7 @@ int run_server(struct addrinfo *addr, int flags)
 	struct timeval ptime;
 	struct timeval stime;
 	char *tsstr = calloc(T_TIME_BUF, sizeof(char));
-	char *tscstr = calloc(T_TIME_BUF, sizeof(char));
+	CHKALLOC(tsstr);
 	/* *tm will be used to point to localtime's statically
 	 * allocated memory, does not need to be allocated/freed
 	 * manually */
