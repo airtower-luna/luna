@@ -111,7 +111,7 @@ int run_server(struct addrinfo *addr, int flags)
 		{
 			tm = localtime(&(ptime.tv_sec));
 			strftime(tsstr, T_TIME_BUF, "%s", tm);
-			printf("%s.%06ld\t%s\t%s\t%i\t%i\n",
+			printf("%s%06ld\t%s\t%s\t%i\t%i\n",
 			       tsstr, ptime.tv_usec,
 			       addrstr, portstr, seq, (int) recvlen);
 		}
