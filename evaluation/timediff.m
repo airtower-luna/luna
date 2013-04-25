@@ -5,14 +5,17 @@
 function eval_kutime(ktime, utime, filename)
   timediff = utime .- ktime;
   u = max(timediff);
+  m = median(timediff);
   l = min(timediff);
-  printf("Upper limit: %ld\n", u);
-  printf("Lower limit: %ld\n", l);
-  printf("Average: %ld\n", mean(timediff));
-  printf("Median: %ld\n", median(timediff));
-  printf("Standard deviation: %ld\n", std(timediff));
+  s = std(timediff);
+  printf("\nEvaluation of differences between kernel and user space arrival times\n");
+  printf("Upper limit: %ld µs\n", u);
+  printf("Lower limit: %ld µs\n", l);
+  printf("Average: %ld µs\n", mean(timediff));
+  printf("Median: %ld µs\n", m);
+  printf("Standard deviation: %ld µs\n", s);
 
-  hist(timediff, [l:150], 1);
+  hist(timediff, [l:(m + 2 * s)], 1);
   title("Distribution of difference between kernel and user space arrival times [us]");
 
   if exist("filename", "var") && ischar(filename)
