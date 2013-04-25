@@ -1,0 +1,4 @@
+src/		C source code of the traffic generator
+
+evaluation/	Octave scripts and related stuff to evalutate the
+		output from fast-tg
