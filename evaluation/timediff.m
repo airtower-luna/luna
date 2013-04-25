@@ -51,6 +51,24 @@ endfunction
 
 
 
+function chk_seq(seq)
+  len = length(seq);
+  m = max(seq);
+  printf("%i data sets present, maximum sequence number is %i", len, m);
+  lost = (m + 1) - len;
+  if (lost == 0)
+    printf(", no packets lost.\n");
+  else
+    if (lost == 1)
+      printf(", %i packet lost.\n", lost);
+    else
+      printf(", %i packets lost.\n", lost);
+    endif
+  endif
+endfunction
+
+
+
 # read arguments and get the input file's name
 arg_list = argv();
 if nargin() < 1
@@ -67,6 +85,9 @@ printf("%i data sets\n", length(A));
 ktime = A( :, 1);
 # second column: arrival time (user space)
 utime = A( :, 2);
+# 5th column: sequence numbers
+seqnos = A( :, 5);
 
+chk_seq(seqnos);
 eval_kutime(ktime, utime, filename);
 eval_iat(ktime, filename);
