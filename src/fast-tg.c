@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 	if (client)
 	{
 		struct timespec interval = {0, 1000000};
-		return run_client(res, &interval, 4, 20);
+		return run_client(res, &interval, 4, 1000);
 	}
 
 	if (server)
