@@ -23,6 +23,31 @@ endfunction
 
 
 
+# calculate inter arrival times
+function eval_iat(ktime, filename)
+  iats = diff(ktime);
+  u = max(iats);
+  m = median(iats);
+  l = min(iats);
+  s = std(iats);
+  printf("\nEvaluation of inter arrival times\n");
+  printf("Upper limit: %ld µs\n", u);
+  printf("Lower limit: %ld µs\n", l);
+  printf("Average: %ld µs\n", mean(iats));
+  printf("Median: %ld µs\n", m);
+  printf("Standard deviation: %ld µs\n", s);
+
+  hist(iats, [(m - 2 * s):(m + 2 * s)], 1);
+  title("Distribution of inter arrival times [us]");
+
+  if exist("filename", "var") && ischar(filename)
+    plotfile = strcat(filename, "-iat.jpg");
+    print(plotfile, "-djpg");
+  endif
+endfunction
+
+
+
 # read arguments and get the input file's name
 arg_list = argv();
 if nargin() < 1
@@ -41,3 +66,4 @@ ktime = A( :, 1);
 utime = A( :, 2);
 
 eval_kutime(ktime, utime, filename);
+eval_iat(ktime, filename);
