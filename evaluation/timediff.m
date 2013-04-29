@@ -40,7 +40,7 @@ function eval_iat(ktime, filename)
   printf("Median: %ld µs\n", m);
   printf("Standard deviation: %ld µs\n", s);
 
-  hist(iats, [(m - 2 * s):(m + 2 * s)], 1);
+  hist(iats, [max(l, (m - 2 * s)):min(u, (m + 2 * s))], 1);
   title("Distribution of inter arrival times [us]");
 
   if exist("filename", "var") && ischar(filename)
