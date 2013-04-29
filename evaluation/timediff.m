@@ -65,6 +65,21 @@ function chk_seq(seq)
       printf(", %i packets lost.\n", lost);
     endif
   endif
+
+  maxseq = seq(1);
+  for i = 2:(len-1)
+    if seq(i) > maxseq
+      maxseq = seq(i);
+    else
+      if seq(i) < maxseq
+	printf("Reordering occurred: Packet %i arrived after Packet %i\n",
+	       seq(i), maxseq);
+      else
+	printf("Error: Sequence number %i was detected more than once!\n",
+	       seq(i));
+      endif
+    endif
+  endfor
 endfunction
 
 
