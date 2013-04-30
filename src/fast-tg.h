@@ -10,6 +10,9 @@
 /* exit code for memory errors */
 #define EXIT_MEMFAIL 3
 
+/* 1s = 1000000µs */
+#define US_PER_S 1000000
+
 /* macro and function to check if memory allocation was successful */
 #define CHKALLOC(a) chkalloc(a, __FILE__, __LINE__)
 void chkalloc(void *ptr, char *file, int line);

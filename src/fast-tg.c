@@ -18,7 +18,7 @@
 #include "client.h"
 
 /* valid command line options for getopt */
-#define CLI_OPTS "sc:p:46TS:"
+#define CLI_OPTS "sc:p:46TS:i:"
 
 void chkalloc(void *ptr, char *file, int line)
 {
@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
 	int client = 0;
 	int flags = 0;
 	int psize = 4;
+	int interval = 1000;
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
 	char *host = NULL;
@@ -108,6 +109,9 @@ int main(int argc, char *argv[])
 		case 'S': // configure packet size (client only)
 			psize = atoi(optarg);
 			break;
+		case 'i': // configure packet interval (µs, client only)
+			interval = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -153,8 +157,10 @@ int main(int argc, char *argv[])
 
 	if (client)
 	{
-		struct timespec interval = {0, 1000000};
-		return run_client(res, &interval, psize, 1000);
+		struct timespec in;
+		in.tv_sec = interval / US_PER_S;
+		in.tv_nsec = (interval % US_PER_S) * 1000;
+		return run_client(res, &in, psize, 1000);
 	}
 
 	if (server)
