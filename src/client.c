@@ -26,7 +26,7 @@
  * count: number of packets to send
  */
 int run_client(struct addrinfo *addr, struct timespec *interval,
-	       size_t size, int count)
+	       size_t size, int time)
 {
 	if (size < MIN_PACKET_SIZE)
 		size = MIN_PACKET_SIZE;
@@ -58,8 +58,11 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	struct timespec nexttick = {0, 0};
 	struct timespec rem = {0, 0};
 	clock_gettime(CLOCK_MONOTONIC, &nexttick);
+	struct timespec end = {nexttick.tv_sec + time, nexttick.tv_nsec};
 
-	for (int i = 0; i < count; i++)
+	for (int i = 0;
+	     nexttick.tv_sec < end.tv_sec || nexttick.tv_nsec < end.tv_nsec;
+	     i++)
 	{
 		*seq = htonl(i);
 		timespecadd(&nexttick, interval, &nexttick);
