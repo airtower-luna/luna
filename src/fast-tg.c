@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
 	int server = 0;
 	int client = 0;
-	int flags = 0;
+	int flags = SERVER_SIGTERM_EXIT;
 	int psize = 4;
 	int interval = 1000;
 	int time = 1;

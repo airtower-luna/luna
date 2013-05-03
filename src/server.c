@@ -4,8 +4,10 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -27,6 +29,9 @@
 /* buffer size for time string (%T or %s of strftime, with some room
  * to spare for the latter) */
 #define T_TIME_BUF 16
+
+/* changed to 0 by SIGTERM to stop the receive loop */
+int work = 1;
 
 int run_server(struct addrinfo *addr, int flags)
 {
@@ -63,6 +68,15 @@ int run_server(struct addrinfo *addr, int flags)
 	}
 	freeaddrinfo(addr); // no longer required
 
+	/* configure graceful exit on SIGTERM, if requested */
+	if (flags & SERVER_SIGTERM_EXIT)
+	{
+		struct sigaction act;
+		memset(&act, 0, sizeof(struct sigaction));
+		act.sa_handler = term_server;
+		sigaction(SIGTERM, &act, NULL);
+	}
+
 	size_t buflen = MSG_BUF_SIZE;
 	void *buf = malloc(buflen);
 	CHKALLOC(buf);
@@ -90,7 +104,6 @@ int run_server(struct addrinfo *addr, int flags)
 	if (flags & SERVER_TSV_OUTPUT)
 		printf("# time\tsource\tport\tsequence\tsize\n");
 
-	int work = 1; // could be changed by SIGTERM later
 	while (work)
 	{
 		addrlen = ADDRBUF_SIZE;
@@ -107,6 +120,12 @@ int run_server(struct addrinfo *addr, int flags)
 			    NI_DGRAM | NI_NUMERICHOST | NI_NUMERICSERV); // TODO: error check
 
 		seq = ntohl(*((int *) buf));
+
+		/* This should only happen when recvlen is cancelled
+		 * by SIGTERM. */
+		if (recvlen == -1)
+			continue;
+
 		if (flags & SERVER_TSV_OUTPUT)
 		{
 			tm = localtime(&(ptime.tv_sec));
@@ -133,4 +152,11 @@ int run_server(struct addrinfo *addr, int flags)
 	free(portstr);
 	free(buf);
 	close(sock);
+}
+
+
+
+void term_server(int signum)
+{
+    work = 0;
 }
