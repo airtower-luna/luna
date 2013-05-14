@@ -100,7 +100,6 @@ int run_server(struct addrinfo *addr, int flags)
 	 * manually */
 	struct tm *tm;
 
-	setlinebuf(stdout);
 	if (flags & SERVER_TSV_OUTPUT)
 		printf("# time\tsource\tport\tsequence\tsize\n");
 
@@ -145,6 +144,7 @@ int run_server(struct addrinfo *addr, int flags)
 		}
 	}
 
+	fflush(NULL);
 	free(tsstr);
 	free(tscstr);
 	free(addrbuf);
