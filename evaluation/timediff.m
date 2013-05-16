@@ -2,7 +2,7 @@
 
 # function to calculate and plot the differences between kernel and user
 # space arrival times
-function eval_kutime(ktime, utime, filename)
+function eval_kutime(ktime, utime, filename, output_format)
   timediff = utime .- ktime;
   u = max(timediff);
   m = median(timediff);
@@ -18,9 +18,10 @@ function eval_kutime(ktime, utime, filename)
   hist(timediff, [l:(m + 2 * s)], 1);
   title("Distribution of difference between kernel and user space arrival times [us]");
 
-  if exist("filename", "var") && ischar(filename)
-    plotfile = strcat(filename, "-kutime.jpg");
-    print(plotfile, "-djpg");
+  if (exist("filename", "var") && exist("output_format", "var")
+      && ischar(filename) && ischar(output_format))
+    plotfile = strcat(filename, "-kutime.", output_format);
+    print(plotfile, strcat("-d", output_format));
   endif
 endfunction
 
@@ -87,7 +88,7 @@ endfunction
 # read arguments and get the input file's name
 arg_list = argv();
 if nargin() < 1
-  printf("Usage: %s FILENAME", program_name());
+  printf("Usage: %s FILENAME [FORMAT]", program_name());
   exit(1);
 endif
 
@@ -103,6 +104,11 @@ utime = A( :, 2);
 # 5th column: sequence numbers
 seqnos = A( :, 5);
 
+output_format = "jpg";
+if nargin() > 1
+  output_format = arg_list{2};
+endif
+
 chk_seq(seqnos);
-eval_kutime(ktime, utime, filename);
+eval_kutime(ktime, utime, filename, output_format);
 eval_iat(ktime, filename);
