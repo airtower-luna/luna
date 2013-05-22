@@ -1,5 +1,8 @@
 #!/usr/bin/octave -qf
 
+# maximum number of bins to use when plotting with the hist function
+global max_hist_bins = 200;
+
 function print_format(filename, output_format)
   if (exist("filename", "var") && exist("output_format", "var")
       && ischar(filename) && ischar(output_format))
@@ -22,7 +25,13 @@ function eval_kutime(ktime, utime, filename, output_format)
   printf("Median: %ld µs\n", m);
   printf("Standard deviation: %ld µs\n", s);
 
-  hist(timediff, [l:(m + 2 * s)], 1);
+  global max_hist_bins;
+  # upper plot limit (median + 2 * standard deviation
+  ul = (m + 2 * s);
+  binwidth = max(1, (ul - l) / max_hist_bins);
+  range = [l:binwidth:ul];
+  hist(timediff, range, 1);
+  axis([min((range(1) - binwidth / 2), 0) (range(end) + binwidth / 2)]);
   title("Distribution of difference between kernel and user space arrival times [us]");
 
   print_format(strcat(filename, "-kutime.", output_format), output_format);
