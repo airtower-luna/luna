@@ -26,8 +26,10 @@ function eval_kutime(ktime, utime, filename, output_format)
   printf("Standard deviation: %ld µs\n", s);
 
   global max_hist_bins;
-  # upper plot limit (median + 2 * standard deviation
+  # upper plot limit (median + 2 * standard deviation)
   ul = (m + 2 * s);
+  # bin width is at least one, otherwise range is split evenly in
+  # max_hist_bins bins
   binwidth = max(1, (ul - l) / max_hist_bins);
   range = [l:binwidth:ul];
   hist(timediff, range, 1);
@@ -53,7 +55,17 @@ function eval_iat(ktime, filename, output_format)
   printf("Median: %ld µs\n", m);
   printf("Standard deviation: %ld µs\n", s);
 
-  hist(iats, [max(l, (m - 2 * s)):min(u, (m + 2 * s))], 1);
+  global max_hist_bins;
+  # lower plot limit (median - 2 * standard deviation)
+  ll = max(l, (m - 2 * s));
+  # upper plot limit (median + 2 * standard deviation)
+  ul = min(u, (m + 2 * s));
+  # bin width is at least one, otherwise range is split evenly in
+  # max_hist_bins bins
+  binwidth = max(1, (ul - ll) / max_hist_bins);
+  range = [ll:binwidth:ul];
+  hist(iats, range, 1);
+  axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)]);
   title("Distribution of inter arrival times [us]");
 
   print_format(strcat(filename, "-iat.", output_format), output_format);
