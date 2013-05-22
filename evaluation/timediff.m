@@ -1,5 +1,12 @@
 #!/usr/bin/octave -qf
 
+function print_format(filename, output_format)
+  if (exist("filename", "var") && exist("output_format", "var")
+      && ischar(filename) && ischar(output_format))
+    print(filename, strcat("-d", output_format));
+  endif
+endfunction
+
 # function to calculate and plot the differences between kernel and user
 # space arrival times
 function eval_kutime(ktime, utime, filename, output_format)
@@ -18,11 +25,7 @@ function eval_kutime(ktime, utime, filename, output_format)
   hist(timediff, [l:(m + 2 * s)], 1);
   title("Distribution of difference between kernel and user space arrival times [us]");
 
-  if (exist("filename", "var") && exist("output_format", "var")
-      && ischar(filename) && ischar(output_format))
-    plotfile = strcat(filename, "-kutime.", output_format);
-    print(plotfile, strcat("-d", output_format));
-  endif
+  print_format(strcat(filename, "-kutime.", output_format), output_format);
 endfunction
 
 
