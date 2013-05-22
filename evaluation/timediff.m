@@ -31,7 +31,7 @@ endfunction
 
 
 # calculate inter arrival times
-function eval_iat(ktime, filename)
+function eval_iat(ktime, filename, output_format)
   iats = diff(ktime);
   u = max(iats);
   m = median(iats);
@@ -47,10 +47,7 @@ function eval_iat(ktime, filename)
   hist(iats, [max(l, (m - 2 * s)):min(u, (m + 2 * s))], 1);
   title("Distribution of inter arrival times [us]");
 
-  if exist("filename", "var") && ischar(filename)
-    plotfile = strcat(filename, "-iat.jpg");
-    print(plotfile, "-djpg");
-  endif
+  print_format(strcat(filename, "-iat.", output_format), output_format);
 endfunction
 
 
@@ -114,4 +111,4 @@ endif
 
 chk_seq(seqnos);
 eval_kutime(ktime, utime, filename, output_format);
-eval_iat(ktime, filename);
+eval_iat(ktime, filename, output_format);
