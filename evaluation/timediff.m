@@ -65,7 +65,13 @@ function eval_iat(ktime, filename, output_format)
   binwidth = max(1, (ul - ll) / max_hist_bins);
   range = [ll:binwidth:ul];
   hist(iats, range, 1);
-  axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)]);
+
+  if (m < s)
+    axis([0 (range(end) + binwidth / 2)]);
+  else
+    axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)]);
+  endif
+
   title("Distribution of inter arrival times [us]");
 
   print_format(strcat(filename, "-iat.", output_format), output_format);
