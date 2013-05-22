@@ -57,11 +57,12 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	/* timespecs for the timer */
 	struct timespec nexttick = {0, 0};
 	struct timespec rem = {0, 0};
+	struct timespec now = {0, 0};
 	clock_gettime(CLOCK_MONOTONIC, &nexttick);
 	struct timespec end = {nexttick.tv_sec + time, nexttick.tv_nsec};
 
 	for (int i = 0;
-	     nexttick.tv_sec < end.tv_sec || nexttick.tv_nsec < end.tv_nsec;
+	     now.tv_sec < end.tv_sec || now.tv_nsec < end.tv_nsec;
 	     i++)
 	{
 		*seq = htonl(i);
@@ -70,6 +71,9 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 				&nexttick, &rem); // TODO: error check
 		if (send(sock, buf, size, 0) == -1)
 			perror("Error while sending");
+		/* get the current time, needed to stop the loop at
+		 * the right time */
+		clock_gettime(CLOCK_MONOTONIC, &now);
 	}
 
 	close(sock);
