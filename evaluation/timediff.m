@@ -17,14 +17,21 @@ endfunction
 
 
 
+function [max, min, med, std] = basic_metrics(a)
+  max = max(a);
+  min = min(a);
+  med = median(a);
+  std = std(a);
+  return;
+endfunction
+
+
+
 # function to calculate and plot the differences between kernel and user
 # space arrival times
 function eval_kutime(ktime, utime, filename, output_format)
   timediff = utime .- ktime;
-  u = max(timediff);
-  m = median(timediff);
-  l = min(timediff);
-  s = std(timediff);
+  [u, l, m, s] = basic_metrics(timediff);
   printf("\nEvaluation of differences between kernel and user space arrival times\n");
   printf("Upper limit: %ld µs\n", u);
   printf("Lower limit: %ld µs\n", l);
@@ -50,12 +57,8 @@ endfunction
 
 # calculate inter arrival times
 function eval_iat(filename, output_format, varargin)
-  ktime = varargin{1};
-  iats = diff(ktime);
-  u = max(iats);
-  m = median(iats);
-  l = min(iats);
-  s = std(iats);
+  iats = diff(varargin{1});
+  [u, l, m, s] = basic_metrics(iats);
   printf("\nEvaluation of inter arrival times\n");
   printf("Upper limit: %ld µs\n", u);
   printf("Lower limit: %ld µs\n", l);
