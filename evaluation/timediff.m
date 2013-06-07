@@ -49,7 +49,8 @@ endfunction
 
 
 # calculate inter arrival times
-function eval_iat(ktime, filename, output_format)
+function eval_iat(filename, output_format, varargin)
+  ktime = varargin{1};
   iats = diff(ktime);
   u = max(iats);
   m = median(iats);
@@ -186,5 +187,5 @@ for i = 1:length(files);
   if parser.Results.kutime
     eval_kutime(ktime, utime, filename, output_format);
   endif
-  eval_iat(ktime, filename, output_format);
+  eval_iat(filename, output_format, ktime);
 endfor
