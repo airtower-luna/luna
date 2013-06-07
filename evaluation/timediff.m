@@ -171,7 +171,10 @@ for i = 1:length(files);
   A = dlmread(filename, "\t", 1, 0);
   printf("%i data sets\n", length(A));
   ktime = A( :, ktime_col);
-  utime = A( :, utime_col);
+  # read utime column only if requested (otherwise, it might not exist)
+  if exist("utime_col", "var")
+    utime = A( :, utime_col);
+  endif
   seqnos = A( :, sequence_col);
 
   chk_seq(seqnos);
