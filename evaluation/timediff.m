@@ -1,5 +1,8 @@
 #!/usr/bin/octave -qf
 
+# inputParser is used for command line options
+pkg load general;
+
 # maximum number of bins to use when plotting with the hist function
 global max_hist_bins = 200;
 
@@ -114,12 +117,32 @@ endfunction
 
 # read arguments and get the input file's name
 arg_list = argv();
-if nargin() < 1
-  printf("Usage: %s FILENAME [FORMAT]", program_name());
+
+# Search for "--" in the command line arguments, if found, split between
+# options and files at that point. Otherwise, all arguments are file names.
+files = arg_list;
+opts = {};
+for i = 1:nargin()
+  if strcmp(arg_list(i), "--")
+    opts = arg_list(1:i-1);
+    files = arg_list(i+1:nargin());
+    break;
+  endif
+endfor
+
+# parse options
+parser = inputParser;
+parser.CaseSensitive = true;
+parser = parser.addParamValue("format", "jpg");
+parser = parser.addSwitch("kutime");
+parser = parser.parse(opts{:});
+
+if length(files) < 1
+  printf("Usage: %s [OPTIONS --] FILENAME", program_name());
   exit(1);
 endif
 
-filename = arg_list{1};
+filename = files{1};
 printf("Reading data from %s: ", filename);
 # read test output
 A = dlmread(filename, "\t", 1, 0);
@@ -131,11 +154,10 @@ utime = A( :, 2);
 # 5th column: sequence numbers
 seqnos = A( :, 5);
 
-output_format = "jpg";
-if nargin() > 1
-  output_format = arg_list{2};
-endif
+output_format = parser.Results.format;
 
 chk_seq(seqnos);
-eval_kutime(ktime, utime, filename, output_format);
+if parser.Results.kutime
+  eval_kutime(ktime, utime, filename, output_format);
+endif
 eval_iat(ktime, filename, output_format);
