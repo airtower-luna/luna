@@ -146,17 +146,30 @@ if length(files) < 1
   exit(1);
 endif
 
+# variables for column meanings
+ktime_col = 1;
+# if there is no user space time column, the following columns shift
+if parser.Results.kutime
+  utime_col = 2;
+  source_col = 3;
+  port_col = 4;
+  sequence_col = 5;
+  size_col = 6;
+else
+  source_col = 2;
+  port_col = 3;
+  sequence_col = 4;
+  size_col = 5;
+endif
+
 filename = files{1};
 printf("Reading data from %s: ", filename);
 # read test output
 A = dlmread(filename, "\t", 1, 0);
 printf("%i data sets\n", length(A));
-# first column: arrival time (kernel)
-ktime = A( :, 1);
-# second column: arrival time (user space)
-utime = A( :, 2);
-# 5th column: sequence numbers
-seqnos = A( :, 5);
+ktime = A( :, ktime_col);
+utime = A( :, utime_col);
+seqnos = A( :, sequence_col);
 
 output_format = parser.Results.format;
 
