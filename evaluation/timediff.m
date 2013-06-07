@@ -164,6 +164,10 @@ endif
 
 output_format = parser.Results.format;
 
+# this cell array collects kernel arrival times for all files so they can
+# be compared
+times = {};
+
 for i = 1:length(files);
   filename = files{i}
   printf("Reading data from %s: ", filename);
@@ -171,6 +175,7 @@ for i = 1:length(files);
   A = dlmread(filename, "\t", 1, 0);
   printf("%i data sets\n", length(A));
   ktime = A( :, ktime_col);
+  times{i} = ktime;
   # read utime column only if requested (otherwise, it might not exist)
   if exist("utime_col", "var")
     utime = A( :, utime_col);
