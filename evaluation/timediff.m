@@ -57,27 +57,35 @@ endfunction
 
 # calculate inter arrival times
 function eval_iat(filename, output_format, varargin)
-  iats = diff(varargin{1});
-  [u, l, m, s] = basic_metrics(iats);
-  printf("\nEvaluation of inter arrival times\n");
-  printf("Upper limit: %ld µs\n", u);
-  printf("Lower limit: %ld µs\n", l);
-  printf("Average: %ld µs\n", mean(iats));
-  printf("Median: %ld µs\n", m);
-  printf("Standard deviation: %ld µs\n", s);
+  for i = 1:length(varargin)
+    iats{i} = diff(varargin{i});
+    [u{i}, l{i}, m{i}, s{i}] = basic_metrics(iats{i});
+
+    # lower plot limit (median - 2 * standard deviation)
+    ll{i} = max(l{i}, (m{i} - 2 * s{i}));
+    # upper plot limit (median + 2 * standard deviation)
+    ul{i} = min(u{i}, (m{i} + 2 * s{i}));
+  endfor
+
+  # printing a summary doesn't make sense for more than one data set
+  if (length(varargin) == 1)
+    printf("\nEvaluation of inter arrival times\n");
+    printf("Upper limit: %ld µs\n", u{1});
+    printf("Lower limit: %ld µs\n", l{1});
+    printf("Average: %ld µs\n", mean(iats{1}));
+    printf("Median: %ld µs\n", m{1});
+    printf("Standard deviation: %ld µs\n", s{1});
+  endif
 
   global max_hist_bins;
-  # lower plot limit (median - 2 * standard deviation)
-  ll = max(l, (m - 2 * s));
-  # upper plot limit (median + 2 * standard deviation)
-  ul = min(u, (m + 2 * s));
   # bin width is at least one, otherwise range is split evenly in
   # max_hist_bins bins
-  binwidth = max(1, (ul - ll) / max_hist_bins);
-  range = [ll:binwidth:ul];
-  hist(iats, range, 1);
+  binwidth = max(1, (max(ul{:}) - min(ll{:})) / max_hist_bins);
+  range = [min(ll{:}):binwidth:max(ul{:})];
+  hist(iats{1}, range, 1);
 
-  if (m < s)
+  [minm, mini] = min([m{:}]);
+  if (minm < s{mini})
     axis([0 (range(end) + binwidth / 2)]);
   else
     axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)]);
