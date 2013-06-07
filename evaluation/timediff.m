@@ -6,12 +6,16 @@ pkg load general;
 # maximum number of bins to use when plotting with the hist function
 global max_hist_bins = 200;
 
+
+
 function print_format(filename, output_format)
   if (exist("filename", "var") && exist("output_format", "var")
       && ischar(filename) && ischar(output_format))
     print(filename, strcat("-d", output_format));
   endif
 endfunction
+
+
 
 # function to calculate and plot the differences between kernel and user
 # space arrival times
@@ -133,12 +137,12 @@ endfor
 # parse options
 parser = inputParser;
 parser.CaseSensitive = true;
-parser = parser.addParamValue("format", "jpg");
+parser = parser.addParamValue("format", "jpg", @ischar);
 parser = parser.addSwitch("kutime");
 parser = parser.parse(opts{:});
 
 if length(files) < 1
-  printf("Usage: %s [OPTIONS --] FILENAME", program_name());
+  printf("Usage: %s [[OPTIONS] --] FILENAME [MORE FILES]", program_name());
   exit(1);
 endif
 
