@@ -162,19 +162,21 @@ else
   size_col = 5;
 endif
 
-filename = files{1};
-printf("Reading data from %s: ", filename);
-# read test output
-A = dlmread(filename, "\t", 1, 0);
-printf("%i data sets\n", length(A));
-ktime = A( :, ktime_col);
-utime = A( :, utime_col);
-seqnos = A( :, sequence_col);
-
 output_format = parser.Results.format;
 
-chk_seq(seqnos);
-if parser.Results.kutime
-  eval_kutime(ktime, utime, filename, output_format);
-endif
-eval_iat(ktime, filename, output_format);
+for i = 1:length(files);
+  filename = files{i}
+  printf("Reading data from %s: ", filename);
+  # read test output
+  A = dlmread(filename, "\t", 1, 0);
+  printf("%i data sets\n", length(A));
+  ktime = A( :, ktime_col);
+  utime = A( :, utime_col);
+  seqnos = A( :, sequence_col);
+
+  chk_seq(seqnos);
+  if parser.Results.kutime
+    eval_kutime(ktime, utime, filename, output_format);
+  endif
+  eval_iat(ktime, filename, output_format);
+endfor
