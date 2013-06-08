@@ -75,6 +75,12 @@ function eval_iat(filename, output_format, varargin)
     printf("Average: %ld µs\n", mean(iats{1}));
     printf("Median: %ld µs\n", m{1});
     printf("Standard deviation: %ld µs\n", s{1});
+  else
+    metrics = [0, 0, 0, 0];
+    for i = 1:length(iats)
+      metrics(i, :) = [u{i}, l{i}, m{i}, s{i}];
+    endfor
+    metrics
   endif
 
   global max_hist_bins;
