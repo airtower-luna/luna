@@ -88,7 +88,16 @@ function eval_iat(filename, output_format, varargin)
   # max_hist_bins bins
   binwidth = max(1, (max(ul{:}) - min(ll{:})) / max_hist_bins);
   range = [min(ll{:}):binwidth:max(ul{:})];
+
+  # plot the histogram(s)
   hist(iats{1}, range, 1);
+  if (length(iats) > 1)
+    hold on;
+    for i = 2:length(iats)
+      hist(iats{i}, range, 1);
+    endfor
+    hold off;
+  endif
 
   [minm, mini] = min([m{:}]);
   if (minm < s{mini})
