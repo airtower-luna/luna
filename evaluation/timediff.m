@@ -89,15 +89,22 @@ function eval_iat(filename, output_format, varargin)
   binwidth = max(1, (max(ul{:}) - min(ll{:})) / max_hist_bins);
   range = [min(ll{:}):binwidth:max(ul{:})];
 
+  # configure graphics
+  graphics_toolkit("fltk");
+  colors = {"blue", "red", "green", "magenta", "black", "cyan", "yellow"};
+
   # plot the histogram(s)
-  hist(iats{1}, range, 1);
-  if (length(iats) > 1)
-    hold on;
-    for i = 2:length(iats)
-      hist(iats{i}, range, 1);
-    endfor
-    hold off;
-  endif
+  clf;
+  hold on;
+  for i = 1:length(iats)
+    [yh, xh] = hist(iats{i}, range, 1);
+    [ys, xs] = stairs(yh, xh);
+    xs = [xs(1); xs; xs(end)];
+    ys = [0; ys; 0];
+    h{i} = fill(xs, ys, colors{i});
+    set(h{i}, "edgecolor", colors{i}, "facecolor", colors{i}, "facealpha", 0.5);
+  endfor
+  hold off;
 
   [minm, mini] = min([m{:}]);
   if (minm < s{mini})
