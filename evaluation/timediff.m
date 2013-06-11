@@ -173,7 +173,7 @@ endfor
 # parse options
 parser = inputParser;
 parser.CaseSensitive = true;
-parser = parser.addParamValue("format", "jpg", @ischar);
+parser = parser.addParamValue("format", "png", @ischar);
 parser = parser.addSwitch("kutime");
 parser = parser.parse(opts{:});
 
