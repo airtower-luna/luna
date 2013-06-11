@@ -6,6 +6,9 @@ pkg load general;
 # maximum number of bins to use when plotting with the hist function
 global max_hist_bins = 200;
 
+# graphics configuration
+graphics_toolkit("fltk");
+global colors = {"blue", "red", "green", "magenta", "black", "cyan", "yellow"};
 
 
 function print_format(filename, output_format)
@@ -89,9 +92,8 @@ function eval_iat(filename, output_format, varargin)
   binwidth = max(1, (max(ul{:}) - min(ll{:})) / max_hist_bins);
   range = [min(ll{:}):binwidth:max(ul{:})];
 
-  # configure graphics
-  graphics_toolkit("fltk");
-  colors = {"blue", "red", "green", "magenta", "black", "cyan", "yellow"};
+  # use global color list for combined diagrams
+  global colors;
 
   # plot the histogram(s)
   clf;
