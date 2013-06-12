@@ -173,7 +173,11 @@ endfor
 # parse options
 parser = inputParser;
 parser.CaseSensitive = true;
+# output format
 parser = parser.addParamValue("format", "png", @ischar);
+# output file name for comparison (if applicable)
+parser = parser.addParamValue("compare_out", "compare", @ischar);
+# set this flag if the input file(s) contain(s) user space arrival times
 parser = parser.addSwitch("kutime");
 parser = parser.parse(opts{:});
 
@@ -227,3 +231,7 @@ for i = 1:length(files);
     eval_iat(filename, output_format, ktime);
   endif
 endfor
+
+if (length(times) > 1)
+  eval_iat(parser.Results.compare_out, output_format, times{:});
+endif
