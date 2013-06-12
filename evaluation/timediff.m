@@ -219,8 +219,11 @@ for i = 1:length(files);
   seqnos = A( :, sequence_col);
 
   chk_seq(seqnos);
-  if parser.Results.kutime
-    eval_kutime(ktime, utime, filename, output_format);
+  # do individual evaluation only when processing a single file
+  if (length(files) == 1)
+    if parser.Results.kutime
+      eval_kutime(ktime, utime, filename, output_format);
+    endif
+    eval_iat(filename, output_format, ktime);
   endif
-  eval_iat(filename, output_format, ktime);
 endfor
