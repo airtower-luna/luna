@@ -65,9 +65,9 @@ function eval_iat(filename, output_format, varargin)
     [u{i}, l{i}, m{i}, s{i}] = basic_metrics(iats{i});
 
     # lower plot limit (median - 2 * standard deviation)
-    ll{i} = max(l{i}, (m{i} - 2 * s{i}));
+    ll(i) = max(l{i}, (m{i} - 2 * s{i}));
     # upper plot limit (median + 2 * standard deviation)
-    ul{i} = min(u{i}, (m{i} + 2 * s{i}));
+    ul(i) = min(u{i}, (m{i} + 2 * s{i}));
   endfor
 
   # printing a summary doesn't make sense for more than one data set
@@ -89,8 +89,8 @@ function eval_iat(filename, output_format, varargin)
   global max_hist_bins;
   # bin width is at least one, otherwise range is split evenly in
   # max_hist_bins bins
-  binwidth = max(1, (max(ul{:}) - min(ll{:})) / max_hist_bins);
-  range = [min(ll{:}):binwidth:max(ul{:})];
+  binwidth = max(1, (max(ul) - min(ll)) / max_hist_bins);
+  range = [min(ll):binwidth:max(ul)];
 
   # use global color list for combined diagrams
   global colors;
