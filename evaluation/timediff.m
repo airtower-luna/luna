@@ -98,6 +98,7 @@ function eval_iat(filename, output_format, varargin)
   clf;
   hold on;
   axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)], "autoy");
+  set(gca, "yscale", "log");
   title("Distribution of inter arrival times [us]");
 
   # plot the histogram(s)
