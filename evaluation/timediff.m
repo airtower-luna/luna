@@ -88,8 +88,10 @@ function eval_iat(filename, output_format, varargin)
   global max_hist_bins;
   # bin width is at least one, otherwise range is split evenly in
   # max_hist_bins bins
-  binwidth = max(1, (max(ul) - min(ll)) / max_hist_bins);
-  range = [min(ll):binwidth:max(ul)];
+  range_lower = min(ll);
+  range_upper = max(ul);
+  binwidth = max(1, (range_upper - range_lower) / max_hist_bins);
+  range = [range_lower:binwidth:range_upper];
 
   # use global color list for combined diagrams
   global colors;
