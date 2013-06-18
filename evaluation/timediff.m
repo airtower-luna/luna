@@ -83,7 +83,6 @@ function eval_iat(filename, output_format, varargin)
     for i = 1:length(iats)
       metrics(i, :) = [u{i}, l{i}, m{i}, s{i}];
     endfor
-    metrics
   endif
 
   global max_hist_bins;
@@ -95,27 +94,25 @@ function eval_iat(filename, output_format, varargin)
   # use global color list for combined diagrams
   global colors;
 
-  # plot the histogram(s)
+  # basic figure setup
   clf;
   hold on;
+  axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)], "autoy");
+  title("Distribution of inter arrival times [us]");
+
+  # plot the histogram(s)
   for i = 1:length(iats)
-    [yh, xh] = hist(iats{i}, range, 1);
-    [ys, xs] = stairs(yh, xh);
-    xs = [xs(1); xs; xs(end)];
-    ys = [0; ys; 0];
+    [yh xh] = hist(iats{i}, range, 1);
+    [ys xs] = stairs(yh, xh);
+    xs = [xs(1) - binwidth; xs(1) - binwidth; xs; xs(end)];
+    xs = xs .+ (binwidth / 2);
+    ys = [0; ys(1); ys; 0];
     h{i} = fill(xs, ys, colors{i});
     set(h{i}, "edgecolor", colors{i}, "facecolor", colors{i}, "facealpha", 0.5);
   endfor
+
+  # figure complete
   hold off;
-
-  [minm, mini] = min([m{:}]);
-  if (minm < s{mini})
-    axis([0 (range(end) + binwidth / 2)]);
-  else
-    axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)]);
-  endif
-
-  title("Distribution of inter arrival times [us]");
 
   print_format(strcat(filename, "-iat.", output_format), output_format);
 endfunction
