@@ -88,7 +88,7 @@ function eval_iat(filename, output_format, varargin)
   global max_hist_bins;
   # bin width is at least one, otherwise range is split evenly in
   # max_hist_bins bins
-  range_lower = min(ll);
+  range_lower = max([min(ll) 0]);
   range_upper = max(ul);
   binwidth = max(1, (range_upper - range_lower) / max_hist_bins);
   range = [range_lower:binwidth:range_upper];
