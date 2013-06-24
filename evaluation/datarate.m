@@ -87,28 +87,35 @@ endfor
 
 # TODO: configurable step size
 #step = 1000;
-step = max(dur) / 500;
+step = max(dur) / 200;
 halfstep = step / 2;
 points = 0:step:max(dur);
-rates = [];
+rates = {};
 for i = 1:length(files);
   idx = 1;
+  rates{i} = [];
   for j = 1:length(points)
     t = points(j);
-    rates(j) = 0;
+    rates{i}(j) = 0;
     while idx <= length(ktimes{i}) && ktimes{i}(idx) < (t + halfstep)
-      rates(j) = rates(j) + sizes{i}(idx);
+      rates{i}(j) = rates{i}(j) + sizes{i}(idx);
       idx = idx + 1;
     endwhile
   endfor
   # byte to bit
-  rates = rates .* 8;
+  rates{i} = rates{i} .* 8;
   # bit per step to bit per second
-  rates = rates ./ step .* 1000000;
+  rates{i} = rates{i} ./ step .* 1000000;
 endfor
 
-#points = [points(1), points, points(end)];
-#rates = [0, rates, 0];
 points = points ./ 1000000;
-plot(points, rates);
-print_format(strcat("datarate-", num2str(step, "%d"), ".png"), "png");
+clf;
+hold on;
+h = {};
+for i = 1:length(rates);
+  h{i} = plot(points, rates{i});
+  set(h{i}, "color", colors{i});
+endfor
+hold off;
+print_format(strcat("datarate-", num2str(step, "%d"), ".", output_format),
+	     output_format);
