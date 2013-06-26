@@ -111,6 +111,8 @@ endfor
 points = points ./ 1000000;
 clf;
 hold on;
+xlabel("Time [s]");
+ylabel("Data rate [bit/s]");
 h = {};
 for i = 1:length(rates);
   h{i} = plot(points, rates{i});

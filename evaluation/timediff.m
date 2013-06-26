@@ -101,7 +101,9 @@ function eval_iat(filename, output_format, varargin)
   hold on;
   axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)], "autoy");
   set(gca, "yscale", "log");
-  title("Distribution of inter arrival times [us]");
+  title("Distribution of inter arrival times");
+  xlabel("IAT [$\\mu s$]");
+  ylabel("Frequency");
 
   # plot the histogram(s)
   for i = 1:length(iats)
