@@ -113,11 +113,13 @@ clf;
 hold on;
 xlabel("Time [s]");
 ylabel("Data rate [bit/s]");
+axis([0 ceil(max(dur) ./ 1000000)], "autoy");
 h = {};
 for i = 1:length(rates);
   h{i} = plot(points, rates{i});
   set(h{i}, "color", colors{i});
 endfor
 hold off;
+
 print_format(strcat("datarate-", num2str(step, "%d"), ".", output_format),
 	     output_format);
