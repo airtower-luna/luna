@@ -184,6 +184,8 @@ parser.CaseSensitive = true;
 parser = parser.addParamValue("format", "png", @ischar);
 # output file name for comparison (if applicable)
 parser = parser.addParamValue("compare_out", "compare", @ischar);
+# upper limit for eval_iat plot
+parser = parser.addParamValue("upper", "-1", @isdigit);
 # set this flag if the input file(s) contain(s) user space arrival times
 parser = parser.addSwitch("kutime");
 parser = parser.parse(opts{:});
@@ -210,6 +212,7 @@ else
 endif
 
 output_format = parser.Results.format;
+upper = str2num(parser.Results.upper);
 
 # this cell array collects kernel arrival times for all files so they can
 # be compared
@@ -235,10 +238,10 @@ for i = 1:length(files);
     if parser.Results.kutime
       eval_kutime(ktime, utime, filename, output_format);
     endif
-    eval_iat(filename, output_format, -1, ktime);
+    eval_iat(filename, output_format, upper, ktime);
   endif
 endfor
 
 if (length(times) > 1)
-  eval_iat(parser.Results.compare_out, output_format, -1, times{:});
+  eval_iat(parser.Results.compare_out, output_format, upper, times{:});
 endif
