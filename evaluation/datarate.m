@@ -42,6 +42,8 @@ parser.CaseSensitive = true;
 parser = parser.addParamValue("format", "png", @ischar);
 # output file name for comparison (if applicable)
 parser = parser.addParamValue("compare_out", "compare", @ischar);
+# list of speed values from IPerf, assumed to be kbit/s in 0.5s intervals
+parser = parser.addParamValue("iperf", "", @ischar);
 # set this flag if the input file(s) contain(s) user space arrival times
 parser = parser.addSwitch("kutime");
 parser = parser.parse(opts{:});
@@ -120,6 +122,28 @@ for i = 1:length(rates);
   set(h{i}, "color", colors{i});
 endfor
 hold off;
+
+# If IPerf data was given, plot it for comparison. The input data is
+# expected to be one number per line, in kbit/s in 0.5s intervals
+if (!strcmp(parser.Results.iperf, ""))
+  hold on;
+  printf("Reading IPerf data from %s.", parser.Results.iperf);
+  # read test output
+  A = dlmread(parser.Results.iperf, "\t", 0, 0);
+  # IPerf data rates, assumed to be kbit/s
+  iy = A(:, 1);
+  iy = iy .* 1000;
+  # Create X values centered in 0.5s intervals
+  ix(1) = 0.25;
+  for i = 2:length(iy);
+    ix(i) = ix(i-1) + 0.5;
+  endfor
+  ih = plot(ix, iy);
+  # I admit that setting a fixed color is a dirty hack, but usually I
+  # just want to compare one fast-tg measurement with iperf.
+  set(ih, "color", colors{2});
+  hold off;
+endif
 
 print_format(strcat("datarate-", num2str(step, "%d"), ".", output_format),
 	     output_format);
