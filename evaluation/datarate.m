@@ -40,8 +40,8 @@ parser = inputParser;
 parser.CaseSensitive = true;
 # output format
 parser = parser.addParamValue("format", "png", @ischar);
-# output file name for comparison (if applicable)
-parser = parser.addParamValue("compare_out", "compare", @ischar);
+# output file name for the plot
+parser = parser.addParamValue("out", "out", @ischar);
 # list of speed values from IPerf, assumed to be kbit/s in 0.5s intervals
 parser = parser.addParamValue("iperf", "", @ischar);
 # step size for data rate averages (in µs)
@@ -154,5 +154,5 @@ if (!strcmp(parser.Results.iperf, ""))
   hold off;
 endif
 
-print_format(strcat("datarate-", num2str(step, "%d"), ".", output_format),
+print_format(strcat(parser.Results.out, ".", output_format),
 	     output_format);
