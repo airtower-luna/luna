@@ -44,6 +44,8 @@ parser = parser.addParamValue("format", "png", @ischar);
 parser = parser.addParamValue("compare_out", "compare", @ischar);
 # list of speed values from IPerf, assumed to be kbit/s in 0.5s intervals
 parser = parser.addParamValue("iperf", "", @ischar);
+# step size for data rate averages (in µs)
+parser = parser.addParamValue("step", "0", @isdigit);
 # set this flag if the input file(s) contain(s) user space arrival times
 parser = parser.addSwitch("kutime");
 parser = parser.parse(opts{:});
@@ -87,11 +89,18 @@ for i = 1:length(files);
   dur(i) = ktimes{i}(end);
 endfor
 
-# TODO: configurable step size
-#step = 1000;
-step = max(dur) / 200;
+# Try to read the specified step size
+step = str2num(parser.Results.step);
+points = [];
+# No fixed value was given, split evenly.
+if (step == 0)
+  points = linspace(0, max(dur), 200);
+  step = points(2);
+else
+  points = 0:step:max(dur);
+endif
 halfstep = step / 2;
-points = 0:step:max(dur);
+
 rates = {};
 for i = 1:length(files);
   idx = 1;
