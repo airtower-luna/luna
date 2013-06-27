@@ -89,7 +89,7 @@ for i = 1:length(files);
   dur(i) = ktimes{i}(end);
 endfor
 
-# Try to read the specified step size
+# Try to read the specified step size, if any
 step = str2num(parser.Results.step);
 points = [];
 # No fixed value was given, split evenly.
@@ -100,6 +100,7 @@ else
   points = 0:step:max(dur);
 endif
 halfstep = step / 2;
+printf("Plotting with step size of %i µs.\n", step);
 
 rates = {};
 for i = 1:length(files);
