@@ -59,7 +59,9 @@ endfunction
 
 
 # calculate inter arrival times
-function eval_iat(filename, output_format, varargin)
+# upper_limit is the largest permitted X value for the histogram, <= 0
+# means "no limit"
+function eval_iat(filename, output_format, upper_limit, varargin)
   for i = 1:length(varargin)
     iats{i} = diff(varargin{i});
     [u{i}, l{i}, m{i}, s{i}] = basic_metrics(iats{i});
@@ -90,6 +92,9 @@ function eval_iat(filename, output_format, varargin)
   # max_hist_bins bins
   range_lower = max([min(ll) 0]);
   range_upper = max(ul);
+  if (exist("upper_limit", "var") && upper_limit > 0)
+    range_upper = min([range_upper upper_limit]);
+  endif
   binwidth = max(1, (range_upper - range_lower) / max_hist_bins);
   range = [range_lower:binwidth:range_upper];
 
@@ -230,10 +235,10 @@ for i = 1:length(files);
     if parser.Results.kutime
       eval_kutime(ktime, utime, filename, output_format);
     endif
-    eval_iat(filename, output_format, ktime);
+    eval_iat(filename, output_format, -1, ktime);
   endif
 endfor
 
 if (length(times) > 1)
-  eval_iat(parser.Results.compare_out, output_format, times{:});
+  eval_iat(parser.Results.compare_out, output_format, -1, times{:});
 endif
