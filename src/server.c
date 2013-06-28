@@ -81,21 +81,29 @@ int run_server(struct addrinfo *addr, int flags)
 	size_t buflen = MSG_BUF_SIZE;
 	void *buf = malloc(buflen);
 	CHKALLOC(buf);
+	touch_page(buf, buflen);
 	ssize_t recvlen = 0;
 	int seq = 0;
 	struct sockaddr *addrbuf = malloc(ADDRBUF_SIZE);
 	CHKALLOC(addrbuf);
+	touch_page(addrbuf, ADDRBUF_SIZE);
 	socklen_t addrlen = 0;
 	char *addrstr = malloc(ADDR_STR_LEN);
 	CHKALLOC(addrstr);
+	touch_page(addrstr, ADDR_STR_LEN);
 	char *portstr = malloc(ADDR_STR_LEN);
 	CHKALLOC(portstr);
+	touch_page(portstr, ADDR_STR_LEN);
 
 	/* timestamp related data */
 	struct timeval ptime;
 	struct timeval stime;
 	char *tsstr = calloc(T_TIME_BUF, sizeof(char));
 	CHKALLOC(tsstr);
+	touch_page(tsstr, T_TIME_BUF);
+	char *tscstr = calloc(T_TIME_BUF, sizeof(char));
+	CHKALLOC(tscstr);
+	touch_page(tscstr, T_TIME_BUF);
 	/* *tm will be used to point to localtime's statically
 	 * allocated memory, does not need to be allocated/freed
 	 * manually */

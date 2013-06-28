@@ -33,3 +33,7 @@ void chkalloc(void *ptr, char *file, int line);
 /* Compare two struct rusage data sets to see if any page faults
  * occurred in between */
 int check_pfaults(struct rusage *pre, struct rusage *post);
+
+/* Touch each page that may be part of mem. The caller is responsible
+ * for passing the correct size. */
+int touch_page(void *mem, size_t size);

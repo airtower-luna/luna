@@ -6,6 +6,7 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/resource.h>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -34,6 +35,7 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 		size = MIN_PACKET_SIZE;
 	char *buf = malloc(size);
 	CHKALLOC(buf);
+	memset(buf, 7, size);
 
 	struct addrinfo *rp;
 	int sock;

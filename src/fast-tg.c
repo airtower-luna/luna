@@ -47,6 +47,21 @@ int check_pfaults(struct rusage *pre, struct rusage *post)
 
 
 
+int touch_page(void *mem, size_t size)
+{
+	/* get page size (once) */
+	static long page_size = 0;
+	if (page_size == 0)
+		page_size = sysconf(_SC_PAGESIZE);
+
+	/* touch each page in mem */
+	char *c = mem;
+	for (int i = 0; i < size; i += page_size)
+		c[i] = 0;
+}
+
+
+
 void printtimeres()
 {
 	struct timespec timeres = {0, 0};
@@ -181,7 +196,7 @@ int main(int argc, char *argv[])
 		perror("mlockall failed");
 		fprintf(stderr, "Make sure fast-tg has the CAP_IPC_LOCK "
 			"capability! If you don't need real-time "
-			"precision, you can safely ignore this message.\n");
+			"precision, you can safely ignore this warning.\n");
 	}
 
 	if (client)
