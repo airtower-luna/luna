@@ -5,6 +5,7 @@
 #include <getopt.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -195,6 +196,22 @@ int main(int argc, char *argv[])
 	{
 		perror("mlockall failed");
 		fprintf(stderr, "Make sure fast-tg has the CAP_IPC_LOCK "
+			"capability! If you don't need real-time "
+			"precision, you can safely ignore this warning.\n");
+	}
+
+	/* Try to get real-time priority */
+	struct sched_param sparam;
+	memset(&sparam, 0, sizeof(struct sched_param));
+	/* POSIX requires a minimum range of 32 for priorities. Using
+	 * the minimum plus 20 seems reasonable to aquire a high
+	 * priority without blocking any high priority processes that
+	 * might be running. */
+	sparam.sched_priority = sched_get_priority_min(SCHED_RR) + 20;
+	if (sched_setscheduler(0, SCHED_RR, &sparam) == -1)
+	{
+		perror("Could not get real-time priority");
+		fprintf(stderr, "Make sure fast-tg has the CAP_SYS_NICE "
 			"capability! If you don't need real-time "
 			"precision, you can safely ignore this warning.\n");
 	}
