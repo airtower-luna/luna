@@ -100,6 +100,9 @@ int run_server(struct addrinfo *addr, int flags)
 	 * allocated memory, does not need to be allocated/freed
 	 * manually */
 	struct tm *tm;
+	/* Call localtime to make sure its internal memory structures
+	 * get initialized. The result doesn't matter. */
+	localtime(&(ptime.tv_sec));
 
 	if (flags & SERVER_TSV_OUTPUT)
 		printf("# time\tsource\tport\tsequence\tsize\n");
