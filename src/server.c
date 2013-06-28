@@ -114,12 +114,20 @@ int run_server(struct addrinfo *addr, int flags)
 	 * get initialized. The result doesn't matter. */
 	localtime(&(ptime.tv_sec));
 
+	/* set up output */
+	char *time_trans = calloc(3, sizeof(char));
+	CHKALLOC(time_trans);
 	if (flags & SERVER_TSV_OUTPUT)
+	{
 #ifdef ENABLE_KUTIME
 		printf("# ktime\tutime\tsource\tport\tsequence\tsize\n");
 #else
 		printf("# utime\tsource\tport\tsequence\tsize\n");
 #endif
+		time_trans = "%s";
+	}
+	else
+		time_trans = "%T";
 
 	/* Store page fault statistics to check if memory management
 	 * is working properly */
@@ -152,13 +160,16 @@ int run_server(struct addrinfo *addr, int flags)
 		if (recvlen == -1)
 			continue;
 
+		tm = localtime(&(ptime.tv_sec));
+		strftime(tsstr, T_TIME_BUF, time_trans, tm);
+#ifdef ENABLE_KUTIME
+		tm = localtime(&(stime.tv_sec));
+		strftime(tscstr, T_TIME_BUF, time_trans, tm);
+#endif
+
 		if (flags & SERVER_TSV_OUTPUT)
 		{
-			tm = localtime(&(ptime.tv_sec));
-			strftime(tsstr, T_TIME_BUF, "%s", tm);
 #ifdef ENABLE_KUTIME
-			tm = localtime(&(stime.tv_sec));
-			strftime(tscstr, T_TIME_BUF, "%s", tm);
 			printf("%s%06ld\t%s%06ld\t%s\t%s\t%i\t%i\n",
 			       tsstr, ptime.tv_usec, tscstr, stime.tv_usec,
 			       addrstr, portstr, seq, (int) recvlen);
@@ -170,11 +181,7 @@ int run_server(struct addrinfo *addr, int flags)
 		}
 		else
 		{
-			tm = localtime(&(ptime.tv_sec));
-			strftime(tsstr, T_TIME_BUF, "%T", tm);
 #ifdef ENABLE_KUTIME
-			tm = localtime(&(stime.tv_sec));
-			strftime(tscstr, T_TIME_BUF, "%T", tm);
 			printf("Received packet %i (%i bytes) from %s, port %s "
 			       "at %s.%06ld.\n",
 			       seq, (int) recvlen, addrstr, portstr, tsstr,
