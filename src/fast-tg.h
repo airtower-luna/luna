@@ -29,3 +29,7 @@ void chkalloc(void *ptr, char *file, int line);
 			(result)->tv_nsec -= 1000000000;		\
 		}							\
 	} while (0)
+
+/* Compare two struct rusage data sets to see if any page faults
+ * occurred in between */
+int check_pfaults(struct rusage *pre, struct rusage *post);

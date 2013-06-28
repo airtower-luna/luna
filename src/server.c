@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
+#include <sys/resource.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -103,6 +104,12 @@ int run_server(struct addrinfo *addr, int flags)
 	if (flags & SERVER_TSV_OUTPUT)
 		printf("# time\tsource\tport\tsequence\tsize\n");
 
+	/* Store page fault statistics to check if memory management
+	 * is working properly */
+	struct rusage usage_pre;
+	struct rusage usage_post;
+	getrusage(RUSAGE_SELF, &usage_pre);
+
 	while (work)
 	{
 		addrlen = ADDRBUF_SIZE;
@@ -143,6 +150,17 @@ int run_server(struct addrinfo *addr, int flags)
 			       ptime.tv_usec);
 		}
 	}
+
+	/* Check page fault statistics to see if memory management is
+	 * working properly */
+	getrusage(RUSAGE_SELF, &usage_post);
+	if (check_pfaults(&usage_pre, &usage_post))
+		fprintf(stderr,
+			"WARNING: Page faults occurred in real-time section!\n"
+			"Pre:  Major-pagefaults: %ld, Minor Pagefaults: %ld\n"
+			"Post: Major-pagefaults: %ld, Minor Pagefaults: %ld\n",
+			usage_pre.ru_majflt, usage_pre.ru_minflt,
+			usage_post.ru_majflt, usage_post.ru_minflt);
 
 	fflush(NULL);
 	free(tsstr);

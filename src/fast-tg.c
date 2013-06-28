@@ -36,6 +36,17 @@ void chkalloc(void *ptr, char *file, int line)
 
 
 
+int check_pfaults(struct rusage *pre, struct rusage *post)
+{
+	if (pre->ru_majflt != post->ru_majflt
+	    || pre->ru_minflt != post->ru_minflt)
+		return 1;
+	else
+		return 0;
+}
+
+
+
 void printtimeres()
 {
 	struct timespec timeres = {0, 0};

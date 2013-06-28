@@ -6,7 +6,9 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/resource.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
@@ -61,6 +63,12 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	clock_gettime(CLOCK_MONOTONIC, &nexttick);
 	struct timespec end = {nexttick.tv_sec + time, nexttick.tv_nsec};
 
+	/* Store page fault statistics to check if memory management
+	 * is working properly */
+	struct rusage usage_pre;
+	struct rusage usage_post;
+	getrusage(RUSAGE_SELF, &usage_pre);
+
 	for (int i = 0;
 	     now.tv_sec < end.tv_sec || now.tv_nsec < end.tv_nsec;
 	     i++)
@@ -75,6 +83,17 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 		 * the right time */
 		clock_gettime(CLOCK_MONOTONIC, &now);
 	}
+
+	/* Check page fault statistics to see if memory management is
+	 * working properly */
+	getrusage(RUSAGE_SELF, &usage_post);
+	if (check_pfaults(&usage_pre, &usage_post))
+		fprintf(stderr,
+			"WARNING: Page faults occurred in real-time section!\n"
+			"Pre:  Major-pagefaults: %ld, Minor Pagefaults: %ld\n"
+			"Post: Major-pagefaults: %ld, Minor Pagefaults: %ld\n",
+			usage_pre.ru_majflt, usage_pre.ru_minflt,
+			usage_post.ru_majflt, usage_post.ru_minflt);
 
 	close(sock);
 	free(buf);
