@@ -8,7 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <sys/resource.h>
 #include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
@@ -159,14 +162,27 @@ int main(int argc, char *argv[])
 	free(host);
 	free(port);
 
+	int retval = 0;
+	/* lock all allocated memory into RAM before starting realtime
+	 * sections (needs capability CAP_IPC_LOCK) */
+	if (mlockall(MCL_CURRENT | MCL_FUTURE))
+	{
+		perror("mlockall failed");
+		fprintf(stderr, "Make sure fast-tg has the CAP_IPC_LOCK "
+			"capability! If you don't need real-time "
+			"precision, you can safely ignore this message.\n");
+	}
+
 	if (client)
 	{
 		struct timespec in;
 		in.tv_sec = interval / US_PER_S;
 		in.tv_nsec = (interval % US_PER_S) * 1000;
-		return run_client(res, &in, psize, time);
+		retval = run_client(res, &in, psize, time);
 	}
 
 	if (server)
-		return run_server(res, flags);
+		retval = run_server(res, flags);
+
+	return retval;
 }
