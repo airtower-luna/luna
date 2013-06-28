@@ -43,6 +43,10 @@ AC_CHECK_HEADERS([stdlib.h signal.h])
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
 
+AC_ARG_ENABLE(kutime,
+	[  --enable-kutime  Record user space times when receiving packages],
+	[AC_DEFINE([ENABLE_KUTIME], [1], [Test])], [])
+
 # Stuff to build
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT

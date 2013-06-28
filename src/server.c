@@ -97,13 +97,15 @@ int run_server(struct addrinfo *addr, int flags)
 
 	/* timestamp related data */
 	struct timeval ptime;
-	struct timeval stime;
 	char *tsstr = calloc(T_TIME_BUF, sizeof(char));
 	CHKALLOC(tsstr);
 	touch_page(tsstr, T_TIME_BUF);
+#ifdef ENABLE_KUTIME
+	struct timeval stime;
 	char *tscstr = calloc(T_TIME_BUF, sizeof(char));
 	CHKALLOC(tscstr);
 	touch_page(tscstr, T_TIME_BUF);
+#endif
 	/* *tm will be used to point to localtime's statically
 	 * allocated memory, does not need to be allocated/freed
 	 * manually */
@@ -113,7 +115,11 @@ int run_server(struct addrinfo *addr, int flags)
 	localtime(&(ptime.tv_sec));
 
 	if (flags & SERVER_TSV_OUTPUT)
-		printf("# time\tsource\tport\tsequence\tsize\n");
+#ifdef ENABLE_KUTIME
+		printf("# ktime\tutime\tsource\tport\tsequence\tsize\n");
+#else
+		printf("# utime\tsource\tport\tsequence\tsize\n");
+#endif
 
 	/* Store page fault statistics to check if memory management
 	 * is working properly */
@@ -125,6 +131,9 @@ int run_server(struct addrinfo *addr, int flags)
 	{
 		addrlen = ADDRBUF_SIZE;
 		recvlen = recvfrom(sock, buf, buflen, 0, addrbuf, &addrlen);
+#ifdef ENABLE_KUTIME
+		gettimeofday(&stime, NULL);
+#endif
 		ioctl(sock, SIOCGSTAMP, &ptime); // TODO: error check
 
 		if (addrlen > ADDRBUF_SIZE)
@@ -147,18 +156,35 @@ int run_server(struct addrinfo *addr, int flags)
 		{
 			tm = localtime(&(ptime.tv_sec));
 			strftime(tsstr, T_TIME_BUF, "%s", tm);
+#ifdef ENABLE_KUTIME
+			tm = localtime(&(stime.tv_sec));
+			strftime(tscstr, T_TIME_BUF, "%s", tm);
+			printf("%s%06ld\t%s%06ld\t%s\t%s\t%i\t%i\n",
+			       tsstr, ptime.tv_usec, tscstr, stime.tv_usec,
+			       addrstr, portstr, seq, (int) recvlen);
+#else
 			printf("%s%06ld\t%s\t%s\t%i\t%i\n",
 			       tsstr, ptime.tv_usec,
 			       addrstr, portstr, seq, (int) recvlen);
+#endif
 		}
 		else
 		{
 			tm = localtime(&(ptime.tv_sec));
 			strftime(tsstr, T_TIME_BUF, "%T", tm);
+#ifdef ENABLE_KUTIME
+			tm = localtime(&(stime.tv_sec));
+			strftime(tscstr, T_TIME_BUF, "%T", tm);
+			printf("Received packet %i (%i bytes) from %s, port %s "
+			       "at %s.%06ld.\n",
+			       seq, (int) recvlen, addrstr, portstr, tsstr,
+			       ptime.tv_usec, tscstr, stime.tv_usec);
+#else
 			printf("Received packet %i (%i bytes) from %s, port %s "
 			       "at %s.%06ld.\n",
 			       seq, (int) recvlen, addrstr, portstr, tsstr,
 			       ptime.tv_usec);
+#endif
 		}
 	}
 
@@ -175,7 +201,9 @@ int run_server(struct addrinfo *addr, int flags)
 
 	fflush(NULL);
 	free(tsstr);
+#ifdef ENABLE_KUTIME
 	free(tscstr);
+#endif
 	free(addrbuf);
 	free(addrstr);
 	free(portstr);
