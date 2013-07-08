@@ -8,7 +8,7 @@ global max_hist_bins = 200;
 
 # graphics configuration
 graphics_toolkit("fltk");
-global colors = {"blue", "red", "green", "magenta", "black", "cyan", "yellow"};
+global colors = {"blue", "red", "cyan", "green", "magenta", "black", "yellow"};
 
 
 function print_format(filename, output_format)
