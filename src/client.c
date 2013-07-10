@@ -74,7 +74,10 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	}
 	freeaddrinfo(addr); // no longer required
 
-	int *seq = (int *) buf;
+	/* current sequence number */
+	int seq = 0;
+	/* sequence element in the fast-tg packet */
+	int *sequence = (int *) buf;
 	/* timespecs for the timer */
 	struct timespec nexttick = {0, 0};
 	struct timespec rem = {0, 0};
@@ -88,11 +91,9 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	struct rusage usage_post;
 	getrusage(RUSAGE_SELF, &usage_pre);
 
-	for (int i = 0;
-	     now.tv_sec < end.tv_sec || now.tv_nsec < end.tv_nsec;
-	     i++)
+	while (now.tv_sec < end.tv_sec || now.tv_nsec < end.tv_nsec)
 	{
-		*seq = htonl(i);
+		*sequence = htonl(seq++);
 		timespecadd(&nexttick, &(block->data[0].delay), &nexttick);
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,
 				&nexttick, &rem); // TODO: error check
