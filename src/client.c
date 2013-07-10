@@ -45,12 +45,11 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 
 	struct packet_block *block = NULL;
 	generator_t generator;
-	sem_t *semaphore = malloc(sizeof(sem_t));
-	CHKALLOC(semaphore);
-	sem_init(semaphore, 0, 0); /* TODO: Error handling */
+	sem_t semaphore;
+	sem_init(&semaphore, 0, 0); /* TODO: Error handling */
 	pthread_t gen_thread;
 	generator.block = &block;
-	generator.control = semaphore;
+	generator.control = &semaphore;
 
 	static_generator_create(&generator, size, interval);
 
@@ -84,7 +83,7 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	/* index in the current block */
 	int bi = 0;
 
-	sem_wait(semaphore);
+	sem_wait(&semaphore);
 	pthread_mutex_lock(block->lock);
 
 	/* timespecs for the timer */
@@ -145,5 +144,4 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 
 	pthread_join(gen_thread, NULL);
 	generator.destroy_generator(&generator);
-	free(semaphore);
 }
