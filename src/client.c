@@ -16,30 +16,13 @@
 #include <unistd.h>
 
 #include "fast-tg.h"
+#include "generator.h"
 #include "traffic.h"
+#include "static_generator.h"
 
 /* Minimum packet size as required for our payload. Larger sizes are
  * possible as long as the UDP stacks permits them. */
 #define MIN_PACKET_SIZE 4
-
-/* Data passed to a generator thread */
-struct generator_args
-{
-	/* The generator must place a pointer to the first block here
-	 * as soon as possible. */
-	struct packet_block **block;
-	/* Semaphore for communcation between generator and sending
-	 * thread */
-	sem_t *sem;
-	// Same stuff as passed to run_client, to be replaced by arg
-	int size;
-	struct timespec *interval;
-	/* Custom data (TODO) */
-	// void *arg;
-};
-
-/* Example of a generator thread */
-void* generate_static_block(void *arg);
 
 
 
@@ -61,17 +44,18 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	memset(buf, 7, size);
 
 	struct packet_block *block = NULL;
+	generator_t generator;
 	sem_t *semaphore = malloc(sizeof(sem_t));
 	CHKALLOC(semaphore);
 	sem_init(semaphore, 0, 0); /* TODO: Error handling */
-	pthread_t generator;
-	struct generator_args args;
-	args.block = &block;
-	args.sem = semaphore;
-	args.size = size;
-	args.interval = interval;
+	pthread_t gen_thread;
+	generator.block = &block;
+	generator.control = semaphore;
+
+	static_generator_create(&generator, size, interval);
+
 	/* TODO: Error handling */
-	pthread_create(&generator, NULL, &generate_static_block, &args);
+	pthread_create(&gen_thread, NULL, &run_generator, &generator);
 
 	struct addrinfo *rp;
 	int sock;
@@ -158,33 +142,8 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 
 	close(sock);
 	free(buf);
-	pthread_join(generator, NULL);
+
+	pthread_join(gen_thread, NULL);
+	generator.destroy_generator(&generator);
 	free(semaphore);
-	packet_block_destroy(block);
-	free(block);
-}
-
-
-
-void* generate_static_block(void *arg)
-{
-	struct generator_args *args = (struct generator_args *) arg;
-	int size = args->size;
-
-	/* TODO: dynamic block length */
-#define BLOCK_LEN 10
-	struct packet_block *block = malloc(sizeof(struct packet_block));
-	CHKALLOC(block);
-	packet_block_init(block, BLOCK_LEN);
-	block->next = block;
-
-	for (int i = 0; i < block->length; i++)
-	{
-		block->data[i].size = size;
-		memcpy(&(block->data[i].delay), args->interval,
-		       sizeof(struct timespec));
-	}
-	*(args->block) = block;
-	sem_post(args->sem);
-	return NULL;
 }

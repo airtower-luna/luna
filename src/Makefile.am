@@ -17,7 +17,7 @@
 
 # Build the fast-tg binary
 bin_PROGRAMS = fast-tg
-fast_tg_SOURCES = fast-tg.c server.c client.c traffic.c
+fast_tg_SOURCES = fast-tg.c server.c traffic.c generator.c static_generator.c client.c
 
 LIBS = $(LIBRT)
 
