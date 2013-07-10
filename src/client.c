@@ -78,6 +78,9 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	int seq = 0;
 	/* sequence element in the fast-tg packet */
 	int *sequence = (int *) buf;
+	/* index in the current block */
+	int bi = 0;
+
 	/* timespecs for the timer */
 	struct timespec nexttick = {0, 0};
 	struct timespec rem = {0, 0};
@@ -90,15 +93,19 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	struct rusage usage_pre;
 	struct rusage usage_post;
 	getrusage(RUSAGE_SELF, &usage_pre);
-
 	while (now.tv_sec < end.tv_sec || now.tv_nsec < end.tv_nsec)
 	{
 		*sequence = htonl(seq++);
-		timespecadd(&nexttick, &(block->data[0].delay), &nexttick);
+		timespecadd(&nexttick, &(block->data[bi].delay), &nexttick);
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,
 				&nexttick, &rem); // TODO: error check
-		if (send(sock, buf, block->data[0].size, 0) == -1)
+		if (send(sock, buf, block->data[bi].size, 0) == -1)
 			perror("Error while sending");
+		if (++bi == block->length)
+		{
+			bi = 0;
+			block = block->next;
+		}
 		/* get the current time, needed to stop the loop at
 		 * the right time */
 		clock_gettime(CLOCK_MONOTONIC, &now);
