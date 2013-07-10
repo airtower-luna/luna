@@ -1,3 +1,6 @@
+#ifndef __FTG_FASTTG_H__
+#define __FTG_FASTTG_H__
+
 /* default server port (can be changed by -p command line argument),
  * and it's length (ASCII bytes including terminating null byte) */
 #define DEFAULT_PORT 4567
@@ -37,3 +40,5 @@ int check_pfaults(struct rusage *pre, struct rusage *post);
 /* Touch each page that may be part of mem. The caller is responsible
  * for passing the correct size. */
 int touch_page(void *mem, size_t size);
+
+#endif /* __FTG_FASTTG_H__ */
