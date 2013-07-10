@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 #include "fast-tg.h"
+#include "traffic.h"
 
 /* Minimum packet size as required for our payload. Larger sizes are
  * possible as long as the UDP stacks permits them. */
@@ -33,9 +34,14 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 {
 	if (size < MIN_PACKET_SIZE)
 		size = MIN_PACKET_SIZE;
-	char *buf = malloc(size);
+
+	struct packet_data data;
+	data.size = size;
+	memcpy(&(data.delay), interval, sizeof(struct timespec));
+
+	char *buf = malloc(data.size);
 	CHKALLOC(buf);
-	memset(buf, 7, size);
+	memset(buf, 7, data.size);
 
 	struct addrinfo *rp;
 	int sock;
@@ -76,10 +82,10 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	     i++)
 	{
 		*seq = htonl(i);
-		timespecadd(&nexttick, interval, &nexttick);
+		timespecadd(&nexttick, &(data.delay), &nexttick);
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,
 				&nexttick, &rem); // TODO: error check
-		if (send(sock, buf, size, 0) == -1)
+		if (send(sock, buf, data.size, 0) == -1)
 			perror("Error while sending");
 		/* get the current time, needed to stop the loop at
 		 * the right time */
