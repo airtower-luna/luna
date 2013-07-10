@@ -35,13 +35,24 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	if (size < MIN_PACKET_SIZE)
 		size = MIN_PACKET_SIZE;
 
-	struct packet_data data;
-	data.size = size;
-	memcpy(&(data.delay), interval, sizeof(struct timespec));
-
-	char *buf = malloc(data.size);
+	/* TODO: allocate buffer based on upper size limit */
+	char *buf = malloc(size);
 	CHKALLOC(buf);
-	memset(buf, 7, data.size);
+	memset(buf, 7, size);
+
+	/* TODO: dynamic block length, separate data generation
+	 * thread */
+#define BLOCK_LEN 10
+	struct packet_block *block = malloc(sizeof(struct packet_block));
+	CHKALLOC(block);
+	packet_block_init(block, BLOCK_LEN);
+	block->next = block;
+	for (int i = 0; i < block->length; i++)
+	{
+		block->data[i].size = size;
+		memcpy(&(block->data[i].delay), interval,
+		       sizeof(struct timespec));
+	}
 
 	struct addrinfo *rp;
 	int sock;
@@ -82,10 +93,10 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	     i++)
 	{
 		*seq = htonl(i);
-		timespecadd(&nexttick, &(data.delay), &nexttick);
+		timespecadd(&nexttick, &(block->data[0].delay), &nexttick);
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,
 				&nexttick, &rem); // TODO: error check
-		if (send(sock, buf, data.size, 0) == -1)
+		if (send(sock, buf, block->data[0].size, 0) == -1)
 			perror("Error while sending");
 		/* get the current time, needed to stop the loop at
 		 * the right time */
@@ -105,4 +116,6 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 
 	close(sock);
 	free(buf);
+	packet_block_destroy(block);
+	free(block);
 }

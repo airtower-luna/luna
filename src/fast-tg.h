@@ -1,6 +1,9 @@
 #ifndef __FTG_FASTTG_H__
 #define __FTG_FASTTG_H__
 
+#include <stdlib.h>
+#include <sys/resource.h>
+
 /* default server port (can be changed by -p command line argument),
  * and it's length (ASCII bytes including terminating null byte) */
 #define DEFAULT_PORT 4567
