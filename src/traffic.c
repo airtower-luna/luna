@@ -24,7 +24,7 @@ int packet_block_destroy(struct packet_block *block)
 	int ret = 0;
 	if (pthread_mutex_destroy(block->lock) != 0)
 	{
-		perror("Mutex still locked while trying to free");
+		fprintf(stderr, "Mutex still locked while trying to free!\n");
 		ret = 1;
 	}
 	free(block->lock);

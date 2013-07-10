@@ -37,6 +37,12 @@ AC_SUBST(LIBRT)
 #AC_SUBST(GLIB_CFLAGS)
 #AC_SUBST(GLIB_LIBS)
 
+# enable pthreads
+ACX_PTHREAD
+LIBS="$LIBS $PTHREAD_LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CC="$PTHREAD_CC"
+
 # Checks for header files.
 AC_CHECK_HEADERS([stdlib.h signal.h])
 

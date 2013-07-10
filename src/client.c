@@ -81,6 +81,8 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	/* index in the current block */
 	int bi = 0;
 
+	pthread_mutex_lock(block->lock);
+
 	/* timespecs for the timer */
 	struct timespec nexttick = {0, 0};
 	struct timespec rem = {0, 0};
@@ -104,7 +106,17 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 		if (++bi == block->length)
 		{
 			bi = 0;
+			pthread_mutex_unlock(block->lock);
 			block = block->next;
+			if (pthread_mutex_trylock(block->lock) != 0)
+			{
+				fprintf(stderr, "ERROR: Could not get lock for "
+					"the next send parameter block!\nMake "
+					"sure your data generator is fast "
+					"enough and unlocks mutexes "
+					"properly.\n");
+				break;
+			}
 		}
 		/* get the current time, needed to stop the loop at
 		 * the right time */
@@ -121,6 +133,8 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 			"Post: Major-pagefaults: %ld, Minor Pagefaults: %ld\n",
 			usage_pre.ru_majflt, usage_pre.ru_minflt,
 			usage_post.ru_majflt, usage_post.ru_minflt);
+
+	pthread_mutex_unlock(block->lock);
 
 	close(sock);
 	free(buf);
