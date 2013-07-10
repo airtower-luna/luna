@@ -38,11 +38,6 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	if (size < MIN_PACKET_SIZE)
 		size = MIN_PACKET_SIZE;
 
-	/* TODO: allocate buffer based on upper size limit */
-	char *buf = malloc(size);
-	CHKALLOC(buf);
-	memset(buf, 7, size);
-
 	struct packet_block *block = NULL;
 	generator_t generator;
 	sem_t semaphore;
@@ -55,6 +50,14 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 
 	/* TODO: Error handling */
 	pthread_create(&gen_thread, NULL, &run_generator, &generator);
+
+	/* Allocate buffer, based on upper size limit provided by the
+	 * generator */
+	char *buf = malloc(generator.max_size);
+	CHKALLOC(buf);
+	memset(buf, 7, generator.max_size);
+	/* TODO: Verify that max_size is large enough for the protocol
+	 * header */
 
 	struct addrinfo *rp;
 	int sock;
