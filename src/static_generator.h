@@ -21,4 +21,10 @@ int static_generator_create(generator_t *this,
 int rand_size_generator_create(generator_t *this,
 			       int size, struct timespec *interval);
 
+/* Prepare an alternating time generator using the given data. All
+ * packets will have the same size, but every second block will use
+ * double the interval between them. */
+int alternate_time_generator_create(generator_t *this,
+				    int size, struct timespec *interval);
+
 #endif /* __FTG_STATIC_GENERATOR_H__ */

@@ -54,6 +54,18 @@ int static_generator_create(generator_t *this,
 
 
 
+int alternate_time_generator_create(generator_t *this,
+				    int size, struct timespec *interval)
+{
+	this->init_generator = &alternate_time_generator_init;
+	this->fill_block = NULL;
+	this->destroy_generator = &static_generator_destroy;
+
+	simple_generator_base(this, size, interval);
+}
+
+
+
 int rand_size_generator_create(generator_t *this,
 			       int size, struct timespec *interval)
 {
