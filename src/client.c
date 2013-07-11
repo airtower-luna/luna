@@ -20,10 +20,6 @@
 #include "traffic.h"
 #include "static_generator.h"
 
-/* Minimum packet size as required for our payload. Larger sizes are
- * possible as long as the UDP stacks permits them. */
-#define MIN_PACKET_SIZE 4
-
 
 
 /*

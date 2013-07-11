@@ -19,6 +19,10 @@
 /* 1s = 1000000µs */
 #define US_PER_S 1000000
 
+/* Minimum packet size as required for our payload. Larger sizes are
+ * possible as long as the UDP stacks permits them. */
+#define MIN_PACKET_SIZE 4
+
 /* macro and function to check if memory allocation was successful */
 #define CHKALLOC(a) chkalloc(a, __FILE__, __LINE__)
 void chkalloc(void *ptr, char *file, int line);
