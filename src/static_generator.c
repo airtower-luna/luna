@@ -13,8 +13,8 @@ int static_generator_destroy(generator_t *this);
 
 int alternate_time_generator_init(generator_t *this);
 int rand_size_generator_init(generator_t *this);
-int rand_size_generator_generate_block(generator_t *this,
-				       struct packet_block *current);
+int rand_size_generator_fill_block(generator_t *this,
+				   struct packet_block *current);
 
 struct static_generator_attr
 {
@@ -46,7 +46,7 @@ int static_generator_create(generator_t *this,
 			    int size, struct timespec *interval)
 {
 	this->init_generator = &static_generator_init;
-	this->generate_block = NULL;
+	this->fill_block = NULL;
 	this->destroy_generator = &static_generator_destroy;
 
 	simple_generator_base(this, size, interval);
@@ -124,7 +124,7 @@ int rand_size_generator_init(generator_t *this)
 	struct packet_block *block = *(this->block);
 	do
 	{
-		rand_size_generator_generate_block(this, block);
+		rand_size_generator_fill_block(this, block);
 		block = block->next;
 	} while (block != *(this->block));
 
@@ -135,8 +135,8 @@ int rand_size_generator_init(generator_t *this)
 
 /* Refill the block using a new random number for packet
  * size. Intervals are set to attr->interval. */
-int rand_size_generator_generate_block(generator_t *this,
-				       struct packet_block *current)
+int rand_size_generator_fill_block(generator_t *this,
+				   struct packet_block *current)
 {
 	struct static_generator_attr *attr =
 		(struct static_generator_attr *) this->attr;

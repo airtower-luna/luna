@@ -38,7 +38,7 @@ struct generator_t
 	/* Fill the block at *current with fresh data, if this
 	 * generator does dynamic generation. May be NULL
 	 * otherwise. */
-	int (*generate_block)(generator_t *this, struct packet_block *current);
+	int (*fill_block)(generator_t *this, struct packet_block *current);
 	/* This function must free all memory behind *arg and the list
 	 * of blocks behind **block. */
 	int (*destroy_generator)(generator_t *this);

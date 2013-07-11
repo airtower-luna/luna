@@ -18,11 +18,11 @@ void* run_generator(void *arg)
 	while (1)
 	{
 		sem_wait(generator->control);
-		if (generator->generate_block != NULL)
+		if (generator->fill_block != NULL)
 		{
 			pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
 			pthread_mutex_lock(block->lock);
-			generator->generate_block(generator, block);
+			generator->fill_block(generator, block);
 			pthread_mutex_unlock(block->lock);
 			pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 			block = block->next;
