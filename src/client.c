@@ -41,10 +41,13 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	struct packet_block *block = NULL;
 	generator_t generator;
 	sem_t semaphore;
+	sem_t ready_sem;
 	sem_init(&semaphore, 0, 0); /* TODO: Error handling */
+	sem_init(&ready_sem, 0, 0); /* TODO: Error handling */
 	pthread_t gen_thread;
 	generator.block = &block;
 	generator.control = &semaphore;
+	generator.ready = &ready_sem;
 
 	static_generator_create(&generator, size, interval);
 
@@ -86,7 +89,7 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	/* index in the current block */
 	int bi = 0;
 
-	sem_wait(&semaphore);
+	sem_wait(&ready_sem);
 	pthread_mutex_lock(block->lock);
 
 	/* timespecs for the timer */
@@ -123,6 +126,7 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 					"properly.\n");
 				break;
 			}
+			sem_post(&semaphore);
 		}
 		/* get the current time, needed to stop the loop at
 		 * the right time */
@@ -141,10 +145,13 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 			usage_post.ru_majflt, usage_post.ru_minflt);
 
 	pthread_mutex_unlock(block->lock);
+	pthread_cancel(gen_thread);
 
 	close(sock);
 	free(buf);
 
 	pthread_join(gen_thread, NULL);
 	generator.destroy_generator(&generator);
+	sem_destroy(&semaphore);
+	sem_destroy(&ready_sem);
 }

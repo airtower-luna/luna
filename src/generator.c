@@ -1,5 +1,7 @@
 #include <config.h>
 
+#include <stdio.h>
+
 #include "fast-tg.h"
 #include "generator.h"
 
@@ -10,10 +12,23 @@ void* run_generator(void *arg)
 	/* TODO: set realtime priority */
 
 	generator->init_generator(generator);
+	struct packet_block *block = *(generator->block);
 
-	sem_post(generator->control);
+	sem_post(generator->ready);
 
-	/* TODO: implement dynamic generation */
+	/* this loop will be stopped by thread cancellation */
+	while (1)
+	{
+		sem_wait(generator->control);
+		if (generator->generate_block != NULL)
+		{
+			pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+			pthread_mutex_lock(block->lock);
+			generator->generate_block(generator, block);
+			pthread_mutex_unlock(block->lock);
+			pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+		}
+	}
 
 	return NULL;
 }

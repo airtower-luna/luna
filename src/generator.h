@@ -21,8 +21,11 @@ struct generator_t
 	/* The generator must place a pointer to the first block here
 	 * during init. */
 	struct packet_block **block;
-	/* Semaphore for communcation between generator and sending
-	 * thread */
+	/* Generator posts to this semaphore when its initialization
+	 * is complete. */
+	sem_t *ready;
+	/* Semaphore to control dynamic data generation. The sending
+	 * thread posts to this after using one block of data. */
 	sem_t *control;
 	/* maximum packet size */
 	int max_size;
