@@ -1,7 +1,5 @@
 #include <config.h>
 
-#include <stdio.h>
-
 #include "fast-tg.h"
 #include "generator.h"
 
@@ -27,6 +25,7 @@ void* run_generator(void *arg)
 			generator->generate_block(generator, block);
 			pthread_mutex_unlock(block->lock);
 			pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+			block = block->next;
 		}
 	}
 
