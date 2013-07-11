@@ -5,8 +5,13 @@
 #include "fast-tg.h"
 #include "static_generator.h"
 
+/* TODO: meaningful block length */
+#define BLOCK_LEN 10
+
 int static_generator_init(generator_t *this);
 int static_generator_destroy(generator_t *this);
+
+int alternate_time_generator_init(generator_t *this);
 
 struct static_generator_attr
 {
@@ -40,20 +45,15 @@ int static_generator_init(generator_t *this)
 	struct static_generator_attr *attr =
 		(struct static_generator_attr *) this->attr;
 
-	/* TODO: meaningful block length */
-#define BLOCK_LEN 10
-	struct packet_block *block = malloc(sizeof(struct packet_block));
-	CHKALLOC(block);
-	packet_block_init(block, BLOCK_LEN);
-	block->next = block;
+	*(this->block) = create_block_circle(1, BLOCK_LEN);
 
+	struct packet_block *block = *(this->block);
 	for (int i = 0; i < block->length; i++)
 	{
 		block->data[i].size = attr->size;
 		memcpy(&(block->data[i].delay), &(attr->interval),
 		       sizeof(struct timespec));
 	}
-	*(this->block) = block;
 
 	return 0;
 }
@@ -62,8 +62,7 @@ int static_generator_init(generator_t *this)
 
 int static_generator_destroy(generator_t *this)
 {
-	packet_block_destroy(*(this->block)); // TODO: error check
-	free(*(this->block));
+	destroy_block_circle(*(this->block)); // TODO: error check
 	*(this->block) = NULL;
 	free(this->attr);
 }

@@ -51,4 +51,14 @@ struct generator_t
  */
 void* run_generator(void *arg);
 
+
+
+/* Create a circular buffer of count packet blocks, with block_len
+ * elements each. Returns a pointer to the first block. */
+struct packet_block *create_block_circle(int count, int block_len);
+
+/* Destry a circular buffer of count packet blocks. The function
+ * follows the next pointers to delete all elements of the circle. */
+int destroy_block_circle(struct packet_block *block);
+
 #endif /* __FTG_GENERATOR_H__ */
