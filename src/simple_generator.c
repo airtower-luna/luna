@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "fast-tg.h"
-#include "static_generator.h"
+#include "simple_generator.h"
 
 /* TODO: meaningful block length */
 #define BLOCK_LEN 10

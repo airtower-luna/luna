@@ -18,7 +18,7 @@
 #include "fast-tg.h"
 #include "generator.h"
 #include "traffic.h"
-#include "static_generator.h"
+#include "simple_generator.h"
 
 
 

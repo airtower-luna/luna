@@ -1,5 +1,5 @@
-#ifndef __FTG_STATIC_GENERATOR_H__
-#define __FTG_STATIC_GENERATOR_H__
+#ifndef __FTG_SIMPLE_GENERATOR_H__
+#define __FTG_SIMPLE_GENERATOR_H__
 
 #include <pthread.h>
 #include <time.h>
@@ -27,4 +27,4 @@ int rand_size_generator_create(generator_t *this,
 int alternate_time_generator_create(generator_t *this,
 				    int size, struct timespec *interval);
 
-#endif /* __FTG_STATIC_GENERATOR_H__ */
+#endif /* __FTG_SIMPLE_GENERATOR_H__ */
