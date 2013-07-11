@@ -54,6 +54,18 @@ int static_generator_create(generator_t *this,
 
 
 
+int rand_size_generator_create(generator_t *this,
+			       int size, struct timespec *interval)
+{
+	this->init_generator = &rand_size_generator_init;
+	this->fill_block = &rand_size_generator_fill_block;
+	this->destroy_generator = &static_generator_destroy;
+
+	simple_generator_base(this, size, interval);
+}
+
+
+
 int static_generator_init(generator_t *this)
 {
 	struct static_generator_attr *attr =
