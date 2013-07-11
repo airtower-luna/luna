@@ -21,13 +21,12 @@ struct static_generator_attr
 
 
 
-int static_generator_create(generator_t *this,
-			    int size, struct timespec *interval)
+/* Helper function for the creation of simple generators that treat
+ * size as a maximum. The interval can be used as is, but can also be
+ * modified without breaking anything. */
+int simple_generator_base(generator_t *this,
+			  int size, struct timespec *interval)
 {
-	this->init_generator = &static_generator_init;
-	this->generate_block = NULL;
-	this->destroy_generator = &static_generator_destroy;
-
 	this->max_size = size;
 
 	this->attr = malloc(sizeof(struct static_generator_attr));
@@ -36,6 +35,18 @@ int static_generator_create(generator_t *this,
 		(struct static_generator_attr *) this->attr;
 	attr->size = size;
 	memcpy(&(attr->interval), interval, sizeof(struct timespec));
+}
+
+
+
+int static_generator_create(generator_t *this,
+			    int size, struct timespec *interval)
+{
+	this->init_generator = &static_generator_init;
+	this->generate_block = NULL;
+	this->destroy_generator = &static_generator_destroy;
+
+	simple_generator_base(this, size, interval);
 }
 
 
