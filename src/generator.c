@@ -7,7 +7,19 @@ void* run_generator(void *arg)
 {
 	struct generator_t *generator = (struct generator_t *) arg;
 
-	/* TODO: set realtime priority */
+	/* The generator thread initially inherits its priority from
+	 * the sending thread. However, realtime behavior is more
+	 * important for sending, while data generation only has to
+	 * keep up well enough to prevent buffer underruns. So, if the
+	 * RT priority is above the minimum, reduce it by one to make
+	 * sure that the generator will never block the sending
+	 * thread. */
+	pthread_t self = pthread_self();
+	int sched_policy = 0;
+	struct sched_param sched_param;
+	pthread_getschedparam(self, &sched_policy, &sched_param);
+	if (sched_param.sched_priority > sched_get_priority_min(sched_policy))
+		pthread_setschedprio(self, sched_param.sched_priority - 1);
 
 	generator->init_generator(generator);
 	struct packet_block *block = *(generator->block);
