@@ -47,6 +47,18 @@ struct generator_t
 
 
 /*
+ * A generator name and the function to create that type of generator
+ */
+struct generator_type
+{
+	char *name;
+	int (*create)(generator_t *generator, int size,
+		      struct timespec *interval);
+};
+
+
+
+/*
  * Run the generator
  *
  * This function is meant to run as a dedicated generator thread,

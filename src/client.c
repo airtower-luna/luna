@@ -22,6 +22,16 @@
 
 
 
+/* List of known generators */
+#define KNOWN_GENERATORS_LENGTH 3
+static struct generator_type known_generators[] = {
+	{"static", &static_generator_create},
+	{"random_size", &rand_size_generator_create},
+	{"alt_time", &alternate_time_generator_create},
+};
+
+
+
 /*
  * addr: destination (IP address, port)
  * interval: time between two packets (µs)
@@ -37,6 +47,7 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 
 	struct packet_block *block = NULL;
 	generator_t generator;
+	memset(&generator, 0, sizeof(generator_t));
 	sem_t semaphore;
 	sem_t ready_sem;
 	sem_init(&semaphore, 0, 0); /* TODO: Error handling */
@@ -46,23 +57,18 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	generator.control = &semaphore;
 	generator.ready = &ready_sem;
 
-	if (strcmp(generator_type, "static") == 0)
-		static_generator_create(&generator, size, interval);
-	else
+	/* initialize the requested generator */
+	for (int i = 0; i < KNOWN_GENERATORS_LENGTH; i++)
 	{
-		if (strcmp(generator_type, "random_size") == 0)
-			rand_size_generator_create(&generator, size, interval);
-		else
-		{
-			if (strcmp(generator_type, "alt_time") == 0)
-				alternate_time_generator_create(&generator, size, interval);
-			else
-			{
-				fprintf(stderr, "ERROR: Unknown generator "
-					"\"%s\"!\n", generator_type);
-				exit(EXIT_INVALID);
-			}
-		}
+		if (strcmp(generator_type, known_generators[i].name) == 0)
+			known_generators[i].create(&generator, size, interval);
+	}
+	/* fail if the requested generator is unknown */
+	if (generator.init_generator == NULL)
+	{
+		fprintf(stderr, "ERROR: Unknown generator "
+			"\"%s\"!\n", generator_type);
+		exit(EXIT_INVALID);
 	}
 
 	/* TODO: Error handling */
