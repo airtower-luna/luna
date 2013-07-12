@@ -29,10 +29,11 @@
  * count: number of packets to send
  */
 int run_client(struct addrinfo *addr, struct timespec *interval,
-	       size_t size, int time)
+	       size_t size, int time, char *generator_type)
 {
 	if (size < MIN_PACKET_SIZE)
 		size = MIN_PACKET_SIZE;
+	printf("Generator: %s\n", generator_type);
 
 	struct packet_block *block = NULL;
 	generator_t generator;
@@ -45,7 +46,24 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	generator.control = &semaphore;
 	generator.ready = &ready_sem;
 
-	static_generator_create(&generator, size, interval);
+	if (strcmp(generator_type, "static") == 0)
+		static_generator_create(&generator, size, interval);
+	else
+	{
+		if (strcmp(generator_type, "random_size") == 0)
+			rand_size_generator_create(&generator, size, interval);
+		else
+		{
+			if (strcmp(generator_type, "alt_time") == 0)
+				alternate_time_generator_create(&generator, size, interval);
+			else
+			{
+				fprintf(stderr, "ERROR: Unknown generator "
+					"\"%s\"!\n", generator_type);
+				exit(EXIT_INVALID);
+			}
+		}
+	}
 
 	/* TODO: Error handling */
 	pthread_create(&gen_thread, NULL, &run_generator, &generator);

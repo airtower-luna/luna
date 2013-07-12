@@ -4,6 +4,6 @@
 #include <netinet/in.h>
 
 int run_client(struct addrinfo *addr, struct timespec *interval,
-	       size_t size, int time);
+	       size_t size, int time, char *generator_type);
 
 #endif /* __FTG_CLIENT_H__ */

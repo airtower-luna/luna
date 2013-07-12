@@ -9,6 +9,9 @@
 #define DEFAULT_PORT 4567
 #define DEFAULT_PORT_LEN 6 /* enough for all valid port numbers */
 
+/* the default generator, used if none specified */
+#define DEFAULT_GENERATOR "static"
+
 /* exit code for invalid command line arguments */
 #define EXIT_INVALID 1
 /* exit code for network problems */
