@@ -46,13 +46,12 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	printf("Generator: %s\n", generator_type);
 
 	struct packet_block *block = NULL;
-	generator_t generator;
-	memset(&generator, 0, sizeof(generator_t));
 	sem_t semaphore;
 	sem_t ready_sem;
 	sem_init(&semaphore, 0, 0); /* TODO: Error handling */
 	sem_init(&ready_sem, 0, 0); /* TODO: Error handling */
-	pthread_t gen_thread;
+	generator_t generator;
+	memset(&generator, 0, sizeof(generator_t));
 	generator.block = &block;
 	generator.control = &semaphore;
 	generator.ready = &ready_sem;
@@ -71,6 +70,7 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 		exit(EXIT_INVALID);
 	}
 
+	pthread_t gen_thread;
 	/* TODO: Error handling */
 	pthread_create(&gen_thread, NULL, &run_generator, &generator);
 
