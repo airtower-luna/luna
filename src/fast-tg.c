@@ -20,7 +20,7 @@
 #include "client.h"
 
 /* valid command line options for getopt */
-#define CLI_OPTS "sc:p:46TS:i:t:g:a:"
+#define CLI_OPTS "sc:p:46Tt:g:a:"
 
 void chkalloc(void *ptr, char *file, int line)
 {
@@ -89,8 +89,6 @@ int main(int argc, char *argv[])
 	int server = 0;
 	int client = 0;
 	int flags = SERVER_SIGTERM_EXIT;
-	int psize = 4;
-	int interval = 1000;
 	int time = 1;
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
@@ -138,20 +136,14 @@ int main(int argc, char *argv[])
 		case 'T': // tab separated value output
 			flags |= SERVER_TSV_OUTPUT;
 			break;
-		case 'S': // configure packet size (client only)
-			psize = atoi(optarg);
-			break;
-		case 'i': // configure packet interval (µs, client only)
-			interval = atoi(optarg);
-			break;
 		case 't': // time to run (s, client only)
 			time = atoi(optarg);
 			break;
-		case 'g':
+		case 'g': // generator to use (client only)
 			generator = strdup(optarg);
 			CHKALLOC(generator);
 			break;
-		case 'a':
+		case 'a': // arguments for the generator (client only)
 			gen_args = strdup(optarg);
 			CHKALLOC(gen_args);
 			break;
@@ -232,12 +224,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (client)
-	{
-		struct timespec in;
-		in.tv_sec = interval / US_PER_S;
-		in.tv_nsec = (interval % US_PER_S) * 1000;
 		retval = run_client(res, time, generator, gen_args);
-	}
 	free(gen_args);
 	free(generator);
 
