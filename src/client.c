@@ -32,17 +32,9 @@ static struct generator_type known_generators[] = {
 
 
 
-/*
- * addr: destination (IP address, port)
- * interval: time between two packets (µs)
- * size: packet size in bytes (must be at least 4)
- * count: number of packets to send
- */
-int run_client(struct addrinfo *addr, struct timespec *interval,
-	       size_t size, int time, char *generator_type)
+int run_client(struct addrinfo *addr, int time,
+	       char *generator_type, char *generator_args)
 {
-	if (size < MIN_PACKET_SIZE)
-		size = MIN_PACKET_SIZE;
 	printf("Generator: %s\n", generator_type);
 
 	struct packet_block *block = NULL;
@@ -60,7 +52,7 @@ int run_client(struct addrinfo *addr, struct timespec *interval,
 	for (int i = 0; i < KNOWN_GENERATORS_LENGTH; i++)
 	{
 		if (strcmp(generator_type, known_generators[i].name) == 0)
-			known_generators[i].create(&generator, size, interval);
+			known_generators[i].create(&generator, generator_args);
 	}
 	/* fail if the requested generator is unknown */
 	if (generator.init_generator == NULL)

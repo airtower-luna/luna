@@ -24,12 +24,48 @@ struct static_generator_attr
 
 
 
-/* Helper function for the creation of simple generators that treat
+/*
+ * Helper function for the creation of simple generators that treat
  * size as a maximum. The interval can be used as is, but can also be
- * modified without breaking anything. */
-int simple_generator_base(generator_t *this,
-			  int size, struct timespec *interval)
+ * modified without breaking anything. The parameters must be
+ * contained in the char* args in the format
+ *     name=value,name2=value2
+ * If args is NULL, default values will be used.
+ *
+ * interval (i): time between two packets (µs)
+ * size (s): packet size in bytes (must be at least 4)
+ */
+int simple_generator_base(generator_t *this, char *args)
 {
+	int size = MIN_PACKET_SIZE;
+	int interval = 1000;
+
+	if (args != NULL)
+	{
+		char *token = NULL;
+		char *name = NULL;
+		char *value = NULL;
+		char *saveptr = NULL;
+		char *saveptr2 = NULL;
+		for (token = strtok_r(args, ",", &saveptr);
+		     token != NULL;
+		     token = strtok_r(NULL, ",", &saveptr))
+		{
+			name = strtok_r(token, "=", &saveptr2);
+			value = strtok_r(NULL, "=", &saveptr2);
+			if (strcmp(name, "size") == 0
+			    || strcmp(name, "s") == 0)
+				size = atoi(value);
+			if (strcmp(name, "interval") == 0
+			    || strcmp(name, "i") == 0)
+				interval = atoi(value);
+			// TODO: catch unknown params
+		}
+	}
+
+	if (size < MIN_PACKET_SIZE)
+		size = MIN_PACKET_SIZE;
+
 	this->max_size = size;
 
 	this->attr = malloc(sizeof(struct static_generator_attr));
@@ -37,43 +73,41 @@ int simple_generator_base(generator_t *this,
 	struct static_generator_attr *attr =
 		(struct static_generator_attr *) this->attr;
 	attr->size = size;
-	memcpy(&(attr->interval), interval, sizeof(struct timespec));
+	attr->interval.tv_sec = interval / US_PER_S;
+	attr->interval.tv_nsec = (interval % US_PER_S) * 1000;
 }
 
 
 
-int static_generator_create(generator_t *this,
-			    int size, struct timespec *interval)
+int static_generator_create(generator_t *this, char *args)
 {
 	this->init_generator = &static_generator_init;
 	this->fill_block = NULL;
 	this->destroy_generator = &static_generator_destroy;
 
-	simple_generator_base(this, size, interval);
+	simple_generator_base(this, args);
 }
 
 
 
-int alternate_time_generator_create(generator_t *this,
-				    int size, struct timespec *interval)
+int alternate_time_generator_create(generator_t *this, char *args)
 {
 	this->init_generator = &alternate_time_generator_init;
 	this->fill_block = NULL;
 	this->destroy_generator = &static_generator_destroy;
 
-	simple_generator_base(this, size, interval);
+	simple_generator_base(this, args);
 }
 
 
 
-int rand_size_generator_create(generator_t *this,
-			       int size, struct timespec *interval)
+int rand_size_generator_create(generator_t *this, char *args)
 {
 	this->init_generator = &rand_size_generator_init;
 	this->fill_block = &rand_size_generator_fill_block;
 	this->destroy_generator = &static_generator_destroy;
 
-	simple_generator_base(this, size, interval);
+	simple_generator_base(this, args);
 }
 
 

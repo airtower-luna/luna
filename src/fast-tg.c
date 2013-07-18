@@ -20,7 +20,7 @@
 #include "client.h"
 
 /* valid command line options for getopt */
-#define CLI_OPTS "sc:p:46TS:i:t:g:"
+#define CLI_OPTS "sc:p:46TS:i:t:g:a:"
 
 void chkalloc(void *ptr, char *file, int line)
 {
@@ -95,8 +95,9 @@ int main(int argc, char *argv[])
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
 	char *host = NULL;
-	/* the packet generator to use */
+	/* the packet generator to use and its arguments */
 	char *generator = NULL;
+	char *gen_args = NULL;
 	for (int opt = getopt(argc, argv, CLI_OPTS);
 	     opt != -1;
 	     opt = getopt(argc, argv, CLI_OPTS))
@@ -149,6 +150,10 @@ int main(int argc, char *argv[])
 		case 'g':
 			generator = strdup(optarg);
 			CHKALLOC(generator);
+			break;
+		case 'a':
+			gen_args = strdup(optarg);
+			CHKALLOC(gen_args);
 			break;
 		default:
 			break;
@@ -231,8 +236,9 @@ int main(int argc, char *argv[])
 		struct timespec in;
 		in.tv_sec = interval / US_PER_S;
 		in.tv_nsec = (interval % US_PER_S) * 1000;
-		retval = run_client(res, &in, psize, time, generator);
+		retval = run_client(res, time, generator, gen_args);
 	}
+	free(gen_args);
 	free(generator);
 
 	if (server)

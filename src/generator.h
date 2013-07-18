@@ -14,6 +14,9 @@
  * The functions must be thread-safe, but the generic generator code
  * will take care of thread management, including aquiring mutexes and
  * semaphore signalling.
+ *
+ * The generator MUST ensure that the generated packet sizes are not
+ * below MIN_PACKET_SIZE (defined in fast-tg.h).
  */
 typedef struct generator_t generator_t;
 struct generator_t
@@ -47,13 +50,15 @@ struct generator_t
 
 
 /*
- * A generator name and the function to create that type of generator
+ * A generator struct and the function to create that type of generator
+ *
+ * The function MUST accept a NULL in generator_args and use default
+ * values in that case.
  */
 struct generator_type
 {
 	char *name;
-	int (*create)(generator_t *generator, int size,
-		      struct timespec *interval);
+	int (*create)(generator_t *generator, char *generator_args);
 };
 
 
