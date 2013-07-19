@@ -30,12 +30,14 @@ AC_PROG_INSTALL
 
 # Checks for libraries.
 AC_GNU_SOURCE
+# realtime stuff
 LIBRT=""
 AC_CHECK_LIB(rt, clock_getres, [LIBRT="-lrt"])
 AC_SUBST(LIBRT)
-#PKG_CHECK_MODULES(GLIB, glib-2.0)
-#AC_SUBST(GLIB_CFLAGS)
-#AC_SUBST(GLIB_LIBS)
+# libgsl
+PKG_CHECK_MODULES(LIBGSL, gsl >= 1.15)
+AC_SUBST(LIBGSL_LIBS)
+AC_SUBST(LIBGSL_CFLAGS)
 
 # enable pthreads
 ACX_PTHREAD

@@ -17,9 +17,9 @@
 
 # Build the fast-tg binary
 bin_PROGRAMS = fast-tg
-fast_tg_SOURCES = fast-tg.c server.c traffic.c generator.c simple_generator.c client.c
+fast_tg_SOURCES = fast-tg.c server.c traffic.c generator.c gaussian_generator.c simple_generator.c client.c
 
-LIBS = $(LIBRT)
+LIBS = $(LIBRT) $(LIBGSL_LIBS)
 
 #INCLUDES = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) $(GIO_CFLAGS) $(LIBNL_CFLAGS) $(GNUTLS_CFLAGS)
 #LIBS = $(GLIB_LIBS) $(GTHREAD_LIBS) $(GIO_LIBS) $(LIBNL_LIBS) $(GNUTLS_LIBS)

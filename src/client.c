@@ -19,15 +19,17 @@
 #include "generator.h"
 #include "traffic.h"
 #include "simple_generator.h"
+#include "gaussian_generator.h"
 
 
 
 /* List of known generators */
-#define KNOWN_GENERATORS_LENGTH 3
+#define KNOWN_GENERATORS_LENGTH 4
 static struct generator_type known_generators[] = {
 	{"static", &static_generator_create},
 	{"random_size", &rand_size_generator_create},
 	{"alt_time", &alternate_time_generator_create},
+	{"gaussian", &gaussian_generator_create},
 };
 
 
