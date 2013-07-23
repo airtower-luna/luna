@@ -19,6 +19,17 @@
 #include "server.h"
 #include "client.h"
 
+/* POSIX requires a minimum range of 32 for priorities. Using the
+ * minimum plus 20 seems reasonable to aquire a high priority without
+ * blocking any high priority processes that might be running. The
+ * client needs a higher priority than the server because the server's
+ * time measurements rely on the kernel and thus it has no reason to
+ * block the client. A client offset of 60 ensures that it can preempt
+ * medium priority kernel threads under PREEMPT_RT, which run at a
+ * priority of 50. */
+#define CLIENT_PRIO_OFFSET 60
+#define SERVER_PRIO_OFFSET 20
+
 /* valid command line options for getopt */
 #define CLI_OPTS "sc:p:46Tt:g:a:"
 
@@ -210,11 +221,12 @@ int main(int argc, char *argv[])
 	/* Try to get real-time priority */
 	struct sched_param sparam;
 	memset(&sparam, 0, sizeof(struct sched_param));
-	/* POSIX requires a minimum range of 32 for priorities. Using
-	 * the minimum plus 20 seems reasonable to aquire a high
-	 * priority without blocking any high priority processes that
-	 * might be running. */
-	sparam.sched_priority = sched_get_priority_min(SCHED_RR) + 20;
+	if (client)
+		sparam.sched_priority =
+			sched_get_priority_min(SCHED_RR) + CLIENT_PRIO_OFFSET;
+	else
+		sparam.sched_priority =
+			sched_get_priority_min(SCHED_RR) + SERVER_PRIO_OFFSET;
 	if (sched_setscheduler(0, SCHED_RR, &sparam) == -1)
 	{
 		perror("Could not get real-time priority");
