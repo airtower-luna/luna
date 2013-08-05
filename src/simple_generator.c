@@ -117,9 +117,9 @@ int static_generator_init(generator_t *this)
 	struct static_generator_attr *attr =
 		(struct static_generator_attr *) this->attr;
 
-	*(this->block) = create_block_circle(1, BLOCK_LEN);
+	this->block = create_block_circle(1, BLOCK_LEN);
 
-	struct packet_block *block = *(this->block);
+	struct packet_block *block = this->block;
 	for (int i = 0; i < block->length; i++)
 	{
 		block->data[i].size = attr->size;
@@ -139,14 +139,14 @@ int alternate_time_generator_init(generator_t *this)
 	struct static_generator_attr *attr =
 		(struct static_generator_attr *) this->attr;
 
-	*(this->block) = create_block_circle(2, BLOCK_LEN);
+	this->block = create_block_circle(2, BLOCK_LEN);
 
 	struct timespec alt_interval;
 	alt_interval.tv_sec = attr->interval.tv_sec;
 	alt_interval.tv_nsec = attr->interval.tv_nsec * 2;
 	int normal = 1;
 
-	struct packet_block *block = *(this->block);
+	struct packet_block *block = this->block;
 	do
 	{
 		for (int i = 0; i < block->length; i++)
@@ -163,7 +163,7 @@ int alternate_time_generator_init(generator_t *this)
 		}
 		block = block->next;
 		normal = !normal;
-	} while (block != *(this->block));
+	} while (block != this->block);
 
 	return 0;
 }
@@ -177,14 +177,14 @@ int rand_size_generator_init(generator_t *this)
 	struct static_generator_attr *attr =
 		(struct static_generator_attr *) this->attr;
 
-	*(this->block) = create_block_circle(4, BLOCK_LEN);
+	this->block = create_block_circle(4, BLOCK_LEN);
 
-	struct packet_block *block = *(this->block);
+	struct packet_block *block = this->block;
 	do
 	{
 		rand_size_generator_fill_block(this, block);
 		block = block->next;
-	} while (block != *(this->block));
+	} while (block != this->block);
 
 	return 0;
 }
@@ -216,7 +216,7 @@ int rand_size_generator_fill_block(generator_t *this,
 
 int static_generator_destroy(generator_t *this)
 {
-	destroy_block_circle(*(this->block)); // TODO: error check
-	*(this->block) = NULL;
+	destroy_block_circle(this->block); // TODO: error check
+	this->block = NULL;
 	free(this->attr);
 }

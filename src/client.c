@@ -39,14 +39,12 @@ int run_client(struct addrinfo *addr, int time,
 {
 	printf("Generator: %s\n", generator_type);
 
-	struct packet_block *block = NULL;
 	sem_t semaphore;
 	sem_t ready_sem;
 	sem_init(&semaphore, 0, 0); /* TODO: Error handling */
 	sem_init(&ready_sem, 0, 0); /* TODO: Error handling */
 	generator_t generator;
 	memset(&generator, 0, sizeof(generator_t));
-	generator.block = &block;
 	generator.control = &semaphore;
 	generator.ready = &ready_sem;
 
@@ -104,6 +102,7 @@ int run_client(struct addrinfo *addr, int time,
 	int bi = 0;
 
 	sem_wait(&ready_sem);
+	struct packet_block *block = generator.block;
 	pthread_mutex_lock(block->lock);
 
 	/* timespecs for the timer */

@@ -113,14 +113,14 @@ int gaussian_generator_init(generator_t *this)
 	struct gaussian_generator_attr *attr =
 		(struct gaussian_generator_attr *) this->attr;
 
-	*(this->block) = create_block_circle(4, BLOCK_LEN);
+	this->block = create_block_circle(4, BLOCK_LEN);
 
-	struct packet_block *block = *(this->block);
+	struct packet_block *block = this->block;
 	do
 	{
 		gaussian_generator_fill_block(this, block);
 		block = block->next;
-	} while (block != *(this->block));
+	} while (block != this->block);
 
 	return 0;
 }
@@ -159,8 +159,8 @@ int gaussian_generator_destroy(generator_t *this)
 	struct gaussian_generator_attr *attr =
 		(struct gaussian_generator_attr *) this->attr;
 
-	destroy_block_circle(*(this->block)); // TODO: error check
-	*(this->block) = NULL;
+	destroy_block_circle(this->block); // TODO: error check
+	this->block = NULL;
 	gsl_rng_free(attr->rng);
 	free(this->attr);
 }

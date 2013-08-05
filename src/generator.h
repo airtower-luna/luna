@@ -21,9 +21,8 @@
 typedef struct generator_t generator_t;
 struct generator_t
 {
-	/* The generator must place a pointer to the first block here
-	 * during init. */
-	struct packet_block **block;
+	/* The "first" block of the ring buffer (set during init) */
+	struct packet_block *block;
 	/* Generator posts to this semaphore when its initialization
 	 * is complete. */
 	sem_t *ready;

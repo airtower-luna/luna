@@ -22,7 +22,7 @@ void* run_generator(void *arg)
 		pthread_setschedprio(self, sched_param.sched_priority - 1);
 
 	generator->init_generator(generator);
-	struct packet_block *block = *(generator->block);
+	struct packet_block *block = generator->block;
 
 	sem_post(generator->ready);
 
