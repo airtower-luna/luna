@@ -33,21 +33,8 @@ if length(files) < 1
   exit(1);
 endif
 
-# variables for column meanings
-ktime_col = 1;
-# if there is no user space time column, the following columns shift
-if parser.Results.kutime
-  utime_col = 2;
-  source_col = 3;
-  port_col = 4;
-  sequence_col = 5;
-  size_col = 6;
-else
-  source_col = 2;
-  port_col = 3;
-  sequence_col = 4;
-  size_col = 5;
-endif
+# load column meanings depending on kutime flag
+cols = ftg_column_definitions(parser.Results.kutime);
 
 output_format = parser.Results.format;
 
@@ -61,8 +48,8 @@ for i = 1:length(files);
   # read test output
   A = dlmread(filename, "\t", 1, 0);
   printf("%i data sets\n", length(A));
-  ktimes{i} = A( :, ktime_col);
-  sizes{i} = A( :, size_col);
+  ktimes{i} = A( :, cols.ktime);
+  sizes{i} = A( :, cols.size);
   ktimes{i} = ktimes{i} .- ktimes{i}(1);
   dur(i) = ktimes{i}(end);
 endfor

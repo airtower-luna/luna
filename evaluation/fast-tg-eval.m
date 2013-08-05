@@ -80,3 +80,25 @@ function parser = ftg_default_parser()
   parser = parser.addSwitch("kutime");
   return;
 endfunction
+
+
+
+# Column numbers by meaning in fast-tg tab separated output
+# If the parameter is missing, false is assumed.
+function cols = ftg_column_definitions(kutime)
+  cols.ktime = 1;
+# if there is a user space time column, the following columns shift
+  if (exist("kutime", "var") && kutime)
+    cols.utime = 2;
+    cols.source = 3;
+    cols.port = 4;
+    cols.sequence = 5;
+    cols.size = 6;
+  else
+    cols.source = 2;
+    cols.port = 3;
+    cols.sequence = 4;
+    cols.size = 5;
+  endif
+  return;
+endfunction
