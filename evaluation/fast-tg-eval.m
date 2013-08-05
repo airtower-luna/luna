@@ -62,3 +62,21 @@ function print_format(filename, output_format)
     print(filename, strcat("-d", output_format));
   endif
 endfunction
+
+
+
+# create a parser for the default command line options
+function parser = ftg_default_parser()
+  # parse options
+  parser = inputParser;
+  parser.CaseSensitive = true;
+  # output format
+  parser = parser.addParamValue("format", "png", @ischar);
+  # output file name (if applicable)
+  parser = parser.addParamValue("out", "out", @ischar);
+  # upper limit for the plot (x axis)
+  parser = parser.addParamValue("upper", "-1", @isdigit);
+  # set this flag if the input file(s) contain(s) user space arrival times
+  parser = parser.addSwitch("kutime");
+  return;
+endfunction

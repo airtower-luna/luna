@@ -118,17 +118,9 @@ for i = 1:nargin()
   endif
 endfor
 
-# parse options
-parser = inputParser;
-parser.CaseSensitive = true;
-# output format
-parser = parser.addParamValue("format", "png", @ischar);
-# output file name for comparison (if applicable)
-parser = parser.addParamValue("compare_out", "compare", @ischar);
-# upper limit for eval_iat plot
-parser = parser.addParamValue("upper", "-1", @isdigit);
-# set this flag if the input file(s) contain(s) user space arrival times
-parser = parser.addSwitch("kutime");
+# create parser with default options
+parser = ftg_default_parser();
+# parse command line options
 parser = parser.parse(opts{:});
 
 if length(files) < 1
@@ -184,5 +176,5 @@ for i = 1:length(files);
 endfor
 
 if (length(times) > 1)
-  eval_iat(parser.Results.compare_out, output_format, upper, times{:});
+  eval_iat(parser.Results.out, output_format, upper, times{:});
 endif

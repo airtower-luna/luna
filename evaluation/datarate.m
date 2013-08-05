@@ -19,19 +19,13 @@ for i = 1:nargin()
   endif
 endfor
 
-# parse options
-parser = inputParser;
-parser.CaseSensitive = true;
-# output format
-parser = parser.addParamValue("format", "png", @ischar);
-# output file name for the plot
-parser = parser.addParamValue("out", "out", @ischar);
+# create parser with default options
+parser = ftg_default_parser();
 # list of speed values from IPerf, assumed to be kbit/s in 0.5s intervals
 parser = parser.addParamValue("iperf", "", @ischar);
 # step size for data rate averages (in µs)
 parser = parser.addParamValue("step", "0", @isdigit);
-# set this flag if the input file(s) contain(s) user space arrival times
-parser = parser.addSwitch("kutime");
+# parse command line options
 parser = parser.parse(opts{:});
 
 if length(files) < 1
