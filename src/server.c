@@ -122,7 +122,7 @@ int run_server(struct addrinfo *addr, int flags)
 #ifdef ENABLE_KUTIME
 		printf("# ktime\tutime\tsource\tport\tsequence\tsize\n");
 #else
-		printf("# utime\tsource\tport\tsequence\tsize\n");
+		printf("# ktime\tsource\tport\tsequence\tsize\n");
 #endif
 		time_trans = "%s";
 	}
