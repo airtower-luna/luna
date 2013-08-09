@@ -96,8 +96,10 @@ int run_client(struct addrinfo *addr, int time,
 
 	/* current sequence number */
 	int seq = 0;
-	/* sequence element in the fast-tg packet */
+	/* sequence number in the fast-tg packet */
 	int *sequence = (int *) buf;
+	/* time right before sending in the fast-tg packet */
+	struct timespec *sendtime = (struct timespec *) (buf + sizeof(int));
 	/* index in the current block */
 	int bi = 0;
 
@@ -121,10 +123,16 @@ int run_client(struct addrinfo *addr, int time,
 	{
 		*sequence = htonl(seq++);
 		timespecadd(&nexttick, &(block->data[bi].delay), &nexttick);
+		/* sleep until scheduled send time */
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,
 				&nexttick, &rem); // TODO: error check
+		/* record current time into the packet */
+		clock_gettime(CLOCK_MONOTONIC, sendtime);
+		/* send the packet */
 		if (send(sock, buf, block->data[bi].size, 0) == -1)
 			perror("Error while sending");
+
+		/* switch buffer block if necessary */
 		if (++bi == block->length)
 		{
 			bi = 0;
