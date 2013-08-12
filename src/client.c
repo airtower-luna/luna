@@ -100,6 +100,9 @@ int run_client(struct addrinfo *addr, int time,
 	int *sequence = (int *) buf;
 	/* time right before sending in the fast-tg packet */
 	struct timespec *sendtime = (struct timespec *) (buf + sizeof(int));
+	/* protocol flags field */
+	char *flags = (char *) (buf + sizeof(int) + sizeof(struct timespec));
+	*flags = 0;
 	/* index in the current block */
 	int bi = 0;
 

@@ -22,13 +22,18 @@
 /* 1s = 1000000µs */
 #define US_PER_S 1000000
 
-/* Minimum packet size as required for our payload. Larger sizes are
+/*
+ * Minimum packet size as required for our payload. Larger sizes are
  * possible as long as the UDP stacks permits them. Current content of
  * the Fast-TG protocol header:
  *
  * int: sequence number
- * struct timespec: clock time recorded right before sending */
-#define MIN_PACKET_SIZE (sizeof(int) + sizeof(struct timespec))
+ * struct timespec: clock time recorded right before sending
+ * char: flags byte
+ */
+#define MIN_PACKET_SIZE (sizeof(int) + sizeof(struct timespec) + sizeof(char))
+/* set in flags byte to request a response from the server */
+#define FTG_FLAG_RESPONSE 1
 
 /* macro and function to check if memory allocation was successful */
 #define CHKALLOC(a) chkalloc(a, __FILE__, __LINE__)
