@@ -102,7 +102,7 @@ int run_client(struct addrinfo *addr, int time,
 	struct timespec *sendtime = (struct timespec *) (buf + sizeof(int));
 	/* protocol flags field */
 	char *flags = (char *) (buf + sizeof(int) + sizeof(struct timespec));
-	*flags = 0;
+	*flags = 0 | FTG_FLAG_ECHO;
 	/* index in the current block */
 	int bi = 0;
 

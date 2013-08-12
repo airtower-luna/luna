@@ -79,7 +79,7 @@ int run_server(struct addrinfo *addr, int flags)
 	}
 
 	size_t buflen = MSG_BUF_SIZE;
-	void *buf = malloc(buflen);
+	char *buf = malloc(buflen);
 	CHKALLOC(buf);
 	touch_page(buf, buflen);
 	ssize_t recvlen = 0;
@@ -142,6 +142,12 @@ int run_server(struct addrinfo *addr, int flags)
 #ifdef ENABLE_KUTIME
 		gettimeofday(&stime, NULL);
 #endif
+		/* echo packet if echo flag is set */
+		if (buf[sizeof(int) + sizeof(struct timespec)]
+		    & FTG_FLAG_ECHO)
+			sendto(sock, buf, recvlen, 0, addrbuf, addrlen);
+
+		/* get kernel timestamp */
 		ioctl(sock, SIOCGSTAMP, &ptime); // TODO: error check
 
 		if (addrlen > ADDRBUF_SIZE)

@@ -30,10 +30,13 @@
  * int: sequence number
  * struct timespec: clock time recorded right before sending
  * char: flags byte
+ *
+ * TODO: Could the sizeof-based definition cause problems between
+ * different architectures?
  */
 #define MIN_PACKET_SIZE (sizeof(int) + sizeof(struct timespec) + sizeof(char))
 /* set in flags byte to request a response from the server */
-#define FTG_FLAG_RESPONSE 1
+#define FTG_FLAG_ECHO 1
 
 /* macro and function to check if memory allocation was successful */
 #define CHKALLOC(a) chkalloc(a, __FILE__, __LINE__)
