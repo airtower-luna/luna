@@ -45,7 +45,7 @@ struct echo_thread_data
 
 
 
-int run_client(struct addrinfo *addr, int time,
+int run_client(struct addrinfo *addr, int time, int echo,
 	       char *generator_type, char *generator_args)
 {
 	printf("Generator: %s\n", generator_type);
@@ -189,6 +189,7 @@ int run_client(struct addrinfo *addr, int time,
 
 	pthread_mutex_unlock(block->lock);
 	pthread_cancel(e_thread);
+	// TODO: appropriate delay to wait for echos
 	pthread_cancel(gen_thread);
 
 	pthread_join(e_thread, NULL);
@@ -231,7 +232,7 @@ void* echo_thread(void *arg)
 	struct timeval rtt;
 
 	int work = 1;
-
+	/* init done */
 	sem_post(&(data->sem));
 
 	while (work)

@@ -31,7 +31,7 @@
 #define SERVER_PRIO_OFFSET 20
 
 /* valid command line options for getopt */
-#define CLI_OPTS "sc:p:46Tt:g:a:"
+#define CLI_OPTS "sc:p:46Tt:g:a:e"
 
 void chkalloc(void *ptr, char *file, int line)
 {
@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
 	int client = 0;
 	int flags = SERVER_SIGTERM_EXIT;
 	int time = 1;
+	int echo = 0;
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
 	char *host = NULL;
@@ -157,6 +158,9 @@ int main(int argc, char *argv[])
 		case 'a': // arguments for the generator (client only)
 			gen_args = strdup(optarg);
 			CHKALLOC(gen_args);
+			break;
+		case 'e': // request echo (client only)
+			echo = 1;
 			break;
 		default:
 			break;
@@ -236,7 +240,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (client)
-		retval = run_client(res, time, generator, gen_args);
+		retval = run_client(res, time, echo, generator, gen_args);
 	free(gen_args);
 	free(generator);
 
