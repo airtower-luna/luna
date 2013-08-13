@@ -215,16 +215,17 @@ void* echo_thread(void *arg)
 	int sock = data->sock;
 
 	size_t buflen = MSG_BUF_SIZE;
-	// TODO: free
 	char *buf = malloc(buflen);
 	CHKALLOC(buf);
 	touch_page(buf, buflen);
+	/* ensure free() on cancellation */
+	pthread_cleanup_push(&free, buf);
 	ssize_t recvlen = 0;
 	int seq = 0;
-	// TODO: free
 	struct sockaddr *addrbuf = malloc(ADDRBUF_SIZE);
 	CHKALLOC(addrbuf);
 	touch_page(addrbuf, ADDRBUF_SIZE);
+	pthread_cleanup_push(&free, addrbuf);
 	socklen_t addrlen = 0;
 	/* timestamp related data */
 	struct timeval recvtime;
@@ -263,4 +264,12 @@ void* echo_thread(void *arg)
 		}
 		printf("%i\t%ld.%06ld\n", seq, rtt.tv_sec, rtt.tv_usec);
 	}
+
+	/* The function should never reach this point because it will
+	 * be cancelled rather than stopping the loop, but each
+	 * pthread_cleanup_push() requires a corresponding
+	 * pthread_cleanup_pop(). Cleanup handlers will, of course, be
+	 * called upon cancellation. */
+	pthread_cleanup_pop(1);
+	pthread_cleanup_pop(1);
 }
