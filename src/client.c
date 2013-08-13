@@ -82,8 +82,6 @@ int run_client(struct addrinfo *addr, int time,
 	char *buf = malloc(generator.max_size);
 	CHKALLOC(buf);
 	memset(buf, 7, generator.max_size);
-	/* TODO: Verify that max_size is large enough for the protocol
-	 * header */
 
 	struct addrinfo *rp;
 	int sock;
