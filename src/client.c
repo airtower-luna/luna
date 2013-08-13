@@ -249,9 +249,19 @@ void* echo_thread(void *arg)
 		if (addrlen > ADDRBUF_SIZE)
 			fprintf(stderr, "recv: addr buffer too small!\n");
 
+		/* This really should not happen, but we're dealing
+		 * with an open network socket, so who knows what
+		 * might arrive there... */
+		if (recvlen < MIN_PACKET_SIZE)
+		{
+			fprintf(stderr, "Only %ld bytes received, smaller than "
+				"minimum protocol size! Ignoring packet.\n",
+				recvlen);
+			continue;
+		}
+
 		seq = ntohl(*((int *) buf));
 
-		// TODO: check packet length before evaluating its content
 		rtt.tv_sec = recvtime.tv_sec - sendtime->tv_sec;
 		rtt.tv_usec =
 			recvtime.tv_usec - (sendtime->tv_nsec / NS_PER_US);
