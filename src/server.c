@@ -137,6 +137,19 @@ int run_server(struct addrinfo *addr, int flags)
 #ifdef ENABLE_KUTIME
 		gettimeofday(&stime, NULL);
 #endif
+		/* ensure minimum packet size */
+		if (recvlen < MIN_PACKET_SIZE)
+		{
+			fprintf(stderr, "Only %ld bytes received, "
+				"smaller than minimum protocol size! "
+				"Ignoring packet.\n", recvlen);
+			continue;
+		}
+		/* This only occurs when recvfrom() is cancelled by
+		 * SIGTERM. */
+		if (recvlen == -1)
+			continue;
+
 		/* echo packet if echo flag is set */
 		if (buf[sizeof(int) + sizeof(struct timespec)]
 		    & FTG_FLAG_ECHO)
@@ -155,11 +168,6 @@ int run_server(struct addrinfo *addr, int flags)
 			    NI_DGRAM | NI_NUMERICHOST | NI_NUMERICSERV); // TODO: error check
 
 		seq = ntohl(*((int *) buf));
-
-		/* This should only happen when recvlen is cancelled
-		 * by SIGTERM. */
-		if (recvlen == -1)
-			continue;
 
 		tm = localtime(&(ptime.tv_sec));
 		strftime(tsstr, T_TIME_BUF, time_trans, tm);
