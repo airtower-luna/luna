@@ -239,6 +239,9 @@ void* echo_thread(void *arg)
 	while (work)
 	{
 		addrlen = ADDRBUF_SIZE;
+		/* recvfrom() is a cancellation point according to
+		 * POSIX, so handling the -1 return case is not
+		 * necessary here. */
 		recvlen = recvfrom(sock, buf, buflen, 0, addrbuf, &addrlen);
 		/* get kernel timestamp */
 		ioctl(sock, SIOCGSTAMP, &recvtime); // TODO: error check
@@ -247,11 +250,6 @@ void* echo_thread(void *arg)
 			fprintf(stderr, "recv: addr buffer too small!\n");
 
 		seq = ntohl(*((int *) buf));
-
-		/* This should only happen when recvlen is cancelled
-		 * by SIGTERM. */
-		if (recvlen == -1)
-			continue;
 
 		// TODO: check packet length before evaluating its content
 		rtt.tv_sec = recvtime.tv_sec - sendtime->tv_sec;
