@@ -103,14 +103,18 @@ int run_client(struct addrinfo *addr, int time, int echo,
 	}
 	freeaddrinfo(addr); // no longer required
 
+	/* prepare and start echo handler thread, if requested */
 	pthread_t e_thread;
-	struct echo_thread_data *e_data =
-		malloc(sizeof(struct echo_thread_data));
-	CHKALLOC(e_data);
-	touch_page(e_data, sizeof(struct echo_thread_data));
-	e_data->sock = sock;
-	sem_init(&(e_data->sem), 0, 0); /* TODO: Error handling */
-	pthread_create(&e_thread, NULL, &echo_thread, e_data);
+	struct echo_thread_data *e_data = NULL;
+	if (echo)
+	{
+		e_data = malloc(sizeof(struct echo_thread_data));
+		CHKALLOC(e_data);
+		touch_page(e_data, sizeof(struct echo_thread_data));
+		e_data->sock = sock;
+		sem_init(&(e_data->sem), 0, 0); /* TODO: Error handling */
+		pthread_create(&e_thread, NULL, &echo_thread, e_data);
+	}
 
 	/* current sequence number */
 	int seq = 0;
@@ -120,12 +124,15 @@ int run_client(struct addrinfo *addr, int time, int echo,
 	struct timespec *sendtime = (struct timespec *) (buf + sizeof(int));
 	/* protocol flags field */
 	char *flags = (char *) (buf + sizeof(int) + sizeof(struct timespec));
-	*flags = 0 | FTG_FLAG_ECHO;
+	*flags = 0;
+	if (echo)
+		*flags = *flags | FTG_FLAG_ECHO;
 	/* index in the current block */
 	int bi = 0;
 
 	sem_wait(&ready_sem);
-	sem_wait(&(e_data->sem));
+	if (echo)
+		sem_wait(&(e_data->sem));
 	struct packet_block *block = generator.block;
 	pthread_mutex_lock(block->lock);
 
@@ -188,13 +195,20 @@ int run_client(struct addrinfo *addr, int time, int echo,
 			usage_post.ru_majflt, usage_post.ru_minflt);
 
 	pthread_mutex_unlock(block->lock);
-	pthread_cancel(e_thread);
+	if (echo)
+		pthread_cancel(e_thread);
 	// TODO: appropriate delay to wait for echos
 	pthread_cancel(gen_thread);
 
-	pthread_join(e_thread, NULL);
-	sem_destroy(&(e_data->sem));
-	free(e_data);
+	/* wait for echo handler thread to terminate and free
+	 * associated data */
+	if (echo)
+	{
+		pthread_join(e_thread, NULL);
+		sem_destroy(&(e_data->sem));
+		free(e_data);
+	}
+
 	close(sock);
 	free(buf);
 
