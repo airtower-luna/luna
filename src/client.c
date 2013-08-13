@@ -130,7 +130,7 @@ int run_client(struct addrinfo *addr, int time,
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,
 				&nexttick, &rem); // TODO: error check
 		/* record current time into the packet */
-		clock_gettime(CLOCK_MONOTONIC, sendtime);
+		clock_gettime(CLOCK_REALTIME, sendtime);
 		/* send the packet */
 		if (send(sock, buf, block->data[bi].size, 0) == -1)
 			perror("Error while sending");
