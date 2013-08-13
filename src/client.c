@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -30,6 +31,16 @@ static struct generator_type known_generators[] = {
 	{"random_size", &rand_size_generator_create},
 	{"alt_time", &alternate_time_generator_create},
 	{"gaussian", &gaussian_generator_create},
+};
+
+void* echo_thread(void *arg);
+
+struct echo_thread_data
+{
+	/* socket to read from */
+	int sock;
+	/* post to this semaphore when init is done */
+	sem_t sem;
 };
 
 
@@ -94,6 +105,15 @@ int run_client(struct addrinfo *addr, int time,
 	}
 	freeaddrinfo(addr); // no longer required
 
+	pthread_t e_thread;
+	struct echo_thread_data *e_data =
+		malloc(sizeof(struct echo_thread_data));
+	CHKALLOC(e_data);
+	touch_page(e_data, sizeof(struct echo_thread_data));
+	e_data->sock = sock;
+	sem_init(&(e_data->sem), 0, 0); /* TODO: Error handling */
+	pthread_create(&e_thread, NULL, &echo_thread, e_data);
+
 	/* current sequence number */
 	int seq = 0;
 	/* sequence number in the fast-tg packet */
@@ -107,6 +127,7 @@ int run_client(struct addrinfo *addr, int time,
 	int bi = 0;
 
 	sem_wait(&ready_sem);
+	sem_wait(&(e_data->sem));
 	struct packet_block *block = generator.block;
 	pthread_mutex_lock(block->lock);
 
@@ -169,8 +190,12 @@ int run_client(struct addrinfo *addr, int time,
 			usage_post.ru_majflt, usage_post.ru_minflt);
 
 	pthread_mutex_unlock(block->lock);
+	pthread_cancel(e_thread);
 	pthread_cancel(gen_thread);
 
+	pthread_join(e_thread, NULL);
+	sem_destroy(&(e_data->sem));
+	free(e_data);
 	close(sock);
 	free(buf);
 
@@ -178,4 +203,64 @@ int run_client(struct addrinfo *addr, int time,
 	generator.destroy_generator(&generator);
 	sem_destroy(&semaphore);
 	sem_destroy(&ready_sem);
+}
+
+
+
+/* This function should run in a separate thread to handle echo
+ * packets */
+void* echo_thread(void *arg)
+{
+	struct echo_thread_data *data = (struct echo_thread_data *) arg;
+	int sock = data->sock;
+
+	size_t buflen = MSG_BUF_SIZE;
+	// TODO: free
+	char *buf = malloc(buflen);
+	CHKALLOC(buf);
+	touch_page(buf, buflen);
+	ssize_t recvlen = 0;
+	int seq = 0;
+	// TODO: free
+	struct sockaddr *addrbuf = malloc(ADDRBUF_SIZE);
+	CHKALLOC(addrbuf);
+	touch_page(addrbuf, ADDRBUF_SIZE);
+	socklen_t addrlen = 0;
+	/* timestamp related data */
+	struct timeval recvtime;
+	struct timespec *sendtime = (struct timespec *) (buf + sizeof(int));
+	struct timeval rtt;
+
+	int work = 1;
+
+	sem_post(&(data->sem));
+
+	while (work)
+	{
+		addrlen = ADDRBUF_SIZE;
+		recvlen = recvfrom(sock, buf, buflen, 0, addrbuf, &addrlen);
+		/* get kernel timestamp */
+		ioctl(sock, SIOCGSTAMP, &recvtime); // TODO: error check
+
+		if (addrlen > ADDRBUF_SIZE)
+			fprintf(stderr, "recv: addr buffer too small!\n");
+
+		seq = ntohl(*((int *) buf));
+
+		/* This should only happen when recvlen is cancelled
+		 * by SIGTERM. */
+		if (recvlen == -1)
+			continue;
+
+		// TODO: check packet length before evaluating its content
+		rtt.tv_sec = recvtime.tv_sec - sendtime->tv_sec;
+		rtt.tv_usec =
+			recvtime.tv_usec - (sendtime->tv_nsec / NS_PER_US);
+		if (rtt.tv_usec < 0)
+		{
+			rtt.tv_usec += US_PER_S;
+			rtt.tv_sec -= 1;
+		}
+		printf("%i\t%ld.%06ld\n", seq, rtt.tv_sec, rtt.tv_usec);
+	}
 }

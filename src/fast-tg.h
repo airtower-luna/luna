@@ -21,6 +21,8 @@
 
 /* 1s = 1000000µs */
 #define US_PER_S 1000000
+/* 1µs = 1000ns */
+#define NS_PER_US 1000
 
 /*
  * Minimum packet size as required for our payload. Larger sizes are
@@ -37,6 +39,12 @@
 #define MIN_PACKET_SIZE (sizeof(int) + sizeof(struct timespec) + sizeof(char))
 /* set in flags byte to request a response from the server */
 #define FTG_FLAG_ECHO 1
+
+/* size of the buffer for one message */
+#define MSG_BUF_SIZE 1500
+/* size of the buffer for one sockaddr struct (IPv6 sockaddr is the
+ * largest one we should expect) */
+#define ADDRBUF_SIZE (sizeof(struct sockaddr_in6))
 
 /* macro and function to check if memory allocation was successful */
 #define CHKALLOC(a) chkalloc(a, __FILE__, __LINE__)

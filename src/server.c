@@ -19,11 +19,6 @@
 #include "fast-tg.h"
 #include "server.h"
 
-/* size of the buffer for one message */
-#define MSG_BUF_SIZE 1500
-/* size of the buffer for one sockaddr struct (IPv6 sockaddr is the
- * largest one we should expect) */
-#define ADDRBUF_SIZE (sizeof(struct sockaddr_in6))
 /* length for address and port strings (probably a bit longer than
  * required) */
 #define ADDR_STR_LEN 100
