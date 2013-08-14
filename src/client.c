@@ -195,27 +195,30 @@ int run_client(struct addrinfo *addr, int time, int echo,
 			usage_post.ru_majflt, usage_post.ru_minflt);
 
 	pthread_mutex_unlock(block->lock);
-	if (echo)
-		pthread_cancel(e_thread);
-	// TODO: appropriate delay to wait for echos
 	pthread_cancel(gen_thread);
 
-	/* wait for echo handler thread to terminate and free
-	 * associated data */
+	/* send buffer isn't needed any more */
+	free(buf);
+
+	/* free up generator resources after it has terminated */
+	pthread_join(gen_thread, NULL);
+	generator.destroy_generator(&generator);
+	sem_destroy(&semaphore);
+	sem_destroy(&ready_sem);
+
 	if (echo)
 	{
+		// TODO: appropriate delay to wait for echos
+		pthread_cancel(e_thread);
+		/* wait for echo handler thread to terminate and free
+		 * associated data */
 		pthread_join(e_thread, NULL);
 		sem_destroy(&(e_data->sem));
 		free(e_data);
 	}
 
+	/* close socket after echo thread has terminated */
 	close(sock);
-	free(buf);
-
-	pthread_join(gen_thread, NULL);
-	generator.destroy_generator(&generator);
-	sem_destroy(&semaphore);
-	sem_destroy(&ready_sem);
 }
 
 
