@@ -303,9 +303,12 @@ void* echo_thread(void *arg)
 		strftime(timestr, T_TIME_BUF, "%s", &tm);
 
 		/* Write packet information */
-		printf("%s%06ld\t%i\t%ld\t%ld.%06ld\n",
-		       timestr, recvtime.tv_usec, seq, recvlen,
-		       rtt.tv_sec, rtt.tv_usec);
+		printf("%s%06ld\t%i\t%ld\t",
+		       timestr, recvtime.tv_usec, seq, recvlen);
+		if (rtt.tv_sec > 0)
+			printf("%ld%06ld\n", rtt.tv_sec, rtt.tv_usec);
+		else
+			printf("%ld\n", rtt.tv_usec);
 	}
 
 	/* The function should never reach this point because it will
