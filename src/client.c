@@ -33,6 +33,10 @@ static struct generator_type known_generators[] = {
 	{"gaussian", &gaussian_generator_create},
 };
 
+
+
+#define ECHO_PRIO_OFFSET 2
+
 void* echo_thread(void *arg);
 
 struct echo_thread_data
@@ -230,6 +234,22 @@ void* echo_thread(void *arg)
 	struct echo_thread_data *data = (struct echo_thread_data *) arg;
 	int sock = data->sock;
 
+	/* Processing echo packets is less urgent than sending or
+	 * generation, because the kernel buffers them. Reduce
+	 * priority by up to ECHO_PRIO_OFFSET, as long as it remains
+	 * within the general priority limits. */
+	pthread_t self = pthread_self();
+	int sched_policy = 0;
+	struct sched_param sched_param;
+	pthread_getschedparam(self, &sched_policy, &sched_param);
+	int min_prio = sched_get_priority_min(sched_policy);
+	if (sched_param.sched_priority - ECHO_PRIO_OFFSET < min_prio)
+		pthread_setschedprio(self, min_prio);
+	else
+		pthread_setschedprio
+			(self, sched_param.sched_priority - ECHO_PRIO_OFFSET);
+
+	/* allocate receive buffer */
 	size_t buflen = MSG_BUF_SIZE;
 	char *buf = malloc(buflen);
 	CHKALLOC(buf);
