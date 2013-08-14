@@ -33,8 +33,8 @@
  * struct timespec: clock time recorded right before sending
  * char: flags byte
  *
- * TODO: Could the sizeof-based definition cause problems between
- * different architectures?
+ * The two timespec struct components are defined to always be 8 byte
+ * each, so this is platform independent.
  */
 #define MIN_PACKET_SIZE (sizeof(int) + sizeof(struct timespec) + sizeof(char))
 /* set in flags byte to request a response from the server */
