@@ -176,13 +176,13 @@ int run_server(struct addrinfo *addr, int flags)
 		if (flags & SERVER_TSV_OUTPUT)
 		{
 #ifdef ENABLE_KUTIME
-			printf("%s%06ld\t%s%06ld\t%s\t%s\t%i\t%i\n",
+			printf("%s%06ld\t%s%06ld\t%s\t%s\t%i\t%ld\n",
 			       tsstr, ptime.tv_usec, tscstr, stime.tv_usec,
-			       addrstr, portstr, seq, (int) recvlen);
+			       addrstr, portstr, seq, recvlen);
 #else
-			printf("%s%06ld\t%s\t%s\t%i\t%i\n",
+			printf("%s%06ld\t%s\t%s\t%i\t%ld\n",
 			       tsstr, ptime.tv_usec,
-			       addrstr, portstr, seq, (int) recvlen);
+			       addrstr, portstr, seq, recvlen);
 #endif
 		}
 		else
