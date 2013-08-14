@@ -302,8 +302,9 @@ void* echo_thread(void *arg)
 		localtime_r(&(recvtime.tv_sec), &tm);
 		strftime(timestr, T_TIME_BUF, "%s", &tm);
 
-		printf("%s%06ld\t%i\t%ld.%06ld\n",
-		       timestr, recvtime.tv_usec, seq,
+		/* Write packet information */
+		printf("%s%06ld\t%i\t%ld\t%ld.%06ld\n",
+		       timestr, recvtime.tv_usec, seq, recvlen,
 		       rtt.tv_sec, rtt.tv_usec);
 	}
 
