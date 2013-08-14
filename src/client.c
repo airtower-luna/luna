@@ -244,11 +244,21 @@ void* echo_thread(void *arg)
 	pthread_cleanup_push(&free, addrbuf);
 	socklen_t addrlen = 0;
 	/* timestamp related data */
-	struct timeval recvtime;
 	struct timespec *sendtime = (struct timespec *) (buf + sizeof(int));
-	struct timeval rtt;
+	struct timeval recvtime = {0, 0};
+	struct timeval rtt = {0, 0};
+
+	/* prepare time to text conversion */
+	tzset();
+	struct tm tm;
+	localtime_r(&(rtt.tv_sec), &tm);
+	char *timestr = calloc(T_TIME_BUF, sizeof(char));
+	CHKALLOC(timestr);
+	touch_page(timestr, T_TIME_BUF);
+	pthread_cleanup_push(&free, timestr);
 
 	int work = 1;
+	printf("# ktime\tsequence\tsize\trtt\n");
 	/* init done */
 	sem_post(&(data->sem));
 
@@ -278,6 +288,7 @@ void* echo_thread(void *arg)
 
 		seq = ntohl(*((int *) buf));
 
+		/* Calculate RTT */
 		rtt.tv_sec = recvtime.tv_sec - sendtime->tv_sec;
 		rtt.tv_usec =
 			recvtime.tv_usec - (sendtime->tv_nsec / NS_PER_US);
@@ -286,7 +297,14 @@ void* echo_thread(void *arg)
 			rtt.tv_usec += US_PER_S;
 			rtt.tv_sec -= 1;
 		}
-		printf("%i\t%ld.%06ld\n", seq, rtt.tv_sec, rtt.tv_usec);
+
+		/* Process arrival time */
+		localtime_r(&(recvtime.tv_sec), &tm);
+		strftime(timestr, T_TIME_BUF, "%s", &tm);
+
+		printf("%s%06ld\t%i\t%ld.%06ld\n",
+		       timestr, recvtime.tv_usec, seq,
+		       rtt.tv_sec, rtt.tv_usec);
 	}
 
 	/* The function should never reach this point because it will
@@ -294,6 +312,7 @@ void* echo_thread(void *arg)
 	 * pthread_cleanup_push() requires a corresponding
 	 * pthread_cleanup_pop(). Cleanup handlers will, of course, be
 	 * called upon cancellation. */
+	pthread_cleanup_pop(1);
 	pthread_cleanup_pop(1);
 	pthread_cleanup_pop(1);
 }

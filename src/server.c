@@ -22,9 +22,6 @@
 /* length for address and port strings (probably a bit longer than
  * required) */
 #define ADDR_STR_LEN 100
-/* buffer size for time string (%T or %s of strftime, with some room
- * to spare for the latter) */
-#define T_TIME_BUF 16
 
 /* changed to 0 by SIGTERM to stop the receive loop */
 int work = 1;

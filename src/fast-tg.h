@@ -63,6 +63,10 @@ void chkalloc(void *ptr, char *file, int line);
 		}							\
 	} while (0)
 
+/* buffer size for time strings (%T or %s of strftime, with some room
+ * to spare for the latter) */
+#define T_TIME_BUF 16
+
 /* Compare two struct rusage data sets to see if any page faults
  * occurred in between */
 int check_pfaults(struct rusage *pre, struct rusage *post);
