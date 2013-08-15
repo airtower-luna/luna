@@ -52,7 +52,7 @@ struct echo_thread_data
 int run_client(struct addrinfo *addr, int time, int echo,
 	       char *generator_type, char *generator_args)
 {
-	printf("Generator: %s\n", generator_type);
+	fprintf(stderr, "Generator: %s\n", generator_type);
 
 	sem_t semaphore;
 	sem_t ready_sem;

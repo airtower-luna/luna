@@ -78,8 +78,8 @@ void printtimeres()
 	if (clock_getres(CLOCK_MONOTONIC, &timeres) == -1)
 		perror("Could not get clock resolution");
 	else
-		printf("Kernel clock resolution: %ld.%09lds\n",
-		       timeres.tv_sec, timeres.tv_nsec);
+		fprintf(stderr, "Kernel clock resolution: %ld.%09lds\n",
+			timeres.tv_sec, timeres.tv_nsec);
 }
 
 
