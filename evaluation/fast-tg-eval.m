@@ -143,3 +143,27 @@ function h = transparent_hist(data, range, binwidth, colorindex)
       "facealpha", 0.5);
   return;
 endfunction
+
+
+
+# Calculate upper and lower limits for a plot, based on "factor"
+# standard deviations around the median. If more than one data set
+# is given, the lowest lower limit and highest upper limit are used.
+#
+# factor: How many times the standard deviation around the median
+#	should define the limits?
+# varargin: Any number of data arrays (at least one)
+function [lower, upper] = std_plot_range(factor, varargin)
+  for i = 1:length(varargin)
+    [u{i}, l{i}, m{i}, s{i}] = basic_metrics(varargin{i});
+
+    # lower plot limit (median - factor * standard deviation)
+    ll(i) = max(l{i}, (m{i} - factor * s{i}));
+    # upper plot limit (median + factor * standard deviation)
+    ul(i) = min(u{i}, (m{i} + factor * s{i}));
+  endfor
+
+  lower = min(ll);
+  upper = max(ul);
+  return;
+endfunction

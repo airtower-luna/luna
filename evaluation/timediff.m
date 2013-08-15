@@ -39,11 +39,6 @@ function eval_iat(filename, output_format, upper_limit, varargin)
   for i = 1:length(varargin)
     iats{i} = diff(varargin{i});
     [u{i}, l{i}, m{i}, s{i}] = basic_metrics(iats{i});
-
-    # lower plot limit (median - 2 * standard deviation)
-    ll(i) = max(l{i}, (m{i} - 2 * s{i}));
-    # upper plot limit (median + 2 * standard deviation)
-    ul(i) = min(u{i}, (m{i} + 2 * s{i}));
   endfor
 
   # printing a summary doesn't make sense for more than one data set
@@ -64,10 +59,12 @@ function eval_iat(filename, output_format, upper_limit, varargin)
   global max_hist_bins;
   # bin width is at least one, otherwise range is split evenly in
   # max_hist_bins bins
-  range_lower = max([min(ll) 0]);
-  range_upper = max(ul);
+  [ll, ul] = std_plot_range(2, iats{:});
+  range_lower = max([ll 0]);
   if (exist("upper_limit", "var") && upper_limit > 0)
     range_upper = min([range_upper upper_limit]);
+  else
+    range_upper = ul;
   endif
   binwidth = max(1, (range_upper - range_lower) / max_hist_bins);
   range = [range_lower:binwidth:range_upper];
