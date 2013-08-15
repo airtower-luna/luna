@@ -167,3 +167,22 @@ function [lower, upper] = std_plot_range(factor, varargin)
   upper = max(ul);
   return;
 endfunction
+
+
+
+# bin width is at least one, otherwise range is split evenly in
+# "bins" bins
+# lower: lower limit
+# upper: upper limit
+# bins (optional): maximum number of bins
+function [range, binwidth] = hist_range(lower, upper, bins)
+  global max_hist_bins;
+  if (!exist("bins", "var"))
+    bins = max_hist_bins;
+  endif
+
+  # binwidth should not be below one
+  binwidth = max(1, (upper - lower) / bins);
+  range = [lower:binwidth:upper];
+  return;
+endfunction

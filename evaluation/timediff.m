@@ -56,9 +56,6 @@ function eval_iat(filename, output_format, upper_limit, varargin)
     endfor
   endif
 
-  global max_hist_bins;
-  # bin width is at least one, otherwise range is split evenly in
-  # max_hist_bins bins
   [ll, ul] = std_plot_range(2, iats{:});
   range_lower = max([ll 0]);
   if (exist("upper_limit", "var") && upper_limit > 0)
@@ -66,8 +63,7 @@ function eval_iat(filename, output_format, upper_limit, varargin)
   else
     range_upper = ul;
   endif
-  binwidth = max(1, (range_upper - range_lower) / max_hist_bins);
-  range = [range_lower:binwidth:range_upper];
+  [range, binwidth] = hist_range(range_lower, range_upper);
 
   # use global color list for combined diagrams
   global colors;
