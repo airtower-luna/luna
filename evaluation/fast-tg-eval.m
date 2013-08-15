@@ -85,7 +85,7 @@ endfunction
 
 # Column numbers by meaning in fast-tg tab separated output
 # If the parameter is missing, false is assumed.
-function cols = ftg_column_definitions(kutime)
+function cols = server_column_definitions(kutime)
   cols.ktime = 1;
 # if there is a user space time column, the following columns shift
   if (exist("kutime", "var") && kutime)

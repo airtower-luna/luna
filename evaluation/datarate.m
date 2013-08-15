@@ -34,7 +34,7 @@ if length(files) < 1
 endif
 
 # load column meanings depending on kutime flag
-cols = ftg_column_definitions(parser.Results.kutime);
+cols = server_column_definitions(parser.Results.kutime);
 
 output_format = parser.Results.format;
 
