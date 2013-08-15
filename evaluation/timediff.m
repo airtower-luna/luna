@@ -86,13 +86,7 @@ function eval_iat(filename, output_format, upper_limit, varargin)
 
   # plot the histogram(s)
   for i = 1:length(iats)
-    [yh xh] = hist(iats{i}, range, 1);
-    [ys xs] = stairs(yh, xh);
-    xs = [xs(1) - binwidth; xs(1) - binwidth; xs; xs(end)];
-    xs = xs .+ (binwidth / 2);
-    ys = [0; ys(1); ys; 0];
-    h{i} = fill(xs, ys, colors{i});
-    set(h{i}, "edgecolor", colors{i}, "facecolor", colors{i}, "facealpha", 0.5);
+    h{i} = transparent_hist(iats{i}, range, binwidth, i);
   endfor
 
   # figure complete

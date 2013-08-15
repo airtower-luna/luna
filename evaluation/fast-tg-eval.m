@@ -113,3 +113,33 @@ function cols = echo_column_definitions()
   cols.rtt = 4;
   return;
 endfunction
+
+
+
+# data: data array to plot
+# range: histogram range, format: [lower_limit:binwidth:upper_limit]
+#	Data outside the limit will be lumped into left-/rightmost bin
+# binwidth: binwidth for the histogram
+# colorindex (optional): index color to use in the global color array
+function h = transparent_hist(data, range, binwidth, colorindex)
+  # color definitions and optional parameter
+  global colors;
+  if (!exist("colorindex", "var"))
+    colorindex = 1;
+  endif
+
+  # calculate and plot
+  [yh xh] = hist(data, range, 1);
+  [ys xs] = stairs(yh, xh);
+  # create top lines of left-/rightmost columns
+  xs = [xs(1) - binwidth; xs(1) - binwidth; xs; xs(end)];
+  # histogram gets slightly shifted when getting drawn as stair plot, fix that
+  xs = xs .+ (binwidth / 2);
+  # create outer socket point of left-/rightmost columns
+  ys = [0; ys(1); ys; 0];
+  # draw the plot
+  h = fill(xs, ys, colors{colorindex});
+  set(h, "edgecolor", colors{colorindex}, "facecolor", colors{colorindex},
+      "facealpha", 0.5);
+  return;
+endfunction
