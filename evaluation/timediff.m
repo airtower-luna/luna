@@ -56,34 +56,20 @@ function eval_iat(filename, output_format, upper_limit, varargin)
     endfor
   endif
 
-  [ll, ul] = std_plot_range(2, iats{:});
-  range_lower = max([ll 0]);
-  if (exist("upper_limit", "var") && upper_limit > 0)
-    range_upper = min([range_upper upper_limit]);
-  else
-    range_upper = ul;
-  endif
-  [range, binwidth] = hist_range(range_lower, range_upper);
-
-  # use global color list for combined diagrams
-  global colors;
-
   # basic figure setup
   clf;
   hold on;
-  axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)], "autoy");
   set(gca, "yscale", "log");
   title("Distribution of inter arrival times");
   xlabel("IAT [$\\mu s$]");
   ylabel("Frequency");
-
-  # plot the histogram(s)
-  for i = 1:length(iats)
-    h{i} = transparent_hist(iats{i}, range, binwidth, i);
-  endfor
-
-  # figure complete
   hold off;
+
+  if (exist("upper_limit", "var") && upper_limit > 0)
+    datasets_hist_plot(2, iats, 0, upper_limit);
+  else
+    datasets_hist_plot(2, iats, 0);
+  endif
 
   print_format(strcat(filename, "-iat.", output_format), output_format);
 endfunction

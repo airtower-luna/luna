@@ -186,3 +186,46 @@ function [range, binwidth] = hist_range(lower, upper, bins)
   range = [lower:binwidth:upper];
   return;
 endfunction
+
+
+
+# Histogram plot function
+#
+# Can draw multiple datasets as transparent histograms, enabling easy
+# comparisons
+#
+# factor: How many times the standard deviation around the median
+#	should define the limits?
+# datasets: datasets to plot (array)
+# min: lowest permitted lower plot limit
+# max: highest permitted upper plot limit
+function h = datasets_hist_plot(factor, datasets, min, max)
+  [ll, ul] = std_plot_range(factor, datasets{:});
+  # apply give minimum
+  if (exist("min", "var"))
+    range_lower = max([ll min]);
+  else
+    range_lower = ll;
+  endif
+  # apply give maximum
+  if (exist("max", "var"))
+    range_upper = min([ul max]);
+  else
+    range_upper = ul;
+  endif
+
+  [range, binwidth] = hist_range(range_lower, range_upper);
+
+  # start plotting
+  hold on;
+  # set figure range
+  axis([(range(1) - binwidth / 2) (range(end) + binwidth / 2)], "autoy");
+
+  # plot the histogram(s)
+  for i = 1:length(datasets)
+    h{i} = transparent_hist(datasets{i}, range, binwidth, i);
+  endfor
+
+  # figure complete
+  hold off;
+endfunction
