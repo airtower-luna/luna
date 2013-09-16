@@ -31,7 +31,7 @@
 #define SERVER_PRIO_OFFSET 20
 
 /* valid command line options for getopt */
-#define CLI_OPTS "sc:p:46Tt:g:a:e"
+#define CLI_OPTS "sc:p:46Tt:g:a:eo:"
 
 void chkalloc(void *ptr, char *file, int line)
 {
@@ -108,6 +108,9 @@ int main(int argc, char *argv[])
 	/* the packet generator to use and its arguments */
 	char *generator = NULL;
 	char *gen_args = NULL;
+	/* file path to write output data to, will be overwritten */
+	char *datafile = NULL;
+
 	for (int opt = getopt(argc, argv, CLI_OPTS);
 	     opt != -1;
 	     opt = getopt(argc, argv, CLI_OPTS))
@@ -161,6 +164,10 @@ int main(int argc, char *argv[])
 			break;
 		case 'e': // request echo (client only)
 			echo = 1;
+			break;
+		case 'o': // data output file
+			datafile = strdup(optarg);
+			CHKALLOC(datafile);
 			break;
 		default:
 			break;
@@ -245,7 +252,8 @@ int main(int argc, char *argv[])
 	free(generator);
 
 	if (server)
-		retval = run_server(res, flags);
+		retval = run_server(res, flags, datafile);
+	free(datafile);
 
 	return retval;
 }

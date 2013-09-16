@@ -26,7 +26,7 @@
 /* changed to 0 by SIGTERM to stop the receive loop */
 int work = 1;
 
-int run_server(struct addrinfo *addr, int flags)
+int run_server(struct addrinfo *addr, int flags, const char* datafile)
 {
 	/* inet6_only one must be a real variable so it can be used in
 	 * setsockopt. */
@@ -68,6 +68,18 @@ int run_server(struct addrinfo *addr, int flags)
 		memset(&act, 0, sizeof(struct sigaction));
 		act.sa_handler = term_server;
 		sigaction(SIGTERM, &act, NULL);
+	}
+
+	/* Open output file if specified */
+	FILE *dataout = stdout;
+	if (datafile != NULL)
+	{
+		dataout = fopen(datafile, "w");
+		if (dataout == NULL)
+		{
+			perror("Opening output file in run_server");
+			exit(EXIT_FILEFAIL);
+		}
 	}
 
 	size_t buflen = MSG_BUF_SIZE;
@@ -112,9 +124,10 @@ int run_server(struct addrinfo *addr, int flags)
 	if (flags & SERVER_TSV_OUTPUT)
 	{
 #ifdef ENABLE_KUTIME
-		printf("# ktime\tutime\tsource\tport\tsequence\tsize\n");
+		fprintf(dataout,
+			"# ktime\tutime\tsource\tport\tsequence\tsize\n");
 #else
-		printf("# ktime\tsource\tport\tsequence\tsize\n");
+		fprintf(dataout, "# ktime\tsource\tport\tsequence\tsize\n");
 #endif
 		time_trans = "%s";
 	}
@@ -176,11 +189,11 @@ int run_server(struct addrinfo *addr, int flags)
 		if (flags & SERVER_TSV_OUTPUT)
 		{
 #ifdef ENABLE_KUTIME
-			printf("%s%06ld\t%s%06ld\t%s\t%s\t%i\t%ld\n",
+			fprintf(dataout, "%s%06ld\t%s%06ld\t%s\t%s\t%i\t%ld\n",
 			       tsstr, ptime.tv_usec, tscstr, stime.tv_usec,
 			       addrstr, portstr, seq, recvlen);
 #else
-			printf("%s%06ld\t%s\t%s\t%i\t%ld\n",
+			fprintf(dataout, "%s%06ld\t%s\t%s\t%i\t%ld\n",
 			       tsstr, ptime.tv_usec,
 			       addrstr, portstr, seq, recvlen);
 #endif
@@ -188,15 +201,16 @@ int run_server(struct addrinfo *addr, int flags)
 		else
 		{
 #ifdef ENABLE_KUTIME
-			printf("Received packet %i (%i bytes) from %s, port %s "
-			       "at %s.%06ld.\n",
-			       seq, (int) recvlen, addrstr, portstr, tsstr,
-			       ptime.tv_usec, tscstr, stime.tv_usec);
+			fprintf(dataout, "Received packet %i (%i bytes) from "
+				"%s, port %s at %s.%06ld (kernel), %s.%06ld "
+				"(user space).\n",
+				seq, (int) recvlen, addrstr, portstr, tsstr,
+				ptime.tv_usec, tscstr, stime.tv_usec);
 #else
-			printf("Received packet %i (%i bytes) from %s, port %s "
-			       "at %s.%06ld.\n",
-			       seq, (int) recvlen, addrstr, portstr, tsstr,
-			       ptime.tv_usec);
+			fprintf(dataout, "Received packet %i (%i bytes) from "
+				"%s, port %s at %s.%06ld.\n",
+				seq, (int) recvlen, addrstr, portstr, tsstr,
+				ptime.tv_usec);
 #endif
 		}
 	}
@@ -221,6 +235,8 @@ int run_server(struct addrinfo *addr, int flags)
 	free(addrstr);
 	free(portstr);
 	free(buf);
+	if (datafile != NULL)
+		fclose(dataout);
 	close(sock);
 }
 

@@ -18,6 +18,8 @@
 #define EXIT_NETFAIL 2
 /* exit code for memory errors */
 #define EXIT_MEMFAIL 3
+/* exit code for file access errors */
+#define EXIT_FILEFAIL 4
 
 /* 1s = 1000000µs */
 #define US_PER_S 1000000
