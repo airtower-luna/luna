@@ -1,8 +1,11 @@
 #!/usr/bin/perl
 use strict;
+use threads;
+use threads::shared;
 use Net::OpenSSH;
 
 my @conns;
+my @workers;
 my %general = ("default_exec" => "/usr/local/bin/fast-tg");
 
 my $conffile = $ARGV[0];
@@ -62,17 +65,32 @@ foreach my $conn (@conns)
     }
 }
 
-# run the first configured connection
-&run_connection($conns[0]);
+# Start a worker thread for each connection.
+for (my $i = 0; $i < @conns; $i++)
+{
+     $workers[$i] = threads->create({'context' => 'void'},
+				    \&run_connection,
+				    $conns[$i]);
+}
+
+# Wait until all worker threads have terminated, order doesn't matter.
+foreach my $thr (@workers)
+{
+    $thr->join();
+}
 
 
 
-# one parameter: a connection hash reference
+# This function runs one connection, passed as a hash reference.
 sub run_connection
 {
     my $conn = $_[0];
     $conn->{server_ssh} = &start_ssh($conn->{server});
     $conn->{client_ssh} = &start_ssh($conn->{client});
+    # Running these three functions synchronously ensures that the
+    # server is (most likely) ready when the client starts running,
+    # and the transmission is (certainly) complete before the server
+    # is stopped.
     &start_server($conn);
     &run_client($conn);
     &stop_server($conn);
