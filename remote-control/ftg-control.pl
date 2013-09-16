@@ -3,7 +3,7 @@ use strict;
 use Net::OpenSSH;
 
 my @conns;
-my %general;
+my %general = ("default_exec" => "/usr/local/bin/fast-tg");
 
 my $conffile = $ARGV[0];
 die "Configuration file missing or not readable!\n" if (! -r $conffile);
@@ -203,6 +203,7 @@ sub init_conn
     my %conn =
 	(
 	 "id" => $_[0],
+	 # The following values are configuration options:
 	 "server" => undef,
 	 "client" => undef,
 	 "port" => "4567",
@@ -210,12 +211,12 @@ sub init_conn
 	 "generator_args" => undef,
 	 "echo" => undef,
 	 # commands to run
-	 "server_exec" => "/usr/local/bin/fast-tg",
-	 "client_exec" => "/usr/local/bin/fast-tg",
+	 "server_exec" => $general{default_exec},
+	 "client_exec" => $general{default_exec},
 	 # local output files
 	 "server_output" => undef,
 	 "client_output" => undef,
-	 # internal, not for configuration
+	 # Variables below this point are internal, not for configuration
 	 "server_ssh" => undef,
 	 "server_pidfile" => undef,
 	 "server_outfile" => undef,
