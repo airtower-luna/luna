@@ -175,6 +175,16 @@ sub run_client
 	$command = $command." -e -o ".$conn->{client_outfile};
     }
 
+    # add generator settings, if present
+    if (defined $conn->{generator})
+    {
+	$command = $command." -g ".$conn->{generator};
+	if (defined $conn->{generator_args})
+	{
+	    $command = $command." -a ".$conn->{generator_args};
+	}
+    }
+
     # run client
     $ssh->system($command);
     print "Command \"".$command."\" failed: ". $ssh->error."\n"
