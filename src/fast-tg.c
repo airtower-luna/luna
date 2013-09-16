@@ -247,7 +247,8 @@ int main(int argc, char *argv[])
 	}
 
 	if (client)
-		retval = run_client(res, time, echo, generator, gen_args);
+		retval = run_client(res, time, echo, generator, gen_args,
+				    datafile);
 	free(gen_args);
 	free(generator);
 

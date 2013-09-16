@@ -38,6 +38,7 @@ static struct generator_type known_generators[] = {
 #define ECHO_PRIO_OFFSET 2
 
 void* echo_thread(void *arg);
+void _fclose_wrapper(void *arg);
 
 struct echo_thread_data
 {
@@ -45,12 +46,15 @@ struct echo_thread_data
 	int sock;
 	/* post to this semaphore when init is done */
 	sem_t sem;
+	/* output file or NULL */
+	const char *datafile;
 };
 
 
 
 int run_client(struct addrinfo *addr, int time, int echo,
-	       char *generator_type, char *generator_args)
+	       char *generator_type, char *generator_args,
+	       const char *datafile)
 {
 	fprintf(stderr, "Generator: %s\n", generator_type);
 
@@ -116,6 +120,7 @@ int run_client(struct addrinfo *addr, int time, int echo,
 		CHKALLOC(e_data);
 		touch_page(e_data, sizeof(struct echo_thread_data));
 		e_data->sock = sock;
+		e_data->datafile = datafile;
 		sem_init(&(e_data->sem), 0, 0); /* TODO: Error handling */
 		pthread_create(&e_thread, NULL, &echo_thread, e_data);
 	}
@@ -277,8 +282,21 @@ void* echo_thread(void *arg)
 	touch_page(timestr, T_TIME_BUF);
 	pthread_cleanup_push(&free, timestr);
 
+	/* Open output file if specified */
+	FILE *dataout = stdout;
+	if (data->datafile != NULL)
+	{
+		dataout = fopen(data->datafile, "w");
+		if (dataout == NULL)
+		{
+			perror("Opening output file in run_server");
+			exit(EXIT_FILEFAIL);
+		}
+	}
+	pthread_cleanup_push(&_fclose_wrapper, dataout);
+
 	int work = 1;
-	printf("# ktime\tsequence\tsize\trtt\n");
+	fprintf(dataout, "# ktime\tsequence\tsize\trtt\n");
 	/* init done */
 	sem_post(&(data->sem));
 
@@ -323,12 +341,12 @@ void* echo_thread(void *arg)
 		strftime(timestr, T_TIME_BUF, "%s", &tm);
 
 		/* Write packet information */
-		printf("%s%06ld\t%i\t%ld\t",
-		       timestr, recvtime.tv_usec, seq, recvlen);
+		fprintf(dataout, "%s%06ld\t%i\t%ld\t",
+			timestr, recvtime.tv_usec, seq, recvlen);
 		if (rtt.tv_sec > 0)
-			printf("%ld%06ld\n", rtt.tv_sec, rtt.tv_usec);
+			fprintf(dataout, "%ld%06ld\n", rtt.tv_sec, rtt.tv_usec);
 		else
-			printf("%ld\n", rtt.tv_usec);
+			fprintf(dataout, "%ld\n", rtt.tv_usec);
 	}
 
 	/* The function should never reach this point because it will
@@ -339,4 +357,24 @@ void* echo_thread(void *arg)
 	pthread_cleanup_pop(1);
 	pthread_cleanup_pop(1);
 	pthread_cleanup_pop(1);
+	pthread_cleanup_pop(1);
+}
+
+
+
+/* This wrapper is needed because fclose does not match the signature
+ * required for pthread_cleanup_push(). If an error occurs, an error
+ * message is written, but no further action taken. Since this
+ * function is only called when the process is about to exit, this
+ * should be safe. */
+void _fclose_wrapper(void *arg)
+{
+	if (arg == stdout)
+		return;
+
+	if (fclose((FILE *) arg))
+	{
+		perror("Opening output file in run_server");
+		exit(EXIT_FILEFAIL);
+	}
 }

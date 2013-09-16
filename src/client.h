@@ -10,6 +10,7 @@
  * generator_args: parameters for the generator
  */
 int run_client(struct addrinfo *addr, int time, int echo,
-	       char *generator_type, char *generator_args);
+	       char *generator_type, char *generator_args,
+	       const char *datafile);
 
 #endif /* __FTG_CLIENT_H__ */
