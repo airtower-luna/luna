@@ -80,7 +80,8 @@ sub run_connection
 
 
 
-# Necessary parameter: [user@]server[:sshport]
+# Establish an SSH connection to the given host, passed as a string
+# parameter in the usual format: [user@]server[:sshport]
 sub start_ssh
 {
     my $host = $_[0];
@@ -92,7 +93,7 @@ sub start_ssh
 
 
 
-# Start the server
+# Start the server for this connection
 # One parameter: a connection hash reference
 sub start_server
 {
@@ -122,7 +123,8 @@ sub start_server
 
 
 
-# one parameter: a connection hash reference
+# Stop the server for this connection
+# One parameter: a connection hash reference
 sub stop_server
 {
     my $conn = $_[0];
