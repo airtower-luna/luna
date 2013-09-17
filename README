@@ -2,3 +2,16 @@ src/		C source code of the traffic generator
 
 evaluation/	Octave scripts and related stuff to evalutate the
 		output from fast-tg
+
+remote-control/	Remote control script for distributed use
+
+Build dependencies: Full autotools, modern GCC and glibc, libgsl
+
+The remote control script also needs the Net::OpenSSH package (and
+OpenSSH, of course).
+
+List of required Debian packages (may be incomplete):
+	build-essentials
+	autoconf-archive
+	libgsl0-dev
+	libnet-openssh-perl
