@@ -182,8 +182,9 @@ sub run_client
     my $conn = $_[0];
     my $ssh = $conn->{client_ssh};
 
-    # basic client command
-    my $command = $conn->{client_exec}." -c ".$conn->{server}." -p ".$conn->{port};
+    # build client command
+    my $command = $conn->{client_exec}." -c ".$conn->{server}.
+	" -p ".$conn->{port}." -t ".$conn->{time};
 
     # add -e and output file, if requested
     if ($conn->{echo} eq "true")
@@ -236,9 +237,12 @@ sub init_conn
 	 # The following values are configuration options:
 	 "server" => undef,
 	 "client" => undef,
-	 "port" => "4567",
+	 "port" => 4567,
 	 "generator" => undef,
 	 "generator_args" => undef,
+	 # time for the client to run, in seconds
+	 "time" => 2,
+	 # set to true to request echo packets
 	 "echo" => undef,
 	 # commands to run
 	 "server_exec" => $general{default_exec},
