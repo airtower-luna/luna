@@ -85,6 +85,11 @@ foreach my $thr (@workers)
 sub run_connection
 {
     my $conn = $_[0];
+    if (not defined $conn->{target})
+    {
+	$conn->{target} = $conn->{server};
+    }
+
     $conn->{server_ssh} = &start_ssh($conn->{server});
     $conn->{client_ssh} = &start_ssh($conn->{client});
     # Running these three functions synchronously ensures that the
@@ -183,7 +188,7 @@ sub run_client
     my $ssh = $conn->{client_ssh};
 
     # build client command
-    my $command = $conn->{client_exec}." -c ".$conn->{server}.
+    my $command = $conn->{client_exec}." -c ".$conn->{target}.
 	" -p ".$conn->{port}." -t ".$conn->{time};
 
     # add -e and output file, if requested
@@ -238,6 +243,11 @@ sub init_conn
 	 "server" => undef,
 	 "client" => undef,
 	 "port" => 4567,
+	 # If the client should use a different IP/hostname as the
+	 # transmission target than the one specified in server, set
+	 # it here.
+	 "target" => undef,
+	 # generator settings for the client
 	 "generator" => undef,
 	 "generator_args" => undef,
 	 # time for the client to run, in seconds
