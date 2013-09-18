@@ -19,6 +19,8 @@ function eval_size(sizes, filename, output_format)
   # bin width is at least one, otherwise range is split evenly in
   # max_hist_bins bins
   binwidth = max(1, (u - l) / max_hist_bins);
+  # non-integer binwidths lead to weird plots, because packet sizes are integers
+  binwidth = round(binwidth);
   # max and min sizes are the plot limits
   range = [l:binwidth:u];
   hist(sizes, range, 1);
