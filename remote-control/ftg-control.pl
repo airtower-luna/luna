@@ -134,11 +134,11 @@ sub start_server
     my $ssh = $conn->{server_ssh};
 
     # create PID file on the server
-    $conn->{server_pidfile} = $ssh->capture("tempfile");
+    $conn->{server_pidfile} = $ssh->capture("mktemp");
     die "Could not create server PID file: " if $ssh->error;
     chomp($conn->{server_pidfile});
     # create output file on the server
-    $conn->{server_outfile} = $ssh->capture("tempfile");
+    $conn->{server_outfile} = $ssh->capture("mktemp");
     die "Could not create server output file: " if $ssh->error;
     chomp($conn->{server_outfile});
 
@@ -205,7 +205,7 @@ sub run_client
     if ($conn->{echo} eq "true")
     {
 	# crate output file
-	$conn->{client_outfile} = $ssh->capture("tempfile");
+	$conn->{client_outfile} = $ssh->capture("mktemp");
 	die "Could not create client output file: " if $ssh->error;
 	chomp($conn->{client_outfile});
 	$command = $command." -e -o ".$conn->{client_outfile};
