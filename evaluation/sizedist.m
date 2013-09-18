@@ -23,7 +23,7 @@ function eval_size(sizes, filename, output_format)
   binwidth = round(binwidth);
   # max and min sizes are the plot limits
   range = [l:binwidth:u];
-  hist(sizes, range, 1);
+  transparent_hist(sizes, range, binwidth);
   axis([min((range(1) - binwidth / 2), 0) (range(end) + binwidth / 2)]);
   title("Distribution of packet sizes [byte]");
 
