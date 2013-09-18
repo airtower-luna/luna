@@ -90,8 +90,18 @@ sub run_connection
 	$conn->{target} = $conn->{server};
     }
 
+    # start SSH connection to the server host
     $conn->{server_ssh} = &start_ssh($conn->{server});
-    $conn->{client_ssh} = &start_ssh($conn->{client});
+    # if server and client are on the same host, just reuse the SSH
+    # connection, otherwise start SSH connection to the client host
+    if ($conn->{server} eq $conn->{client})
+    {
+	$conn->{client_ssh} = $conn->{server_ssh};
+    }
+    else
+    {
+	$conn->{client_ssh} = &start_ssh($conn->{client});
+    }
     # Running these three functions synchronously ensures that the
     # server is (most likely) ready when the client starts running,
     # and the transmission is (certainly) complete before the server
