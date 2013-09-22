@@ -289,7 +289,7 @@ void* echo_thread(void *arg)
 		dataout = fopen(data->datafile, "w");
 		if (dataout == NULL)
 		{
-			perror("Opening output file in run_server");
+			perror("Opening output file in echo_thread");
 			exit(EXIT_FILEFAIL);
 		}
 	}
@@ -374,7 +374,7 @@ void _fclose_wrapper(void *arg)
 
 	if (fclose((FILE *) arg))
 	{
-		perror("Opening output file in run_server");
+		perror("Closing output file on echo_thread termination");
 		exit(EXIT_FILEFAIL);
 	}
 }
