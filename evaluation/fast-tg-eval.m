@@ -183,6 +183,7 @@ function [range, binwidth] = hist_range(lower, upper, bins)
 
   # binwidth should not be below one
   binwidth = max(1, (upper - lower) / bins);
+  binwidth = round(binwidth);
   range = [lower:binwidth:upper];
   return;
 endfunction
