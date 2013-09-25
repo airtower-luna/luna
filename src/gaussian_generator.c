@@ -53,17 +53,12 @@ int gaussian_generator_base(generator_t *this, char *args)
 
 	if (args != NULL)
 	{
-		char *token = NULL;
-		char *name = NULL;
-		char *value = NULL;
-		char *saveptr = NULL;
-		char *saveptr2 = NULL;
-		for (token = strtok_r(args, ",", &saveptr);
-		     token != NULL;
-		     token = strtok_r(NULL, ",", &saveptr))
+		generator_option* gen_args =
+			split_generator_args(args);
+		for (int i = 0; gen_args[i].name != NULL; i++)
 		{
-			name = strtok_r(token, "=", &saveptr2);
-			value = strtok_r(NULL, "=", &saveptr2);
+			char *name = gen_args[i].name;
+			char *value = gen_args[i].value;
 			if (strcmp(name, "max") == 0
 			    || strcmp(name, "m") == 0)
 				attr->max = atoi(value);
@@ -75,6 +70,7 @@ int gaussian_generator_base(generator_t *this, char *args)
 				interval = atoi(value);
 			// TODO: catch unknown params
 		}
+		free_generator_args(gen_args);
 	}
 
 	if (attr->max < MIN_PACKET_SIZE)
