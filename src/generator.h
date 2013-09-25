@@ -49,20 +49,6 @@ struct generator_t
 
 
 /*
- * A generator struct and the function to create that type of generator
- *
- * The function MUST accept a NULL in generator_args and use default
- * values in that case.
- */
-struct generator_type
-{
-	char *name;
-	int (*create)(generator_t *generator, char *generator_args);
-};
-
-
-
-/*
  * Struct to store command line arguments for the generator as name
  * value pairs
  */
@@ -71,6 +57,20 @@ struct generator_option
 {
 	char *name;
 	char *value;
+};
+
+
+
+/*
+ * A generator struct and the function to create that type of generator
+ *
+ * The function MUST accept a NULL in generator_args and use default
+ * values in that case.
+ */
+struct generator_type
+{
+	char *name;
+	int (*create)(generator_t *generator, generator_option *generator_args);
 };
 
 

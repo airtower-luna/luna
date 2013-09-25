@@ -26,28 +26,25 @@ struct static_generator_attr
 
 /*
  * Helper function for the creation of simple generators that treat
- * size as a maximum. The interval can be used as is, but can also be
- * modified without breaking anything. The parameters must be
- * contained in the char* args in the format
- *     name=value,name2=value2
- * If args is NULL, default values will be used.
+ * the size parameter as a maximum. The interval can be used as is,
+ * but can also be modified without breaking anything. The parameters
+ * are taken from args. If args is NULL, or a parameter is missing,
+ * default values will be used.
  *
  * interval (i): time between two packets (µs)
  * size (s): packet size in bytes (must be at least 4)
  */
-int simple_generator_base(generator_t *this, char *args)
+int simple_generator_base(generator_t *this, generator_option *args)
 {
 	int size = MIN_PACKET_SIZE;
 	int interval = 1000;
 
 	if (args != NULL)
 	{
-		generator_option* gen_args =
-			split_generator_args(args);
-		for (int i = 0; gen_args[i].name != NULL; i++)
+		for (int i = 0; args[i].name != NULL; i++)
 		{
-			char *name = gen_args[i].name;
-			char *value = gen_args[i].value;
+			char *name = args[i].name;
+			char *value = args[i].value;
 			if (strcmp(name, "size") == 0
 			    || strcmp(name, "s") == 0)
 				size = atoi(value);
@@ -56,7 +53,6 @@ int simple_generator_base(generator_t *this, char *args)
 				interval = atoi(value);
 			// TODO: catch unknown params
 		}
-		free_generator_args(gen_args);
 	}
 
 	if (size < MIN_PACKET_SIZE)
@@ -75,7 +71,7 @@ int simple_generator_base(generator_t *this, char *args)
 
 
 
-int static_generator_create(generator_t *this, char *args)
+int static_generator_create(generator_t *this, generator_option *args)
 {
 	this->init_generator = &static_generator_init;
 	this->fill_block = NULL;
@@ -86,7 +82,7 @@ int static_generator_create(generator_t *this, char *args)
 
 
 
-int alternate_time_generator_create(generator_t *this, char *args)
+int alternate_time_generator_create(generator_t *this, generator_option *args)
 {
 	this->init_generator = &alternate_time_generator_init;
 	this->fill_block = NULL;
@@ -97,7 +93,7 @@ int alternate_time_generator_create(generator_t *this, char *args)
 
 
 
-int rand_size_generator_create(generator_t *this, char *args)
+int rand_size_generator_create(generator_t *this, generator_option *args)
 {
 	this->init_generator = &rand_size_generator_init;
 	this->fill_block = &rand_size_generator_fill_block;

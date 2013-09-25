@@ -30,15 +30,14 @@ struct gaussian_generator_attr
 
 /*
  * Helper function for the creation of a gaussian generators. The
- * parameters must be contained in the char* args in the format
- *     name=value,name2=value2
- * If args is NULL, default values will be used.
+ * parameters must be contained in args. If args is NULL, or a
+ * parameter is missing, default values will be used.
  *
  * interval (i): time between two packets (µs)
  * max (m): maximum packet size in bytes (must be at least 4)
  * sigma (s): standard deviation of packet size in bytes (double)
  */
-int gaussian_generator_base(generator_t *this, char *args)
+int gaussian_generator_base(generator_t *this, generator_option *args)
 {
 	this->attr = malloc(sizeof(struct gaussian_generator_attr));
 	CHKALLOC(this->attr);
@@ -53,12 +52,10 @@ int gaussian_generator_base(generator_t *this, char *args)
 
 	if (args != NULL)
 	{
-		generator_option* gen_args =
-			split_generator_args(args);
-		for (int i = 0; gen_args[i].name != NULL; i++)
+		for (int i = 0; args[i].name != NULL; i++)
 		{
-			char *name = gen_args[i].name;
-			char *value = gen_args[i].value;
+			char *name = args[i].name;
+			char *value = args[i].value;
 			if (strcmp(name, "max") == 0
 			    || strcmp(name, "m") == 0)
 				attr->max = atoi(value);
@@ -70,7 +67,6 @@ int gaussian_generator_base(generator_t *this, char *args)
 				interval = atoi(value);
 			// TODO: catch unknown params
 		}
-		free_generator_args(gen_args);
 	}
 
 	if (attr->max < MIN_PACKET_SIZE)
@@ -87,7 +83,7 @@ int gaussian_generator_base(generator_t *this, char *args)
 
 
 
-int gaussian_generator_create(generator_t *this, char *args)
+int gaussian_generator_create(generator_t *this, generator_option *args)
 {
 	this->init_generator = &gaussian_generator_init;
 	this->fill_block = &gaussian_generator_fill_block;

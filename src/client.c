@@ -70,8 +70,11 @@ int run_client(struct addrinfo *addr, int time, int echo,
 	/* initialize the requested generator */
 	for (int i = 0; i < KNOWN_GENERATORS_LENGTH; i++)
 	{
+		generator_option* gen_args =
+			split_generator_args(generator_args);
 		if (strcmp(generator_type, known_generators[i].name) == 0)
-			known_generators[i].create(&generator, generator_args);
+			known_generators[i].create(&generator, gen_args);
+		free_generator_args(gen_args);
 	}
 	/* fail if the requested generator is unknown */
 	if (generator.init_generator == NULL)
