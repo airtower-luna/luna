@@ -63,6 +63,19 @@ struct generator_type
 
 
 /*
+ * Struct to store command line arguments for the generator as name
+ * value pairs
+ */
+typedef struct generator_option generator_option;
+struct generator_option
+{
+	char *name;
+	char *value;
+};
+
+
+
+/*
  * Run the generator
  *
  * This function is meant to run as a dedicated generator thread,
@@ -79,5 +92,15 @@ struct packet_block *create_block_circle(int count, int block_len);
 /* Destry a circular buffer of count packet blocks. The function
  * follows the next pointers to delete all elements of the circle. */
 int destroy_block_circle(struct packet_block *block);
+
+/* Split an arguments string into a generator_option[]. The string is
+ * expected in the format name=value,name2=value2,... In the last
+ * element of the array both name and value are set to NULL to allow
+ * detecting the end of the array. */
+generator_option *split_generator_args(char *args);
+
+/* Free a generator_option[], including the strings pointed to by the
+ * elements. */
+void free_generator_args(generator_option *args);
 
 #endif /* __FTG_GENERATOR_H__ */

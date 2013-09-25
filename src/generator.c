@@ -1,5 +1,8 @@
 #include <config.h>
 
+#include <string.h>
+#include <stdlib.h>
+
 #include "fast-tg.h"
 #include "generator.h"
 
@@ -81,4 +84,73 @@ int destroy_block_circle(struct packet_block *block)
 		free(current);
 		current = next;
 	}
+}
+
+
+
+generator_option *split_generator_args(char *args)
+{
+	if (args == NULL)
+		return NULL;
+
+	/* copy input string, because strtok_r modifies a string while
+	 * splitting it */
+	char *a = strdup(args);
+	CHKALLOC(a);
+
+	/* calculate the number of elements (comma separated) in the
+	 * arguments string */
+	int elements = 0;
+	char *s = a;
+	while (s != NULL)
+	{
+		s = strchr(s, ',');
+		elements++;
+		if (s != NULL)
+			s = s + 1;
+	}
+
+	/* array to store name/value pairs */
+	generator_option* options =
+		calloc(elements + 1, sizeof(generator_option));
+	CHKALLOC(options);
+	/* Last element is set to NULL to make the end of the array
+	 * detectable */
+	options[elements].name = NULL;
+	options[elements].value = NULL;
+
+	/* split the arguments string */
+	int i = 0;
+	char *token = NULL;
+	char *name = NULL;
+	char *value = NULL;
+	char *saveptr = NULL;
+	char *saveptr2 = NULL;
+	for (token = strtok_r(a, ",", &saveptr);
+	     token != NULL;
+	     token = strtok_r(NULL, ",", &saveptr))
+	{
+		name = strtok_r(token, "=", &saveptr2);
+		value = strtok_r(NULL, "=", &saveptr2);
+
+		/* store the name value pair */
+		options[i].name = strdup(name);
+		options[i].value = strdup(value);
+		i++;
+	}
+
+	free(a);
+	return options;
+}
+
+
+
+void free_generator_args(generator_option *args)
+{
+	for (int i = 0; args[i].name != NULL; i++)
+	{
+		free(args[i].name);
+		free(args[i].value);
+	}
+	free(args);
 }
