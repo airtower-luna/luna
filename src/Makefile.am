@@ -16,8 +16,8 @@
 # along with fast-tg. If not, see <http://www.gnu.org/licenses/>.
 
 # Build the fast-tg binary
-bin_PROGRAMS = fast-tg
-fast_tg_SOURCES = fast-tg.c server.c traffic.c generator.c gaussian_generator.c simple_generator.c client.c
+bin_PROGRAMS = luna
+luna_SOURCES = fast-tg.c server.c traffic.c generator.c gaussian_generator.c simple_generator.c client.c
 
 LIBS = $(LIBRT) $(LIBGSL_LIBS)
 

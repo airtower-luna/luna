@@ -6,7 +6,7 @@ use Net::OpenSSH;
 
 my @conns;
 my @workers;
-my %general = ("default_exec" => "/usr/local/bin/fast-tg");
+my %general = ("default_exec" => "/usr/local/bin/luna");
 
 my $conffile = $ARGV[0];
 die "Configuration file missing or not readable!\n" if (! -r $conffile);
