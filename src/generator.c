@@ -147,6 +147,9 @@ generator_option *split_generator_args(char *args)
 
 void free_generator_args(generator_option *args)
 {
+	if (args == NULL)
+		return;
+
 	for (int i = 0; args[i].name != NULL; i++)
 	{
 		free(args[i].name);
