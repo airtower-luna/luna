@@ -59,7 +59,7 @@ step = str2num(parser.Results.step);
 points = [];
 # No fixed value was given, split evenly.
 if (step == 0)
-  points = linspace(0, max(dur), 200);
+  points = linspace(0, max(dur), 300);
   step = points(2);
 else
   points = 0:step:max(dur);
