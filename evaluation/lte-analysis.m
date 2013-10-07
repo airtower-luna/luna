@@ -21,6 +21,10 @@ endfor
 
 # create parser with default options
 parser = ftg_default_parser();
+# if activated, create a 3D plot (without error bars)
+parser = parser.addSwitch("three");
+# activate "support" structure in 3D plot
+parser = parser.addSwitch("support");
 # parse command line options
 parser = parser.parse(opts{:});
 
@@ -48,7 +52,8 @@ ist = {};
 for i = 1:length(files);
   filename = files{i};
   # read from file
-  A = dlmread(filename, "\t", 1, 0);
+  # rtt.m prints an additional empty line for some reason, so skip two lines
+  A = dlmread(filename, "\t", 2, 0);
   rtt{i} = A( :, cols.rtt);
   size{i} = A( :, cols.size);
   std{i} = A( :, cols.std);
@@ -59,18 +64,41 @@ endfor
 clf;
 hold on;
 xlabel("Packet size [byte]");
-ylabel("RTT [$\\mu s$]");
+if parser.Results.three
+  ylabel("IST [$\\mu s$]");
+  zlabel("RTT [$\\mu s$]");
+else
+  ylabel("RTT [$\\mu s$]");
+endif
+
+if parser.Results.support
+  grid("on");
+endif
 
 for i = 1:length(rtt);
-  p = errorbar(size{i}, rtt{i}, std{i}, ".-", "o");
-  set(p, "color", colors{i});
+  if parser.Results.three
+    plot3(size{i}, ist{i}, rtt{i}, ".-", "color", colors{i});
+    if parser.Results.support
+      for j = 1:length(rtt{i});
+	plot3([size{i}(j) size{i}(j)], [ist{i}(j) ist{i}(j)], [0 rtt{i}(j)],
+	      "-", "color", colors{i});
+      endfor
+      plot3(size{i}, ist{i}, linspace(0, 0, length(size{i})),
+	    "-", "color", colors{i});
+    endif
+  else
+    p = errorbar(size{i}, rtt{i}, std{i}, ".-", "o");
+    set(p, "color", colors{i});
+  endif
 endfor
 
-# use tight axis scaling for x-axis only
-a1 = axis();
-axis("tight");
-a2 = axis();
-axis([a2(1) a2(2) a1(3) a1(4)]);
+# use tight axis scaling for x-axis in 2D plots only
+if !parser.Results.three
+  a1 = axis();
+  axis("tight");
+  a2 = axis();
+  axis([0 a2(2) a1(3) a1(4)]);
+endif
 
 hold off;
 
