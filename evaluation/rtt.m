@@ -21,6 +21,11 @@ endfor
 
 # create parser with default options
 parser = ftg_default_parser();
+# Write tabular output for all input files. Assumes that all packets in
+# one file have the same size.
+parser = parser.addSwitch("tab");
+# provide IST for tabular output
+parser = parser.addParamValue("ist", "-1", @isdigit);
 # parse command line options
 parser = parser.parse(opts{:});
 
@@ -31,23 +36,30 @@ endif
 
 cols = echo_column_definitions();
 upper = str2num(parser.Results.upper);
+ist = str2num(parser.Results.ist);
 
 # this cell array collects RTTs for all files so they can
 # be compared
 rtt = {};
+size = {};
 
 for i = 1:length(files);
-  filename = files{i}
-  printf("Reading data from %s: ", filename);
+  filename = files{i};
+  if (!parser.Results.tab)
+    printf("Reading data from %s: ", filename);
+  endif
   # read test output
   A = dlmread(filename, "\t", 1, 0);
-  printf("%i data sets\n", length(A));
-  ktime = A( :, cols.rtt);
-  rtt{i} = ktime;
+  if (!parser.Results.tab)
+    printf("%i data sets\n", length(A));
+  endif
+  rtt{i} = A( :, cols.rtt);
+  size{i} = A( :, cols.size);
   seqnos = A( :, cols.sequence);
 
-  chk_seq(seqnos);
-  # do individual evaluation only when processing a single file
+  if (!parser.Results.tab)
+    chk_seq(seqnos);
+  endif
 endfor
 
 for i = 1:length(rtt)
@@ -55,7 +67,7 @@ for i = 1:length(rtt)
 endfor
 
 # printing a summary doesn't make sense for more than one data set
-if (length(rtt) == 1)
+if (length(rtt) == 1 && !parser.Results.tab)
   printf("\nEvaluation of inter arrival times\n");
   printf("Upper limit: %ld µs\n", u{1});
   printf("Lower limit: %ld µs\n", l{1});
@@ -67,6 +79,16 @@ else
   for i = 1:length(rtt)
     metrics(i, :) = [u{i}, l{i}, m{i}, s{i}];
   endfor
+endif
+
+# tabular output, if requested
+if (parser.Results.tab)
+  printf("# Size\tIST\tavg(RTT)\tstd(RTT)\tPackets\n");
+  for i = 1:length(rtt)
+    printf("%ld\t%ld\t%ld\t%ld\t%ld\n",
+	   size{i}(1), ist, mean(rtt{i}), s{i}, length(rtt{i}));
+  endfor
+  exit(0);
 endif
 
 # basic figure setup
