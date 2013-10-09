@@ -1,5 +1,5 @@
-#ifndef __FTG_GENERATOR_H__
-#define __FTG_GENERATOR_H__
+#ifndef __LUNA_GENERATOR_H__
+#define __LUNA_GENERATOR_H__
 
 #include <pthread.h>
 #include <semaphore.h>
@@ -16,7 +16,7 @@
  * semaphore signalling.
  *
  * The generator MUST ensure that the generated packet sizes are not
- * below MIN_PACKET_SIZE (defined in fast-tg.h).
+ * below MIN_PACKET_SIZE (defined in luna.h).
  */
 typedef struct generator_t generator_t;
 struct generator_t
@@ -103,4 +103,4 @@ generator_option *split_generator_args(char *args);
  * elements. */
 void free_generator_args(generator_option *args);
 
-#endif /* __FTG_GENERATOR_H__ */
+#endif /* __LUNA_GENERATOR_H__ */

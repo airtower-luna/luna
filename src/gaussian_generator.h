@@ -1,5 +1,5 @@
-#ifndef __FTG_GAUSSIAN_GENERATOR_H__
-#define __FTG_GAUSSIAN_GENERATOR_H__
+#ifndef __LUNA_GAUSSIAN_GENERATOR_H__
+#define __LUNA_GAUSSIAN_GENERATOR_H__
 
 #include "generator.h"
 
@@ -10,4 +10,4 @@
  * only. */
 int gaussian_generator_create(generator_t *this, generator_option *args);
 
-#endif /* __FTG_GAUSSIAN_GENERATOR_H__ */
+#endif /* __LUNA_GAUSSIAN_GENERATOR_H__ */

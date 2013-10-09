@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#include "fast-tg.h"
+#include "luna.h"
 #include "traffic.h"
 
 int packet_block_init(struct packet_block *block, int length)

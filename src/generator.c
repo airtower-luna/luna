@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "fast-tg.h"
+#include "luna.h"
 #include "generator.h"
 
 void* run_generator(void *arg)

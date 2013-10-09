@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include "fast-tg.h"
+#include "luna.h"
 #include "simple_generator.h"
 
 /* TODO: meaningful block length */

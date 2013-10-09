@@ -5,7 +5,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 
-#include "fast-tg.h"
+#include "luna.h"
 #include "gaussian_generator.h"
 
 /* TODO: meaningful block length */

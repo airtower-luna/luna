@@ -16,7 +16,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "fast-tg.h"
+#include "luna.h"
 #include "server.h"
 
 /* length for address and port strings (probably a bit longer than
@@ -162,7 +162,7 @@ int run_server(struct addrinfo *addr, int flags, const char* datafile)
 
 		/* echo packet if echo flag is set */
 		if (buf[sizeof(int) + sizeof(struct timespec)]
-		    & FTG_FLAG_ECHO)
+		    & LUNA_FLAG_ECHO)
 			sendto(sock, buf, recvlen, 0, addrbuf, addrlen);
 
 		/* get kernel timestamp */

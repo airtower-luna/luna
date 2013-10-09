@@ -1,5 +1,5 @@
-#ifndef __FTG_CLIENT_H__
-#define __FTG_CLIENT_H__
+#ifndef __LUNA_CLIENT_H__
+#define __LUNA_CLIENT_H__
 
 #include <netinet/in.h>
 
@@ -13,4 +13,4 @@ int run_client(struct addrinfo *addr, int time, int echo,
 	       char *generator_type, char *generator_args,
 	       const char *datafile);
 
-#endif /* __FTG_CLIENT_H__ */
+#endif /* __LUNA_CLIENT_H__ */

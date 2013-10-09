@@ -1,5 +1,5 @@
-#ifndef __FTG_SIMPLE_GENERATOR_H__
-#define __FTG_SIMPLE_GENERATOR_H__
+#ifndef __LUNA_SIMPLE_GENERATOR_H__
+#define __LUNA_SIMPLE_GENERATOR_H__
 
 #include <pthread.h>
 #include <time.h>
@@ -24,4 +24,4 @@ int rand_size_generator_create(generator_t *this, generator_option *args);
  * double the interval between them. */
 int alternate_time_generator_create(generator_t *this, generator_option *args);
 
-#endif /* __FTG_SIMPLE_GENERATOR_H__ */
+#endif /* __LUNA_SIMPLE_GENERATOR_H__ */

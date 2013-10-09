@@ -16,7 +16,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "fast-tg.h"
+#include "luna.h"
 #include "generator.h"
 #include "traffic.h"
 #include "simple_generator.h"
@@ -130,15 +130,15 @@ int run_client(struct addrinfo *addr, int time, int echo,
 
 	/* current sequence number */
 	int seq = 0;
-	/* sequence number in the fast-tg packet */
+	/* sequence number in the LUNA packet */
 	int *sequence = (int *) buf;
-	/* time right before sending in the fast-tg packet */
+	/* time right before sending in the LUNA packet */
 	struct timespec *sendtime = (struct timespec *) (buf + sizeof(int));
 	/* protocol flags field */
 	char *flags = (char *) (buf + sizeof(int) + sizeof(struct timespec));
 	*flags = 0;
 	if (echo)
-		*flags = *flags | FTG_FLAG_ECHO;
+		*flags = *flags | LUNA_FLAG_ECHO;
 	/* index in the current block */
 	int bi = 0;
 

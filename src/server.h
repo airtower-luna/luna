@@ -1,5 +1,5 @@
-#ifndef __FTG_SERVER_H_
-#define __FTG_SERVER_H_
+#ifndef __LUNA_SERVER_H_
+#define __LUNA_SERVER_H_
 
 #include <netinet/in.h>
 
@@ -12,4 +12,4 @@ int run_server(struct addrinfo *addr, int flags, const char* datafile);
 
 void term_server(int signum);
 
-#endif /* __FTG_SERVER_H_ */
+#endif /* __LUNA_SERVER_H_ */

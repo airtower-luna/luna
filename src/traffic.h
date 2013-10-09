@@ -1,5 +1,5 @@
-#ifndef __FTG_TRAFFIC_H__
-#define __FTG_TRAFFIC_H__
+#ifndef __LUNA_TRAFFIC_H__
+#define __LUNA_TRAFFIC_H__
 
 #include <pthread.h>
 #include <time.h>
@@ -8,7 +8,7 @@
 struct packet_data
 {
 	struct timespec delay; /* delay relative to the previous packet */
-	size_t size; /* UDP payload size, including fast-tg header */
+	size_t size; /* UDP payload size, including LUNA header */
 };
 
 /* A lockable list of struct packet_data elements, with a pointer to
@@ -36,4 +36,4 @@ int packet_block_init(struct packet_block *block, int length);
  * itself. */
 int packet_block_destroy(struct packet_block *block);
 
-#endif /* __FTG_TRAFFIC_H__ */
+#endif /* __LUNA_TRAFFIC_H__ */

@@ -15,7 +15,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "fast-tg.h"
+#include "luna.h"
 #include "server.h"
 #include "client.h"
 
@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
 	if (mlockall(MCL_CURRENT | MCL_FUTURE))
 	{
 		perror("mlockall failed");
-		fprintf(stderr, "Make sure fast-tg has the CAP_IPC_LOCK "
+		fprintf(stderr, "Make sure LUNA has the CAP_IPC_LOCK "
 			"capability! If you don't need real-time "
 			"precision, you can safely ignore this warning.\n");
 	}
@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
 	if (sched_setscheduler(0, SCHED_RR, &sparam) == -1)
 	{
 		perror("Could not get real-time priority");
-		fprintf(stderr, "Make sure fast-tg has the CAP_SYS_NICE "
+		fprintf(stderr, "Make sure LUNA has the CAP_SYS_NICE "
 			"capability! If you don't need real-time "
 			"precision, you can safely ignore this warning.\n");
 	}
