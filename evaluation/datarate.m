@@ -1,6 +1,6 @@
 #!/usr/bin/octave -qf
 
-source("fast-tg-eval.m");
+source("luna-eval.m");
 
 
 
@@ -115,7 +115,7 @@ if (!strcmp(parser.Results.iperf, ""))
   endfor
   ih = plot(ix, iy);
   # I admit that setting a fixed color is a dirty hack, but usually I
-  # just want to compare one fast-tg measurement with iperf.
+  # just want to compare one LUNA measurement with Iperf.
   set(ih, "color", colors{2});
   hold off;
 endif

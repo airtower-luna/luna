@@ -83,7 +83,7 @@ endfunction
 
 
 
-# Column numbers by meaning in fast-tg server tab separated output
+# Column numbers by meaning in LUNA server tab separated output
 # If the parameter is missing, false is assumed.
 function cols = server_column_definitions(kutime)
   cols.ktime = 1;
@@ -105,7 +105,7 @@ endfunction
 
 
 
-# Column numbers by meaning in the fast-tg client's echo logs
+# Column numbers by meaning in the LUNA client's echo logs
 function cols = echo_column_definitions()
   cols.ktime = 1;
   cols.sequence = 2;

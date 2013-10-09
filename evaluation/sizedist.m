@@ -1,7 +1,7 @@
 #!/usr/bin/octave -qf
 
-# load common variables and function definitions for fast-tg evaluation
-source("fast-tg-eval.m");
+# load common variables and function definitions for LUNA evaluation
+source("luna-eval.m");
 
 
 
