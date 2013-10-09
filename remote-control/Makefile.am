@@ -15,4 +15,4 @@
 # You should have received a copy of the GNU General Public License
 # along with LUNA. If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS	= src remote-control
+dist_bin_SCRIPTS = luna-control.pl
