@@ -66,7 +66,7 @@ endfunction
 
 
 # create a parser for the default command line options
-function parser = ftg_default_parser()
+function parser = luna_default_parser()
   # parse options
   parser = inputParser;
   parser.CaseSensitive = true;

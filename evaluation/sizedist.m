@@ -48,7 +48,7 @@ for i = 1:nargin()
 endfor
 
 # create parser with default options
-parser = ftg_default_parser();
+parser = luna_default_parser();
 # parse command line options
 parser = parser.parse(opts{:});
 

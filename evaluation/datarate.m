@@ -20,7 +20,7 @@ for i = 1:nargin()
 endfor
 
 # create parser with default options
-parser = ftg_default_parser();
+parser = luna_default_parser();
 # list of speed values from IPerf, assumed to be kbit/s in 0.5s intervals
 parser = parser.addParamValue("iperf", "", @ischar);
 # step size for data rate averages (in µs)

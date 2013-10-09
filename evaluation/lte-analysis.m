@@ -20,7 +20,7 @@ for i = 1:nargin()
 endfor
 
 # create parser with default options
-parser = ftg_default_parser();
+parser = luna_default_parser();
 # if activated, create a 3D plot (without error bars)
 parser = parser.addSwitch("three");
 # activate "support" structure in 3D plot
