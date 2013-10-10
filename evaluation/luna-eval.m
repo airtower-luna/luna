@@ -12,7 +12,12 @@ endfunction
 
 # graphics configuration
 graphics_toolkit("fltk");
-global colors = {"blue", "red", "cyan", "green", "magenta", "black", "yellow"};
+# LUNA default plot colors
+function c = luna_colors(a)
+  colors = {"blue", "red", "cyan", "green", "magenta", "black", "yellow"};
+  c = colors{a};
+  return;
+endfunction
 
 
 
@@ -123,10 +128,8 @@ endfunction
 # range: histogram range, format: [lower_limit:binwidth:upper_limit]
 #	Data outside the limit will be lumped into left-/rightmost bin
 # binwidth: binwidth for the histogram
-# colorindex (optional): index color to use in the global color array
+# colorindex (optional): index color to use from LUNA's default selection
 function h = transparent_hist(data, range, binwidth, colorindex)
-  # color definitions and optional parameter
-  global colors;
   if (!exist("colorindex", "var"))
     colorindex = 1;
   endif
@@ -141,8 +144,9 @@ function h = transparent_hist(data, range, binwidth, colorindex)
   # create outer socket point of left-/rightmost columns
   ys = [0; ys(1); ys; 0];
   # draw the plot
-  h = fill(xs, ys, colors{colorindex});
-  set(h, "edgecolor", colors{colorindex}, "facecolor", colors{colorindex},
+  h = fill(xs, ys, luna_colors(colorindex));
+  set(h, "edgecolor", luna_colors(colorindex),
+      "facecolor", luna_colors(colorindex),
       "facealpha", 0.5);
   return;
 endfunction

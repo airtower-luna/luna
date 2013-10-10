@@ -94,7 +94,7 @@ axis([0 ceil(max(dur) ./ 1000000)], "autoy");
 h = {};
 for i = 1:length(rates);
   h{i} = plot(points, rates{i});
-  set(h{i}, "color", colors{i});
+  set(h{i}, "color", luna_colors(i));
 endfor
 hold off;
 
@@ -116,7 +116,7 @@ if (!strcmp(parser.Results.iperf, ""))
   ih = plot(ix, iy);
   # I admit that setting a fixed color is a dirty hack, but usually I
   # just want to compare one LUNA measurement with Iperf.
-  set(ih, "color", colors{2});
+  set(ih, "color", luna_colors(2));
   hold off;
 endif
 

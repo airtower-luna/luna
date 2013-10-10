@@ -77,18 +77,18 @@ endif
 
 for i = 1:length(rtt);
   if parser.Results.three
-    plot3(size{i}, ist{i}, rtt{i}, ".-", "color", colors{i});
+    plot3(size{i}, ist{i}, rtt{i}, ".-", "color", luna_colors(i));
     if parser.Results.support
       for j = 1:length(rtt{i});
 	plot3([size{i}(j) size{i}(j)], [ist{i}(j) ist{i}(j)], [0 rtt{i}(j)],
-	      "-", "color", colors{i});
+	      "-", "color", luna_colors(i));
       endfor
       plot3(size{i}, ist{i}, linspace(0, 0, length(size{i})),
-	    "-", "color", colors{i});
+	    "-", "color", luna_colors(i));
     endif
   else
     p = errorbar(size{i}, rtt{i}, std{i}, ".-", "o");
-    set(p, "color", colors{i});
+    set(p, "color", luna_colors(i));
   endif
 endfor
 
