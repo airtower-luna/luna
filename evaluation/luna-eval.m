@@ -5,7 +5,10 @@
 pkg load general;
 
 # maximum number of bins to use when plotting with the hist function
-global max_hist_bins = 200;
+function m = max_hist_bins()
+  m = 200;
+  return;
+endfunction
 
 # graphics configuration
 graphics_toolkit("fltk");
@@ -176,9 +179,8 @@ endfunction
 # upper: upper limit
 # bins (optional): maximum number of bins
 function [range, binwidth] = hist_range(lower, upper, bins)
-  global max_hist_bins;
   if (!exist("bins", "var"))
-    bins = max_hist_bins;
+    bins = max_hist_bins();
   endif
 
   # binwidth should not be below one

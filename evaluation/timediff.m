@@ -16,12 +16,11 @@ function eval_kutime(ktime, utime, filename, output_format)
   printf("Median: %ld µs\n", m);
   printf("Standard deviation: %ld µs\n", s);
 
-  global max_hist_bins;
   # upper plot limit (median + 2 * standard deviation)
   ul = (m + 2 * s);
   # bin width is at least one, otherwise range is split evenly in
   # max_hist_bins bins
-  binwidth = max(1, (ul - l) / max_hist_bins);
+  binwidth = max(1, (ul - l) / max_hist_bins());
   range = [l:binwidth:ul];
   hist(timediff, range, 1);
   axis([min((range(1) - binwidth / 2), 0) (range(end) + binwidth / 2)]);
