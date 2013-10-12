@@ -15,4 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with LUNA. If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS	= src remote-control evaluation
+# Install the LUNA evaluation helper functions file
+data_DATA = luna-eval.m
+# Evaluation scripts are installed to libexec
+pkglibexec_SCRIPTS = timediff rtt datarate lte-analysis sizedist
+CLEANFILES = $(pkglibexec_SCRIPTS)
+# TODO: general evaluation script that calls the ones from libexec
+
+# replace path to luna-eval.m with the post-install one
+do_subst = sed -e 's,"luna-eval.m","$(datadir)/luna-eval.m",g'
+
+$(pkglibexec_SCRIPTS): %: %.m Makefile
+	$(do_subst) < $< > $@
+	chmod +x $@

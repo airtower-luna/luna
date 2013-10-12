@@ -56,5 +56,5 @@ AC_ARG_ENABLE(kutime,
 	[AC_DEFINE([ENABLE_KUTIME], [1], [Test])], [])
 
 # Stuff to build
-AC_CONFIG_FILES([Makefile src/Makefile remote-control/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile evaluation/Makefile remote-control/Makefile])
 AC_OUTPUT
