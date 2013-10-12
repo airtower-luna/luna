@@ -37,20 +37,7 @@ endfunction
 
 
 
-# read arguments and get the input file's name
-arg_list = argv();
-
-# Search for "--" in the command line arguments, if found, split between
-# options and files at that point. Otherwise, all arguments are file names.
-files = arg_list;
-opts = {};
-for i = 1:nargin()
-  if strcmp(arg_list(i), "--")
-    opts = arg_list(1:i-1);
-    files = arg_list(i+1:nargin());
-    break;
-  endif
-endfor
+[opts, files] = split_command_line();
 
 # create parser with default options
 parser = luna_default_parser();

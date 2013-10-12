@@ -73,6 +73,27 @@ endfunction
 
 
 
+# read command line arguments and split them into options (all arguments
+# up to "--", if any) and filenames (all remaining arguments)
+function [opts, files] = split_command_line()
+  args = argv();
+
+  # Search for "--" in the command line arguments, if found, split between
+  # options and files at that point. Otherwise, all arguments are file names.
+  files = args;
+  opts = {};
+  for i = 1:length(args)
+    if strcmp(args(i), "--")
+      opts = args(1:i-1);
+      files = args(i+1:end);
+      break;
+    endif
+  endfor
+  return;
+endfunction
+
+
+
 # create a parser for the default command line options
 function parser = luna_default_parser()
   # parse options
