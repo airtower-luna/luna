@@ -33,9 +33,6 @@ if length(files) < 1
   exit(1);
 endif
 
-# load column meanings depending on kutime flag
-cols = server_column_definitions(parser.Results.kutime);
-
 output_format = parser.Results.format;
 
 ktimes = {};
@@ -46,10 +43,9 @@ for i = 1:length(files);
   filename = files{i}
   printf("Reading data from %s: ", filename);
   # read test output
-  A = dlmread(filename, "\t", 1, 0);
-  printf("%i data sets\n", length(A));
-  ktimes{i} = A( :, cols.ktime);
-  sizes{i} = A( :, cols.size);
+  data = parse_server_log(parser.Results.kutime, filename);
+  ktimes{i} = data.ktime;
+  sizes{i} = data.size;
   ktimes{i} = ktimes{i} .- ktimes{i}(1);
   dur(i) = ktimes{i}(end);
 endfor

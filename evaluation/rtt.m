@@ -49,16 +49,15 @@ for i = 1:length(files);
     printf("Reading data from %s: ", filename);
   endif
   # read test output
-  A = dlmread(filename, "\t", 1, 0);
+  data = parse_log(cols, filename);
   if (!parser.Results.tab)
-    printf("%i data sets\n", length(A));
+    printf("%i data sets\n", length(data.sequence));
   endif
-  rtt{i} = A( :, cols.rtt);
-  size{i} = A( :, cols.size);
-  seqnos = A( :, cols.sequence);
+  rtt{i} = data.rtt;
+  size{i} = data.size;
 
   if (!parser.Results.tab)
-    chk_seq(seqnos);
+    chk_seq(data.sequence);
   endif
 endfor
 

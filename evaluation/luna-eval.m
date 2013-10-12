@@ -124,6 +124,43 @@ endfunction
 
 
 
+
+# kutime parameter
+# varargin: One or more filenames to read. For one filename, parse_server_log
+# returns a structure, otherwise a cell array of structures.
+function data = parse_server_log(kutime, varargin)
+  cols = server_column_definitions(kutime);
+  data = parse_log(cols, varargin{:});
+  return;
+endfunction
+
+
+
+# cols: column definitions
+# varargin: One or more filenames to read. For one filename, parse_server_log
+# returns a structure, otherwise a cell array of structures.
+function data = parse_log(cols, varargin)
+  d = {};
+
+  for i = 1:length(varargin);
+    A = dlmread(varargin{i}, "\t", 1, 0);
+
+    d{i} = struct();
+    for [val, key] = cols;
+      d{i} = setfield(d{i}, key, A( :, val));
+    endfor
+  endfor
+
+  if (length(d) > 1)
+    data = d;
+  else
+    data = d{1};
+  endif
+  return;
+endfunction
+
+
+
 # data: data array to plot
 # range: histogram range, format: [lower_limit:binwidth:upper_limit]
 #	Data outside the limit will be lumped into left-/rightmost bin
