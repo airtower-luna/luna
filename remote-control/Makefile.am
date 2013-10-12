@@ -15,4 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with LUNA. If not, see <http://www.gnu.org/licenses/>.
 
-dist_bin_SCRIPTS = luna-control.pl
+dist_bin_SCRIPTS = luna-control
+CLEANFILES = $(dist_bin_SCRIPTS)
+EXTRA_DIST = luna-control.pl localhost-test.bash
+TESTS = localhost-test.bash
+TESTS_ENVIRONMENT = export BUILDDIR=$(top_builddir);
+
+luna-control: luna-control.pl Makefile
+	sed -e 's,/usr/local/bin,$(bindir),g' < $< > $@
+	chmod +x $@

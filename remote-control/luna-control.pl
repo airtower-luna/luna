@@ -68,16 +68,18 @@ foreach my $conn (@conns)
 # Start a worker thread for each connection.
 for (my $i = 0; $i < @conns; $i++)
 {
-     $workers[$i] = threads->create({'context' => 'void'},
+     $workers[$i] = threads->create({'context' => 'scalar'},
 				    \&run_connection,
 				    $conns[$i]);
 }
 
 # Wait until all worker threads have terminated, order doesn't matter.
+my $ret = 0;
 foreach my $thr (@workers)
 {
-    $thr->join();
+    $ret = $ret + $thr->join();
 }
+exit($ret);
 
 
 
@@ -106,9 +108,11 @@ sub run_connection
     # server is (most likely) ready when the client starts running,
     # and the transmission is (certainly) complete before the server
     # is stopped.
-    &start_server($conn);
-    &run_client($conn);
-    &stop_server($conn);
+    my $ret = 0;
+    $ret += &start_server($conn);
+    $ret += &run_client($conn);
+    $ret += &stop_server($conn);
+    return $ret;
 }
 
 
@@ -132,14 +136,23 @@ sub start_server
 {
     my $conn = $_[0];
     my $ssh = $conn->{server_ssh};
+    my $ret = 0;
 
     # create PID file on the server
     $conn->{server_pidfile} = $ssh->capture("mktemp");
-    die "Could not create server PID file: " if $ssh->error;
+    if ($ssh->error)
+    {
+	$ret = 1;
+	print "Could not create server PID file.\n";
+    }
     chomp($conn->{server_pidfile});
     # create output file on the server
     $conn->{server_outfile} = $ssh->capture("mktemp");
-    die "Could not create server output file: " if $ssh->error;
+    if ($ssh->error)
+    {
+	$ret = 1;
+	print "Could not create server output file.\n";
+    }
     chomp($conn->{server_outfile});
 
     # build server start command
@@ -150,8 +163,13 @@ sub start_server
     # server parameters
     $command = $command." -s -T -p ".$conn->{port}." -o ".$conn->{server_outfile};
     $ssh->system($command);
-    print "Command \"".$command."\" failed: ". $ssh->error."\n"
-	if ($ssh->error);
+    if ($ssh->error)
+    {
+	$ret = 1;
+	print "Command \"".$command."\" failed: ". $ssh->error."\n";
+    }
+
+    return $ret;
 }
 
 
@@ -162,29 +180,45 @@ sub stop_server
 {
     my $conn = $_[0];
     my $ssh = $conn->{server_ssh};
+    my $ret = 0;
 
     # stop the server, using the stored PID
     my $command = "kill -TERM \$(cat ".$conn->{server_pidfile}.")";
     $ssh->system($command);
-    print "Command \"".$command."\" failed: ". $ssh->error."\n"
-	if ($ssh->error);
+    if ($ssh->error)
+    {
+	$ret = 1;
+	print "Command \"".$command."\" failed: ". $ssh->error."\n";
+    }
 
     # delete PID file
     my $command = "rm ".$conn->{server_pidfile};
     $ssh->system($command);
-    print "Command \"".$command."\" failed: ". $ssh->error."\n"
-	if ($ssh->error);
+    if ($ssh->error)
+    {
+	$ret = 1;
+	print "Command \"".$command."\" failed: ". $ssh->error."\n";
+    }
 
     # copy output to local storage
     $ssh->scp_get({async => 0}, $conn->{server_outfile},
 		  $conn->{server_output});
-    print "Copying server output to ".$conn->{server_output}." failed: ".$ssh->error."\n" if ($ssh->error);
+    if ($ssh->error)
+    {
+	$ret = 1;
+	print "Copying server output to ".$conn->{server_output}." failed: ".$ssh->error."\n";
+    }
 
     # delete output file on the server
     my $command = "rm ".$conn->{server_outfile};
     $ssh->system($command);
-    print "Command \"".$command."\" failed: ". $ssh->error."\n"
-	if ($ssh->error);
+    if ($ssh->error)
+    {
+	$ret = 1;
+	print "Command \"".$command."\" failed: ". $ssh->error."\n";
+    }
+
+    return $ret;
 }
 
 
@@ -234,8 +268,11 @@ sub run_client
 
 	my $command = "rm ".$conn->{client_outfile};
 	$ssh->system($command);
-	print "Command \"".$command."\" failed: ". $ssh->error."\n"
-	    if ($ssh->error);
+	if ($ssh->error)
+	{
+	    print "Command \"".$command."\" failed: ". $ssh->error."\n";
+	    return 1;
+	}
     }
 }
 
