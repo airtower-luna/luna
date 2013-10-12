@@ -18,8 +18,8 @@ int gaussian_generator_destroy(generator_t *this);
 
 struct gaussian_generator_attr
 {
-	int max;
-	int mean;
+	size_t max;
+	size_t mean;
 	double sigma;
 	struct timespec interval;
 	const gsl_rng_type *rng_type;
@@ -93,7 +93,7 @@ int gaussian_generator_create(generator_t *this, generator_option *args)
 
 	struct gaussian_generator_attr *attr =
 		(struct gaussian_generator_attr *) this->attr;
-	gsl_rng_env_setup(); // TODO: is this the right place?
+	gsl_rng_env_setup();
 	attr->rng_type = gsl_rng_default;
 	attr->rng = gsl_rng_alloc(attr->rng_type);
 }
@@ -130,7 +130,7 @@ int gaussian_generator_fill_block(generator_t *this,
 	for (int i = 0; i < current->length; i++)
 	{
 		double d = gsl_ran_gaussian_ziggurat(attr->rng, attr->sigma);
-		int r = lround(d);
+		size_t r = lround(d);
 		r += attr->mean;
 		if (r < MIN_PACKET_SIZE)
 			r = MIN_PACKET_SIZE;
