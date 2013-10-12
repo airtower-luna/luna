@@ -209,7 +209,8 @@ int rand_size_generator_fill_block(generator_t *this,
 
 int static_generator_destroy(generator_t *this)
 {
-	destroy_block_circle(this->block); // TODO: error check
+	int ret = destroy_block_circle(this->block);
 	this->block = NULL;
 	free(this->attr);
+	return ret;
 }

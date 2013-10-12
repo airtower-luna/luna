@@ -74,16 +74,19 @@ struct packet_block *create_block_circle(int count, int block_len)
 
 int destroy_block_circle(struct packet_block *block)
 {
+	int ret = 0;
 	struct packet_block *next = block->next;
 	block->next = NULL;
 	struct packet_block *current = next;
 	while (current != NULL)
 	{
 		next = current->next;
-		packet_block_destroy(current); // TODO: error check
+		if (packet_block_destroy(current))
+			ret = 1; // pass error along
 		free(current);
 		current = next;
 	}
+	return ret;
 }
 
 

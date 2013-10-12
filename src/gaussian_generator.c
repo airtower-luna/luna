@@ -150,9 +150,11 @@ int gaussian_generator_destroy(generator_t *this)
 {
 	struct gaussian_generator_attr *attr =
 		(struct gaussian_generator_attr *) this->attr;
+	int ret = 0;
 
-	destroy_block_circle(this->block); // TODO: error check
+	ret = destroy_block_circle(this->block); // pass error, if any
 	this->block = NULL;
 	gsl_rng_free(attr->rng);
 	free(this->attr);
+	return ret;
 }
