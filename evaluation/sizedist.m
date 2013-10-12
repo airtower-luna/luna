@@ -6,27 +6,33 @@ source("luna-eval.m");
 
 
 # function to plot distribution of packet sizes (UDP payload)
-function eval_size(sizes, filename, output_format)
-  [u, l, m, s] = basic_metrics(sizes);
-  printf("\nEvaluation of packet sizes\n");
-  printf("Upper limit: %ld byte\n", u);
-  printf("Lower limit: %ld byte\n", l);
-  printf("Average: %ld byte\n", mean(sizes));
-  printf("Median: %ld byte\n", m);
-  printf("Standard deviation: %ld byte\n", s);
+function plot_size_dist(varargin)
+  for i = 1:length(varargin)
+    [u(i), l(i), m(i), s(i)] = basic_metrics(varargin{i});
+    printf("\nEvaluation of packet sizes\n");
+    printf("Upper limit: %ld byte\n", u(i));
+    printf("Lower limit: %ld byte\n", l(i));
+    printf("Average: %ld byte\n", mean(varargin{i}));
+    printf("Median: %ld byte\n", m(i));
+    printf("Standard deviation: %ld byte\n", s(i));
+  endfor
 
   # bin width is at least one, otherwise range is split evenly in
   # max_hist_bins bins
-  binwidth = max(1, (u - l) / max_hist_bins());
+  binwidth = max(1, (max(u) - min(l)) / max_hist_bins());
   # non-integer binwidths lead to weird plots, because packet sizes are integers
   binwidth = round(binwidth);
   # max and min sizes are the plot limits
-  range = [l:binwidth:u];
-  transparent_hist(sizes, range, binwidth);
+  range = [min(l):binwidth:max(u)];
+
+  hold on;
+  for i = 1:length(varargin)
+    h{i} = transparent_hist(varargin{i}, range, binwidth, i);
+  endfor
+  hold off;
+
   axis([min((range(1) - binwidth / 2), 0) (range(end) + binwidth / 2)]);
   title("Distribution of packet sizes [byte]");
-
-  print_format(strcat(filename, "-size.", output_format), output_format);
 endfunction
 
 
@@ -56,7 +62,6 @@ if length(files) < 1
   exit(1);
 endif
 
-output_format = parser.Results.format;
 upper = str2num(parser.Results.upper);
 
 # this cell array collects packet sizes for all files
@@ -70,12 +75,9 @@ for i = 1:length(files);
   sizes{i} = data.size;
 
   chk_seq(data.sequence);
-  # do individual evaluation only when processing a single file
-  if (length(files) == 1)
-    eval_size(sizes{i}, filename, output_format);
-  endif
 endfor
 
-#if (length(times) > 1)
-#  eval_iat(parser.Results.out, output_format, upper, times{:});
-#endif
+plot_size_dist(sizes{:});
+
+print_format(strcat(parser.Results.out, "-size.", parser.Results.format),
+	     parser.Results.format);
