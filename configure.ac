@@ -52,9 +52,14 @@ AC_CHECK_HEADERS([stdlib.h signal.h])
 AC_TYPE_SIZE_T
 
 AC_ARG_ENABLE(kutime,
-	[  --enable-kutime  Record user space times when receiving packages],
+	[  --enable-kutime	Record user space times when receiving packages],
 	[AC_DEFINE([ENABLE_KUTIME], [1], [Test])], [])
+AC_ARG_ENABLE(capabilites,
+	[  --enable-capabilites	Set file capabilities for LUNA binary during
+			installation],
+	[AC_SUBST([SET_CAPS], [true])], AC_SUBST([SET_CAPS], [false]))
 
 # Stuff to build
-AC_CONFIG_FILES([Makefile src/Makefile evaluation/Makefile remote-control/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile evaluation/Makefile \
+			  remote-control/Makefile])
 AC_OUTPUT

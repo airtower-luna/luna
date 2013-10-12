@@ -23,3 +23,9 @@ LIBS = $(LIBRT) $(LIBGSL_LIBS)
 
 #INCLUDES = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) $(GIO_CFLAGS) $(LIBNL_CFLAGS) $(GNUTLS_CFLAGS)
 #LIBS = $(GLIB_LIBS) $(GTHREAD_LIBS) $(GIO_LIBS) $(LIBNL_LIBS) $(GNUTLS_LIBS)
+
+install-exec-hook:
+	if ($(SET_CAPS)); then \
+	setcap cap_sys_nice,cap_ipc_lock=pe $(DESTDIR)$(bindir)/luna || \
+	echo "WARNING: Could not set capabilities for LUNA executable." >&2; \
+	fi
