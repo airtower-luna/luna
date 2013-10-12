@@ -9,7 +9,15 @@ my @files;
 
 if (not defined $command)
 {
-    die "No command.\n";
+    die "No command.\n" if ($LIBEXECPATH eq "");
+
+    print "Evaluation command missing. The following commands are available:\n";
+    my @list = <${LIBEXECPATH}/*>;
+    foreach my $filename (@list)
+    {
+	print "\t".$1."\n" if ($filename =~ /^.*\/([^\/]+)$/);
+    }
+    exit(1);
 }
 
 for (my $i = 1; $i < @ARGV; $i++)
