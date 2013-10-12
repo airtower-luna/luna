@@ -19,12 +19,20 @@
 data_DATA = luna-eval.m
 # Evaluation scripts are installed to libexec
 pkglibexec_SCRIPTS = timediff rtt datarate lte-analysis sizedist
-CLEANFILES = $(pkglibexec_SCRIPTS)
+# Master evaluation script (for post-install use)
+bin_SCRIPTS = luna-eval
+EXTRA_DIST = luna-eval.in
+
+# clean modified scripts
+CLEANFILES = $(bin_SCRIPTS) $(pkglibexec_SCRIPTS)
 # TODO: general evaluation script that calls the ones from libexec
 
-# replace path to luna-eval.m with the post-install one
-do_subst = sed -e 's,"luna-eval.m","$(datadir)/luna-eval.m",g'
+# set path to scripts installed to $pkglibexecdir
+luna-eval: luna-eval.in Makefile
+	sed -e 's,LIBEXECPATH="",LIBEXECPATH="$(pkglibexecdir)",g' < $< > $@
+	chmod +x $@
 
+# replace path to luna-eval.m with the post-install one
 $(pkglibexec_SCRIPTS): %: %.m Makefile
-	$(do_subst) < $< > $@
+	sed -e 's,"luna-eval.m","$(datadir)/luna-eval.m",g' < $< > $@
 	chmod +x $@

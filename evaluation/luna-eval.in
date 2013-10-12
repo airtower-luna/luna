@@ -1,0 +1,62 @@
+#!/usr/bin/perl -w
+use strict;
+
+my $LIBEXECPATH="";
+
+my $command = $ARGV[0];
+my @opts;
+my @files;
+
+if (not defined $command)
+{
+    die "No command.\n";
+}
+
+for (my $i = 1; $i < @ARGV; $i++)
+{
+    my $arg = $ARGV[$i];
+    # option with value
+    if ($arg =~ /^--(\w*)=(.*)$/)
+    {
+	push(@opts, $1." ".$2);
+	next;
+    }
+    # switch option
+    if ($arg =~ /^--(\w*)$/)
+    {
+	push(@opts, $1);
+	next;
+    }
+    # everything else should be a file
+    if (-r $arg)
+    {
+	push(@files, $arg);
+    }
+    else
+    {
+	die "File not readable: ".$arg."\n";
+    }
+}
+
+my $cli = "";
+if ($LIBEXECPATH eq "")
+{
+    $cli = "./".$command.".m";
+}
+else
+{
+    $cli = $LIBEXECPATH."/".$command;
+}
+
+foreach my $i (@opts)
+{
+    $cli .= " ".$i;
+}
+$cli .= " --";
+foreach my $i (@files)
+{
+    $cli .= " ".$i;
+}
+
+print $cli."\n";
+exec ($cli) or die "No such command: ".$command."\n";
