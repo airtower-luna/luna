@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
+use File::Basename;
 
 my $LIBEXECPATH="";
 
@@ -7,11 +8,12 @@ my $command = $ARGV[0];
 my @opts;
 my @files;
 
-if (not defined $command)
+if (not defined $command or $command eq "help" or $command eq "--help")
 {
     die "No command.\n" if ($LIBEXECPATH eq "");
 
-    print "Evaluation command missing. The following commands are available:\n";
+    print basename($0);
+    print ": LUNA output evaluation. The following commands are available:\n";
     my @list = <${LIBEXECPATH}/*>;
     foreach my $filename (@list)
     {
