@@ -17,7 +17,12 @@
 
 # Build the LUNA binary
 bin_PROGRAMS = luna
-luna_SOURCES = luna.c server.c traffic.c generator.c gaussian_generator.c simple_generator.c client.c
+luna_SOURCES = luna.c server.c traffic.c generator.c gaussian_generator.c \
+	simple_generator.c client.c
+# header files don't need to be installed (because there's no library),
+# but must be included in source packages
+noinst_HEADERS = client.h gaussian_generator.h generator.h luna.h server.h \
+	simple_generator.h traffic.h
 
 LIBS = $(LIBRT) $(LIBGSL_LIBS)
 
