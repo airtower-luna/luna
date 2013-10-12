@@ -83,9 +83,9 @@ endif
 
 # tabular output, if requested
 if (parser.Results.tab)
-  printf("# Size\tIST\tavg(RTT)\tstd(RTT)\tPackets\n");
+  printf("# Size\tIST\tavg(RTT)\tstd(RTT)\tPackets");
   for i = 1:length(rtt)
-    printf("%ld\t%ld\t%ld\t%ld\t%ld\n",
+    printf("\n%ld\t%ld\t%ld\t%ld\t%ld",
 	   size{i}(1), ist, mean(rtt{i}), s{i}, length(rtt{i}));
   endfor
   exit(0);

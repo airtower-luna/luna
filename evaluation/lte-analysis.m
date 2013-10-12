@@ -53,7 +53,8 @@ for i = 1:length(files);
   filename = files{i};
   # read from file
   # rtt.m prints an additional empty line for some reason, so skip two lines
-  A = dlmread(filename, "\t", 2, 0);
+  A = dlmread(filename, "\t", 1, 0);
+  A = sortrows(A, cols.size);
   rtt{i} = A( :, cols.rtt);
   size{i} = A( :, cols.size);
   std{i} = A( :, cols.std);
