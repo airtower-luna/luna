@@ -56,33 +56,20 @@ if length(files) < 1
   exit(1);
 endif
 
-# load column meanings depending on kutime flag
-cols = server_column_definitions(parser.Results.kutime);
-
 output_format = parser.Results.format;
 upper = str2num(parser.Results.upper);
 
-# this cell array collects kernel arrival times for all files so they can
-# be compared
-times = {};
+# this cell array collects packet sizes for all files
 sizes = {};
 
 for i = 1:length(files);
   filename = files{i}
   printf("Reading data from %s: ", filename);
   # read test output
-  A = dlmread(filename, "\t", 1, 0);
-  printf("%i data sets\n", length(A));
-  ktime = A( :, cols.ktime);
-  times{i} = ktime;
-  # read utime column only if requested (otherwise, it might not exist)
-  if isfield(cols, "utime")
-    utime = A( :, cols.utime);
-  endif
-  seqnos = A( :, cols.sequence);
-  sizes{i} = A( :, cols.size);
+  data = parse_server_log(parser.Results.kutime, filename);
+  sizes{i} = data.size;
 
-  chk_seq(seqnos);
+  chk_seq(data.sequence);
   # do individual evaluation only when processing a single file
   if (length(files) == 1)
     eval_size(sizes{i}, filename, output_format);
