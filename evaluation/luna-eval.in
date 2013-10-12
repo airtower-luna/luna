@@ -19,6 +19,14 @@ if (not defined $command or $command eq "help" or $command eq "--help")
     {
 	print "\t".$1."\n" if ($filename =~ /^.*\/([^\/]+)$/);
     }
+    print "Common options:\n";
+    print "\t--out=NAME\tOutput file prefix\n";
+    print "\t--format=FORMAT\tOutput file format, any format supported by ";
+    print "Octave's\n\t\t\tprint function can be used.\n";
+    print "\t--upper=VALUE\tUpper limit for the plot's x-axis\n";
+    print "\t--kutime\tSet if the input files contain user space timing\n";
+    print "\t\t\tinformation.\n";
+    print "Some commands offer additional options.\n";
     exit(1);
 }
 
@@ -47,6 +55,8 @@ for (my $i = 1; $i < @ARGV; $i++)
 	die "File not readable: ".$arg."\n";
     }
 }
+
+die "No input files.\n" if (@files == 0);
 
 my $cli = "";
 if ($LIBEXECPATH eq "")
