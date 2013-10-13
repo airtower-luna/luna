@@ -16,3 +16,11 @@
 # along with LUNA. If not, see <http://www.gnu.org/licenses/>.
 
 SUBDIRS	= src remote-control evaluation
+
+# Remove $(pkglibexecdir) on uninstall, which currently is the only
+# package-specific subdirectory used by LUNA. The option
+# --ignore-fail-on-non-empty prevents error messages if the user has
+# added anything (most likely evaluation scripts) independently of the
+# LUNA installation.
+uninstall-hook:
+	rmdir --ignore-fail-on-non-empty $(pkglibexecdir)
