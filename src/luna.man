@@ -1,0 +1,147 @@
+.\" This file is part of the Lightweight Universal Network Analyzer (LUNA)
+.\"
+.\" Copyright (c) 2013 Fiona Klute
+.\"
+.\" LUNA is free software: you can redistribute it and/or modify it
+.\" under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" LUNA is distributed in the hope that it will be useful, but WITHOUT
+.\" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+.\" or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+.\" License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with LUNA. If not, see <http://www.gnu.org/licenses/>.
+
+.TH LUNA 1 2013-11-04 "LUNA" "LUNA Manual"
+
+.SH NAME
+luna \- generate and record packets to measure network performance
+
+.SH SYNOPSIS
+.B luna
+-s|-c SERVER [OPTIONS]...
+
+.SH DESCRIPTION
+.P
+TODO
+.SS Generators
+.P
+TODO
+
+.SH OPTIONS
+
+.P
+.B -s
+.RS
+Run in server mode.
+.B -s
+and
+.B -c
+are mutually exclusive.
+.RE
+
+.P
+.B -c SERVER
+.RS
+Run in client mode, send to the specified server. The server can be
+given by hostname, IPv4 or IPv6 address.
+.B -c
+and
+.B -s
+are mutually exclusive.
+.RE
+
+.P
+.B -p PORT
+.RS
+Use the specified port. In server mode,
+.B luna
+binds this UDP port for listening. In client mode, this is used as the
+destination port.
+.RE
+
+.P
+.B -4
+.RS
+Run in IPv4 only mode
+.RE
+
+.P
+.B -6
+.RS
+Run in IPv6 only mode
+.RE
+
+.P
+.B -T
+.RS
+Write tab separated output. This is required to use the analysis tools
+provided by LUNA, and strongly recommended if you want to write your
+own. May become default behavior in the future.
+.RE
+
+.P
+.B -t SECONDS
+.RS
+Send for the given number of seconds (client mode only)
+.RE
+
+.P
+.B -g GENERATOR
+.RS
+Use the named generator (client mode only). Default is "static".
+.RE
+
+.P
+.B -a ARGS
+.RS
+Pass the specified arguments to the configured generator (see option
+.BR -g ).
+Generator arguments must be written in the format
+name=value,... Acceptable names depend on the generator.
+.RE
+
+.P
+.B -e
+.RS
+Request echo packets for round trip time measurements (client mode only)
+.RE
+
+.P
+.B -o FILE
+.RS
+Write recorded results to FILE instead of standard out
+.RE
+
+.SH EXIT STATUS
+.P
+.B 0
+if execution completed normally, non-zero in case of an error. In the
+latter case,
+.BR luna
+will output an error message for the user. Error exit codes are
+defined in
+.BR luna.h .
+
+.SH ENVIRONMENT
+.P
+Generators using random generators from the GNU Scientific Library
+(libgsl) may be influenced by the environment variables evaluated in
+.BR gsl_rng_env_setup (),
+see section "Random number environment variables" in the libgsl
+handbook.
+
+.SH NOTES
+.P
+TODO: PREEMPT_RT
+
+.SH EXAMPLE
+.P
+TODO
+
+.SH SEE ALSO
+.P
+TODO

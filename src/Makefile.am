@@ -26,8 +26,8 @@ noinst_HEADERS = client.h gaussian_generator.h generator.h luna.h server.h \
 
 LIBS = $(LIBRT) $(LIBGSL_LIBS)
 
-#INCLUDES = $(GLIB_CFLAGS) $(GTHREAD_CFLAGS) $(GIO_CFLAGS) $(LIBNL_CFLAGS) $(GNUTLS_CFLAGS)
-#LIBS = $(GLIB_LIBS) $(GTHREAD_LIBS) $(GIO_LIBS) $(LIBNL_LIBS) $(GNUTLS_LIBS)
+# manpages
+dist_man1_MANS = luna.man
 
 install-exec-hook:
 	if ($(SET_CAPS)); then \
