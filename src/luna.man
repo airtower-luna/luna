@@ -33,88 +33,58 @@ TODO
 
 .SH OPTIONS
 
-.P
-.B -s
-.RS
-Run in server mode.
-.B -s
-and
-.B -c
-are mutually exclusive.
-.RE
+.TP
+.B \-s
+Run in server mode. \fB\-s\fR and \fB\-c\fR are mutually exclusive.
 
-.P
-.B -c SERVER
-.RS
+.TP
+.B \-c SERVER
 Run in client mode, send to the specified server. The server can be
-given by hostname, IPv4 or IPv6 address.
-.B -c
-and
-.B -s
-are mutually exclusive.
-.RE
+given by hostname, IPv4 or IPv6 address. \fB\-c\fR and \fB\-s\fR are
+mutually exclusive.
 
-.P
-.B -p PORT
-.RS
-Use the specified port. In server mode,
-.B luna
-binds this UDP port for listening. In client mode, this is used as the
-destination port.
-.RE
+.TP
+.B \-p PORT
+Use the specified port. In server mode, \fBluna\fR binds this UDP
+port for listening. In client mode, this is used as the destination
+port.
 
-.P
-.B -4
-.RS
+.TP
+.B \-4
 Run in IPv4 only mode
-.RE
 
-.P
-.B -6
-.RS
+.TP
+.B \-6
 Run in IPv6 only mode
-.RE
 
-.P
-.B -T
-.RS
+.TP
+.B \-T
 Write tab separated output. This is required to use the analysis tools
 provided by LUNA, and strongly recommended if you want to write your
 own. May become default behavior in the future.
-.RE
 
-.P
-.B -t SECONDS
-.RS
+.TP
+.B \-t SECONDS
 Send for the given number of seconds (client mode only)
-.RE
 
-.P
-.B -g GENERATOR
-.RS
+.TP
+.B \-g GENERATOR
 Use the named generator (client mode only). Default is "static".
-.RE
 
-.P
-.B -a ARGS
-.RS
+.TP
+.B \-a ARGS
 Pass the specified arguments to the configured generator (see option
-.BR -g ).
+.BR \-g ).
 Generator arguments must be written in the format
-name=value,... Acceptable names depend on the generator.
-.RE
+name=value,... Acceptable names and values depend on the generator.
 
-.P
-.B -e
-.RS
+.TP
+.B \-e
 Request echo packets for round trip time measurements (client mode only)
-.RE
 
-.P
-.B -o FILE
-.RS
+.TP
+.B \-o FILE
 Write recorded results to FILE instead of standard out
-.RE
 
 .SH EXIT STATUS
 .P
