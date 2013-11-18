@@ -1,3 +1,10 @@
+LUNA, short for "Lightweight Universal Network Analyzer", is a system
+to analyze network behavior under different network loads. LUNA can
+generate UDP packets following configured distributions and record
+their arrivals. It also includes tools to analyze the resulting packet
+logs and a remote control system to simplify setting up experiments
+involving many hosts.
+
 src/		C source code of the traffic generator
 
 evaluation/	Octave scripts and related stuff to evalutate the
@@ -10,8 +17,12 @@ Build dependencies: Full autotools, modern GCC and glibc, libgsl
 The remote control script also needs the Net::OpenSSH package (and
 OpenSSH, of course).
 
-List of required Debian packages (may be incomplete):
+List of required Debian packages (might be incomplete, please report
+if something is missing):
 	build-essentials
 	autoconf-archive
 	libgsl0-dev
 	libnet-openssh-perl
+
+Please send bug reports or patches to the author by mail or through
+the Github issue tracker (https://github.com/airtower-luna/luna/issues).
