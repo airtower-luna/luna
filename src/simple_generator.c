@@ -19,6 +19,7 @@
 #include <config.h>
 
 #include <string.h>
+#include <time.h>
 
 #include "luna.h"
 #include "simple_generator.h"

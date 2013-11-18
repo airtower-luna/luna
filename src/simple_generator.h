@@ -19,11 +19,7 @@
 #ifndef __LUNA_SIMPLE_GENERATOR_H__
 #define __LUNA_SIMPLE_GENERATOR_H__
 
-#include <pthread.h>
-#include <time.h>
-
 #include "generator.h"
-#include "traffic.h"
 
 
 
