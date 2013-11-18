@@ -54,9 +54,9 @@ AC_TYPE_SIZE_T
 AC_ARG_ENABLE(kutime,
 	[  --enable-kutime	Record user space times when receiving packages],
 	[AC_DEFINE([ENABLE_KUTIME], [1], [Test])], [])
-AC_ARG_ENABLE(capabilites,
-	[  --enable-capabilites	Set file capabilities for LUNA binary during
-			installation],
+AC_ARG_ENABLE(capabilities,
+	[  --enable-capabilities	Set file capabilities for LUNA binary
+			during installation],
 	[AC_SUBST([SET_CAPS], [true])], AC_SUBST([SET_CAPS], [false]))
 
 # Stuff to build
