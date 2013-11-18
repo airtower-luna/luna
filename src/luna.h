@@ -41,6 +41,8 @@
 
 /* 1s = 1000000µs */
 #define US_PER_S 1000000
+/* 1s = 1000000000ns */
+#define NS_PER_S 1000000000
 /* 1µs = 1000ns */
 #define NS_PER_US 1000
 

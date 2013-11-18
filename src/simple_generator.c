@@ -152,8 +152,13 @@ int alternate_time_generator_init(generator_t *this)
 	this->block = create_block_circle(2, BLOCK_LEN);
 
 	struct timespec alt_interval;
-	alt_interval.tv_sec = attr->interval.tv_sec;
+	alt_interval.tv_sec = attr->interval.tv_sec * 2;
 	alt_interval.tv_nsec = attr->interval.tv_nsec * 2;
+	while (alt_interval.tv_nsec > NS_PER_S)
+	{
+		alt_interval.tv_nsec -= NS_PER_S;
+		alt_interval.tv_sec++;
+	}
 	int normal = 1;
 
 	struct packet_block *block = this->block;
