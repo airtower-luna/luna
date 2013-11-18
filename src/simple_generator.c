@@ -214,12 +214,12 @@ int rand_size_generator_fill_block(generator_t *this,
 	struct static_generator_attr *attr =
 		(struct static_generator_attr *) this->attr;
 
-	/* scale random number to range of MIN_PACKET_SIZE to attr->size */
-	long int r = random() * (attr->size - MIN_PACKET_SIZE) / RAND_MAX
-		+ MIN_PACKET_SIZE;
-
 	for (int i = 0; i < current->length; i++)
 	{
+		/* scale random number to range of MIN_PACKET_SIZE to
+		 * attr->size */
+		long int r = random() * (attr->size - MIN_PACKET_SIZE)
+			/ RAND_MAX + MIN_PACKET_SIZE;
 		current->data[i].size = r;
 		memcpy(&(current->data[i].delay), &(attr->interval),
 		       sizeof(struct timespec));
