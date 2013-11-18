@@ -14,7 +14,6 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with LUNA. If not, see <http://www.gnu.org/licenses/>.
-
 .TH LUNA 1 2013-11-04 "LUNA" "LUNA Manual"
 
 .SH NAME
@@ -26,10 +25,14 @@ luna \- generate and record packets to measure network performance
 
 .SH DESCRIPTION
 .P
-TODO
-.SS Generators
-.P
-TODO
+LUNA, short for "Lightweight Universal Network Analyzer", is a system
+to analyze network behavior under different network loads. LUNA can
+generate UDP packets following configured distributions (client mode),
+or receive and log them (server mode). Optionally, if requested by the
+client, the server will echo packets back to the client for round trip
+time measurements. The LUNA source provides tools based on GNU Octave
+for parsing logs and plot results, but you can also create your own
+analysis tools.
 
 .SH OPTIONS
 
@@ -59,9 +62,9 @@ Run in IPv6 only mode
 
 .TP
 .B \-T
-Write tab separated output. This is required to use the analysis tools
-provided by LUNA, and strongly recommended if you want to write your
-own. May become default behavior in the future.
+Write recorded data as tab separated output. This is required to use
+the analysis tools provided by LUNA, and strongly recommended if you
+want to write your own. May become default behavior in the future.
 
 .TP
 .B \-t SECONDS
@@ -69,14 +72,16 @@ Send for the given number of seconds (client mode only)
 
 .TP
 .B \-g GENERATOR
-Use the named generator (client mode only). Default is "static".
+Use the named generator (client mode only). Default is "static". See
+\fBGENERATORS\fR below.
 
 .TP
 .B \-a ARGS
 Pass the specified arguments to the configured generator (see option
 .BR \-g ).
 Generator arguments must be written in the format
-name=value,... Acceptable names and values depend on the generator.
+name=value,... Acceptable names and values depend on the
+generator. Packet intervals are generally given in microseconds.
 
 .TP
 .B \-e
@@ -104,14 +109,102 @@ Generators using random generators from the GNU Scientific Library
 see section "Random number environment variables" in the libgsl
 handbook.
 
-.SH NOTES
+.SH GENERATORS
 .P
-TODO: PREEMPT_RT
+A \fBgenerator\fR is a component of the LUNA client that provides
+sizes and intervals for sending packets. You can choose between some
+pre-defined generators or write your own. Each generator must provide
+a creation function that returns a \fBgenerator_t\fR variable as
+defined in \fBgenerator.h\fR. The same header also provides useful
+helper functions. Generators usually accept arguments from the command
+line, see option \fB-a\fR.
+
+.P
+Currently available generators are:
+
+.TP
+.B static
+Generate packets with a fixed size and interval, as defined by
+generator arguments \fBsize\fR and
+\fBinterval\fR.
+
+.TP
+.B random_size
+Use packet sizes evenly distributed between the provided \fBsize\fR
+argument and the minimum size required by the LUNA protocol. The
+\fBinterval\fR argument is used as a static value.
+
+.TP
+.B alt_time
+Alternate packet intervals between the provided \fBinterval\fR
+argument and double that value every ten packets. The \fBsize\fR
+argument is used as a static value. This generator is primarily an
+example.
+
+.TP
+.B gaussian
+This generator creates packets with sizes following a Gaussian
+distribution, based on a random generator provided by
+\fBlibgsl\fR. Three parameters can be configured: \fBmax\fR sets the
+maximum permitted packet size, \fBsigma\fR is the standard deviation
+for the Gaussian distribution, and \fBinterval\fR the static packet
+interval. The distributions mean value will be half the
+maximum. Random values above and below the permitted range will be
+replaced with the maximum and minimum values, respectively. Behavior
+and available arguments of this generator will likely change in the
+future for more flexibility.
+
+.P
+Unless mentioned otherwise, all generators listed above use a default
+packet interval of 1000µs.
+
+.SH NOTES
+
+.P
+LUNA tries to acquire realtime priority and lock its memory into RAM
+to optimize timing performance. This requires the \fBCAP_IPC_LOCK\fR
+and \fBCAP_SYS_NICE\fR capabilities. The \fB./configure\fR script
+provides the option \fB\-\-enable\-capabilities\fR to set file
+capabilities at install time using
+.BR setcap (8),
+but whether using this option is appropriate depends on the system's
+security policy, see
+.BR capabilities (7)
+for details. LUNA will work without these capabilities, but likely
+with reduced performance.
+
+.P
+For optimal timing precision, it is recommended to use LUNA with a
+\%PREEMPT_RT patched Linux kernel to avoid delays caused by kernel
+threads as far as possible. Whether or not this is relevant for your
+application depends on your system properties and precision
+requirements. Testing precision before taking measurements for
+research is highly recommended in any case. Note that network hardware
+can have a significant impact on packet timings in the microseconds
+range.
 
 .SH EXAMPLE
 .P
-TODO
+Send one packet with 400 byte payload every 200µs to localhost for 20
+seconds:
+.RS
+.P
+luna -c localhost -g static -a size=400,interval=200 -t 20
+.RE
+
+.P
+Send packets to 192.0.2.7 with sizes following a Gaussian distribution
+around 200 bytes with a standard deviation of 30 bytes and a maximum
+packet size of 400 bytes:
+.RS
+.P
+luna -c 192.0.2.7 -g gaussian -a max=400,sigma=30
+.RE
 
 .SH SEE ALSO
 .P
-TODO
+capabilities(7)
+.P
+References to documentation for other LUNA components will be added as
+it is written. At the moment, please see the LUNA source code for
+analysis and remote control tools.
