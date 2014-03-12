@@ -19,7 +19,7 @@ OpenSSH, of course).
 
 List of required Debian packages (might be incomplete, please report
 if something is missing):
-	build-essentials
+	build-essential
 	autoconf-archive
 	libgsl0-dev
 	libnet-openssh-perl
