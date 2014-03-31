@@ -25,9 +25,10 @@ if something is missing):
 	libnet-openssh-perl
 
 After a cloning the Git repository you'll need to run "autoreconf -i"
-or "autoreconf -i -s" to initialize the autoconf system. Afterwards
-please follow the common "./configure && make && make install"
-procedure.
+or "autoreconf -i -s" to initialize the autoconf system. For your
+convenience, there is also an "autogen.sh" script which will take care
+of that. Afterwards please follow the common "./configure && make &&
+make install" procedure.
 
 Please send bug reports or patches to the author by mail or through
 the Github issue tracker (https://github.com/airtower-luna/luna/issues).
