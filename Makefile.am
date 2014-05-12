@@ -23,4 +23,4 @@ SUBDIRS	= src remote-control evaluation
 # added anything (most likely evaluation scripts) independently of the
 # LUNA installation.
 uninstall-hook:
-	rmdir --ignore-fail-on-non-empty $(pkglibexecdir)
+	rmdir --ignore-fail-on-non-empty $(pkglibexecdir) || true
