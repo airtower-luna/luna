@@ -18,6 +18,7 @@ configure
 depcomp
 install-sh
 test-driver
+compile
 
 # compiled (or otherwise processed) programs
 src/luna
