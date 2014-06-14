@@ -51,6 +51,7 @@
 /* Option codes for long options, starting at 260 to be safely above
  * charcodes for short options */
 #define OPT_START_TIME 260
+#define OPT_CLOCK 261
 
 /* valid command line options for getopt */
 #define CLI_OPTS "sc:p:46Tt:g:a:eo:"
@@ -67,6 +68,7 @@ struct option long_opts[] = {
 	{"echo",	no_argument,		NULL,	'e'},
 	{"output",	required_argument,	NULL,	'o'},
 	{"start-time",	required_argument,	NULL,	OPT_START_TIME},
+	{"clock",	required_argument,	NULL,	OPT_CLOCK},
 	{NULL,		0,			NULL,	0}
 };
 
@@ -139,7 +141,7 @@ int main(int argc, char *argv[])
 	int flags = SERVER_SIGTERM_EXIT;
 	int time = 1;
 	struct timespec start_time = {0, 0};
-	clockid_t clk_id = CLOCK_REALTIME;
+	clockid_t clk_id = CLOCK_MONOTONIC;
 	int echo = 0;
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
@@ -210,6 +212,18 @@ int main(int argc, char *argv[])
 			break;
 		case OPT_START_TIME:
 			start_time.tv_sec = strtoul(optarg, NULL, 10);
+			clk_id = CLOCK_REALTIME;
+			break;
+		case OPT_CLOCK:
+			if (strcmp(optarg, "realtime") == 0)
+				clk_id = CLOCK_REALTIME;
+			else if (strcmp(optarg, "monotonic") == 0)
+				clk_id = CLOCK_MONOTONIC;
+			else
+			{
+				fprintf(stderr, "Invalid clock!\n");
+				exit(EXIT_INVALID);
+			}
 			break;
 		default:
 			break;
