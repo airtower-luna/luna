@@ -50,6 +50,20 @@
 
 /* valid command line options for getopt */
 #define CLI_OPTS "sc:p:46Tt:g:a:eo:"
+struct option long_opts[] = {
+	{"server",	no_argument,		NULL,	's'},
+	{"client",	required_argument,	NULL,	'c'},
+	{"port",	required_argument,	NULL,	'p'},
+	{"ipv4",	no_argument,		NULL,	'4'},
+	{"ipv6",	no_argument,		NULL,	'6'},
+	{"tsv-output",	no_argument,		NULL,	'T'},
+	{"time",	required_argument,	NULL,	't'},
+	{"generator",	required_argument,	NULL,	'g'},
+	{"generator-args", required_argument,	NULL,	'a'},
+	{"echo",	no_argument,		NULL,	'e'},
+	{"output",	required_argument,	NULL,	'o'},
+	{NULL,		0,			NULL,	0}
+};
 
 void chkalloc(void *ptr, char *file, int line)
 {
@@ -129,9 +143,9 @@ int main(int argc, char *argv[])
 	/* file path to write output data to, will be overwritten */
 	char *datafile = NULL;
 
-	for (int opt = getopt(argc, argv, CLI_OPTS);
+	for (int opt = getopt_long(argc, argv, CLI_OPTS, long_opts, NULL);
 	     opt != -1;
-	     opt = getopt(argc, argv, CLI_OPTS))
+	     opt = getopt_long(argc, argv, CLI_OPTS, long_opts, NULL))
 	{
 		switch (opt)
 		{
