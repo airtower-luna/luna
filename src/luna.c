@@ -48,6 +48,10 @@
 #define CLIENT_PRIO_OFFSET 60
 #define SERVER_PRIO_OFFSET 20
 
+/* Option codes for long options, starting at 260 to be safely above
+ * charcodes for short options */
+#define OPT_START_TIME 260
+
 /* valid command line options for getopt */
 #define CLI_OPTS "sc:p:46Tt:g:a:eo:"
 struct option long_opts[] = {
@@ -62,6 +66,7 @@ struct option long_opts[] = {
 	{"generator-args", required_argument,	NULL,	'a'},
 	{"echo",	no_argument,		NULL,	'e'},
 	{"output",	required_argument,	NULL,	'o'},
+	{"start-time",	required_argument,	NULL,	OPT_START_TIME},
 	{NULL,		0,			NULL,	0}
 };
 
@@ -133,10 +138,12 @@ int main(int argc, char *argv[])
 	int client = 0;
 	int flags = SERVER_SIGTERM_EXIT;
 	int time = 1;
+	struct timespec start_time = {0, 0};
 	int echo = 0;
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
 	char *host = NULL;
+	char *start_time_str = NULL;
 	/* the packet generator to use and its arguments */
 	char *generator = NULL;
 	char *gen_args = NULL;
@@ -200,6 +207,9 @@ int main(int argc, char *argv[])
 		case 'o': // data output file
 			datafile = strdup(optarg);
 			CHKALLOC(datafile);
+			break;
+		case OPT_START_TIME:
+			start_time.tv_sec = strtoul(optarg, NULL, 10);
 			break;
 		default:
 			break;
