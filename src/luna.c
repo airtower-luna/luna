@@ -143,9 +143,11 @@ int main(int argc, char *argv[])
 	struct timespec start_time = {0, 0};
 	clockid_t clk_id = CLOCK_MONOTONIC;
 	int echo = 0;
-	/* port and host will be allocated by strdup, free'd below. */
+	/* port, host and clock will be allocated by strdup if needed,
+	 * free'd below. */
 	char *port = NULL;
 	char *host = NULL;
+	char *clock = NULL;
 	/* the packet generator to use and its arguments */
 	char *generator = NULL;
 	char *gen_args = NULL;
@@ -215,15 +217,8 @@ int main(int argc, char *argv[])
 			clk_id = CLOCK_REALTIME;
 			break;
 		case OPT_CLOCK:
-			if (strcmp(optarg, "realtime") == 0)
-				clk_id = CLOCK_REALTIME;
-			else if (strcmp(optarg, "monotonic") == 0)
-				clk_id = CLOCK_MONOTONIC;
-			else
-			{
-				fprintf(stderr, "Invalid clock!\n");
-				exit(EXIT_INVALID);
-			}
+			clock = strdup(optarg);
+			CHKALLOC(clock);
 			break;
 		default:
 			break;
@@ -244,6 +239,34 @@ int main(int argc, char *argv[])
 	{
 		generator = strdup(DEFAULT_GENERATOR);
 		CHKALLOC(generator);
+	}
+
+	/* If true, the clock to use was set manually */
+	if (clock != NULL)
+	{
+		if (strcmp(clock, "realtime") == 0)
+			clk_id = CLOCK_REALTIME;
+		else if (strcmp(clock, "monotonic") == 0)
+			clk_id = CLOCK_MONOTONIC;
+		else
+		{
+			fprintf(stderr, "Invalid clock: \"%s\"!\n", clock);
+			exit(EXIT_INVALID);
+		}
+		free(clock);
+
+		/* If one of the elements of start_time is non-zero,
+		 * it was specified on the command line. Right now,
+		 * only full seconds are possible, but by checking for
+		 * nanoseconds, too, the code is prepared for higher
+		 * precision. */
+		if ((start_time.tv_sec != 0 || start_time.tv_nsec != 0)
+		    && clk_id == CLOCK_MONOTONIC)
+		{
+			fprintf(stderr, "Error: Using a fixed start time is "
+				"not possible with the monotonic clock!\n");
+			exit(EXIT_INVALID);
+		}
 	}
 
 	if (server)
