@@ -14,7 +14,7 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with LUNA. If not, see <http://www.gnu.org/licenses/>.
-.TH LUNA 1 2013-11-04 "LUNA" "LUNA Manual"
+.TH LUNA 1 2014-06-14 "LUNA" "LUNA Manual"
 
 .SH NAME
 luna \- generate and record packets to measure network performance
@@ -36,59 +36,81 @@ analysis tools.
 
 .SH OPTIONS
 
+.IP \fB\-s\fR
+.PD 0
 .TP
-.B \-s
+.B \-\-server
 Run in server mode. \fB\-s\fR and \fB\-c\fR are mutually exclusive.
 
+.IP "\fB\-c SERVER\fR"
+.PD 0
 .TP
-.B \-c SERVER
+.B \-\-client=SERVER
 Run in client mode, send to the specified server. The server can be
 given by hostname, IPv4 or IPv6 address. \fB\-c\fR and \fB\-s\fR are
 mutually exclusive.
 
+.IP "\fB\-p PORT\fR"
+.PD 0
 .TP
-.B \-p PORT
+.B \-\-port=PORT
 Use the specified port. In server mode, \fBluna\fR binds this UDP
 port for listening. In client mode, this is used as the destination
 port.
 
+.IP \fB\-4\fR
+.PD 0
 .TP
-.B \-4
+.B \-\-ipv4
 Run in IPv4 only mode
 
+.IP \fB\-6\fR
+.PD 0
 .TP
-.B \-6
+.B \-\-ipv6
 Run in IPv6 only mode
 
+.IP \fB\-T\fR
+.PD 0
 .TP
-.B \-T
+.B \-\-tsv\-output
 Write recorded data as tab separated output. This is required to use
 the analysis tools provided by LUNA, and strongly recommended if you
 want to write your own. May become default behavior in the future.
 
+.IP "\fB\-t SECONDS\fR"
+.PD 0
 .TP
-.B \-t SECONDS
+.B \-\-time=SECONDS
 Send for the given number of seconds (client mode only)
 
+.IP "\fB\-g GENERATOR\fR"
+.PD 0
 .TP
-.B \-g GENERATOR
+.B \-\-generator=GENERATOR
 Use the named generator (client mode only). Default is "static". See
 \fBGENERATORS\fR below.
 
+.IP "\fB\-a ARGS\fR"
+.PD 0
 .TP
-.B \-a ARGS
+.B \-\-generator-args=ARGS
 Pass the specified arguments to the configured generator (see option
 .BR \-g ).
 Generator arguments must be written in the format
 name=value,... Acceptable names and values depend on the
 generator. Packet intervals are generally given in microseconds.
 
+.IP \fB\-e\fR
+.PD 0
 .TP
-.B \-e
+.B \-\-echo
 Request echo packets for round trip time measurements (client mode only)
 
+.IP "\fB\-o FILE\fR"
+.PD 0
 .TP
-.B \-o FILE
+.B \-\-output=FILE
 Write recorded results to FILE instead of standard out
 
 .SH EXIT STATUS
@@ -204,6 +226,7 @@ luna -c 192.0.2.7 -g gaussian -a max=400,sigma=30
 .SH SEE ALSO
 .P
 capabilities(7)
+
 .P
 References to documentation for other LUNA components will be added as
 it is written. At the moment, please see the LUNA source code for
