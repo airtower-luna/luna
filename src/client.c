@@ -166,11 +166,14 @@ int run_client(struct addrinfo *addr, int time, int echo,
 	struct packet_block *block = generator.block;
 	pthread_mutex_lock(block->lock);
 
+	/* Clock to use for packet timing */
+	clockid_t clk_id = CLOCK_MONOTONIC;
+
 	/* timespecs for the timer */
 	struct timespec nexttick = {0, 0};
 	struct timespec rem = {0, 0};
 	struct timespec now = {0, 0};
-	clock_gettime(CLOCK_MONOTONIC, &nexttick);
+	clock_gettime(clk_id, &nexttick);
 	struct timespec end = {nexttick.tv_sec + time, nexttick.tv_nsec};
 
 	/* Store page fault statistics to check if memory management
@@ -183,7 +186,7 @@ int run_client(struct addrinfo *addr, int time, int echo,
 		*sequence = htonl(seq++);
 		timespecadd(&nexttick, &(block->data[bi].delay), &nexttick);
 		/* sleep until scheduled send time */
-		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,
+		clock_nanosleep(clk_id, TIMER_ABSTIME,
 				&nexttick, &rem); // TODO: error check
 		/* record current time into the packet */
 		clock_gettime(CLOCK_REALTIME, sendtime);
@@ -210,7 +213,7 @@ int run_client(struct addrinfo *addr, int time, int echo,
 		}
 		/* get the current time, needed to stop the loop at
 		 * the right time */
-		clock_gettime(CLOCK_MONOTONIC, &now);
+		clock_gettime(clk_id, &now);
 	}
 
 	/* Check page fault statistics to see if memory management is
