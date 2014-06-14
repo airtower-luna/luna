@@ -24,10 +24,16 @@
 /*
  * addr: destination (IP address, port)
  * time: time (in seconds) to send packets
+ * start_time: time when the client should start sending
+ * clk_id: Clock to use for packet timing, start_time is compared to
+ *	   this clock. See time.h for available clocks.
+ * echo: request echo packets?
  * generator_type: name of the generator to use
  * generator_args: parameters for the generator
  */
-int run_client(struct addrinfo *addr, int time, int echo,
+int run_client(struct addrinfo *addr, int time,
+	       struct timespec start_time, clockid_t clk_id,
+	       int echo,
 	       char *generator_type, char *generator_args,
 	       const char *datafile);
 

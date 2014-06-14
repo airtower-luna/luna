@@ -70,7 +70,9 @@ struct echo_thread_data
 
 
 
-int run_client(struct addrinfo *addr, int time, int echo,
+int run_client(struct addrinfo *addr, int time,
+	       struct timespec start_time, clockid_t clk_id,
+	       int echo,
 	       char *generator_type, char *generator_args,
 	       const char *datafile)
 {
@@ -165,9 +167,6 @@ int run_client(struct addrinfo *addr, int time, int echo,
 		sem_wait(&(e_data->sem));
 	struct packet_block *block = generator.block;
 	pthread_mutex_lock(block->lock);
-
-	/* Clock to use for packet timing */
-	clockid_t clk_id = CLOCK_MONOTONIC;
 
 	/* timespecs for the timer */
 	struct timespec nexttick = {0, 0};
