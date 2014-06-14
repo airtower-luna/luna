@@ -113,6 +113,25 @@ Request echo packets for round trip time measurements (client mode only)
 .B \-\-output=FILE
 Write recorded results to FILE instead of standard out
 
+.TP
+.B \-\-start-time=UNIXTIME
+Start the transmission at the given time (client mode only). The time
+must be in Unix time (seconds since 1970-01-01). If this option is not
+used, the transmission is started as soon as possible. This can be
+used to start transmissions on different hosts at the same time,
+assuming their clocks are in sync. The first packet will be sent at
+the given time plus the first delay returned by the generator used.
+
+.TP
+.B \-\-clock=(realtime|monotonic)
+Set the clock to use. Two clocks are available, realtime and
+monotonic, corresponting to \fBCLOCK_REALTIME\fR and
+\fBCLOCK_MONOTONIC\fR as described in
+.BR clock_gettime (3).
+If \fB--start-time\fR is used, LUNA always uses \fBCLOCK_REALTIME\fR,
+otherwise \fBCLOCK_MONOTONIC\fR is the default but can be changed
+using this option.
+
 .SH EXIT STATUS
 .P
 .B 0
