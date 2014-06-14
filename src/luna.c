@@ -143,7 +143,6 @@ int main(int argc, char *argv[])
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
 	char *host = NULL;
-	char *start_time_str = NULL;
 	/* the packet generator to use and its arguments */
 	char *generator = NULL;
 	char *gen_args = NULL;
