@@ -172,7 +172,16 @@ int run_client(struct addrinfo *addr, int time,
 	struct timespec nexttick = {0, 0};
 	struct timespec rem = {0, 0};
 	struct timespec now = {0, 0};
-	clock_gettime(clk_id, &nexttick);
+
+	/* if start_time is zeroed, just use "now" */
+	if (start_time.tv_sec == 0 && start_time.tv_nsec == 0)
+		clock_gettime(clk_id, &nexttick);
+	/* otherwise initialize nexttick to start_time */
+	else
+	{
+		nexttick.tv_sec = start_time.tv_sec;
+		nexttick.tv_nsec = start_time.tv_nsec;
+	}
 	struct timespec end = {nexttick.tv_sec + time, nexttick.tv_nsec};
 
 	/* Store page fault statistics to check if memory management

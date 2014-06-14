@@ -139,6 +139,7 @@ int main(int argc, char *argv[])
 	int flags = SERVER_SIGTERM_EXIT;
 	int time = 1;
 	struct timespec start_time = {0, 0};
+	clockid_t clk_id = CLOCK_REALTIME;
 	int echo = 0;
 	/* port and host will be allocated by strdup, free'd below. */
 	char *port = NULL;
@@ -289,7 +290,7 @@ int main(int argc, char *argv[])
 
 	if (client)
 		retval = run_client(res, time,
-				    start_time, CLOCK_MONOTONIC,
+				    start_time, clk_id,
 				    echo,
 				    generator, gen_args,
 				    datafile);
