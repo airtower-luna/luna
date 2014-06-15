@@ -17,8 +17,8 @@
 
 dist_bin_SCRIPTS = luna-control
 CLEANFILES = $(dist_bin_SCRIPTS)
-EXTRA_DIST = luna-control.pl localhost-test.bash
-TESTS = localhost-test.bash
+EXTRA_DIST = luna-control.pl localhost-test.bash start-time-test.bash
+TESTS = localhost-test.bash start-time-test.bash
 TESTS_ENVIRONMENT = export BUILDDIR=$(top_builddir);
 
 luna-control: luna-control.pl Makefile
