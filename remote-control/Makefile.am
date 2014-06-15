@@ -21,6 +21,9 @@ EXTRA_DIST = luna-control.pl localhost-test.bash start-time-test.bash
 TESTS = localhost-test.bash start-time-test.bash
 TESTS_ENVIRONMENT = export BUILDDIR=$(top_builddir);
 
+# manpages
+dist_man1_MANS = luna-control.man
+
 luna-control: luna-control.pl Makefile
 	sed -e 's,/usr/local/bin,$(bindir),g' < $< > $@
 	chmod +x $@

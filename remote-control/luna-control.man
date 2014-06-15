@@ -1,0 +1,220 @@
+.\" This file is part of the Lightweight Universal Network Analyzer (LUNA)
+.\"
+.\" Copyright (c) 2014 Fiona Klute
+.\"
+.\" LUNA is free software: you can redistribute it and/or modify it
+.\" under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" LUNA is distributed in the hope that it will be useful, but WITHOUT
+.\" ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+.\" or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+.\" License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with LUNA. If not, see <http://www.gnu.org/licenses/>.
+.TH LUNA-CONTROL 1 2014-06-15 "LUNA" "LUNA Manual"
+
+.SH NAME
+luna-control \- run one or more LUNA transmissions as defined in a
+configuration file
+
+.SH SYNOPSIS
+.B luna-control
+CONFFILE
+
+.SH DESCRIPTION
+.P
+LUNA, short for "Lightweight Universal Network Analyzer", is a system
+to analyze network behavior under different network loads. The
+.B luna-control
+command provides a way to automate LUNA measurements using a simple
+configuration file (see section
+.B CONFIGURATION FILE
+below). It requires the low-level
+.BR luna (1)
+command to be available on the hosts configured as clients and
+servers. The host running \fBluna-control\fR is called the \fBcontrol
+host\fR.
+
+.SH OPTIONS
+
+None.
+
+.SH CONFIGURATION FILE
+.P
+The configuration file consists of variable assignments in
+.RS
+.P
+NAME=VALUE
+.RE
+.P
+form. Additionally, the file is split in sections. The top of the
+configuration file before any explicit section definition is the
+global section, which contains common settings and defaults. All
+further sections are connection sections, each of which configures one
+LUNA transmission. A section definition has the following form:
+.RS
+.P
+[NAME]
+.RE
+.P
+All variables after the section definition belong to that section, up
+to either another section definition or the end of file.
+
+Names of variables and sections may contain letters, numbers and
+underscores (\fB\\w\fR in Perl regex syntax). Empty lines and lines
+starting with \fB#\fR are ignored. Section headers must be the only
+thing in their line. Variable assignments may be indented if desired,
+but whitespace at line ends is prohibited.
+
+Valid variables for global and connection sections are listed
+below. Required variables are marked as such, others are optional and
+will use default values if not set. An example configuration file is
+shown in the section
+.B EXAMPLE
+below.
+
+.SS Global Settings
+
+These variables must be set before any connection sections.
+
+.TP
+.B default_exec
+TODO, default value: /usr/local/bin/luna
+
+.TP
+.B startup_delay
+TODO
+
+.SS Connection Section
+
+TODO
+
+.TP
+.B server
+The LUNA server host (traffic sink, may send echo packets if
+requested). Required.
+
+.TP
+.B client
+The LUNA client host (traffic source). Required.
+
+.TP
+.B port
+The listening port on the server, default is 4567. If your
+configuration contains multiple connections with the server running on
+the same host, you must configure all but one of the servers to use
+another port, or connections will fail because the server cannot bind
+its listening port.
+
+.TP
+.B target
+By default, the LUNA client will use the IP address or hostname
+defined in \fBserver\fR as the transmission target. If it should use a
+different IP address or hostname (e.g. because the experiment uses a
+separate control network), set the server to pass to the LUNA client
+here.
+
+.TP
+.B generator
+The generator the client will use, if not set, the default generator
+will be used. All generators supported by the LUNA version installed
+on the client can be used. If an invalid generator name is set, this
+connection will fail.
+
+.TP
+.B generator_args
+Arguments for the configured generator. Valid arguments depend on the
+generator.
+
+.TP
+.B time
+The duration for which the client should send, in seconds. Required.
+
+.TP
+.B echo
+Set to true if the client should request echo packets.
+
+.TP
+.B server_exec
+TODO, defaults to default_exec
+
+.TP
+.B client_exec
+TODO, defaults to default_exec
+
+.TP
+.B server_output
+Filename on the control host for the server output. Required.
+
+.TP
+.B client_output
+Filename on the control host for the client output. Required if
+\fBecho\fR is set to true.
+
+.TP
+.B delay
+TODO, connection specific delay, additional to
+.BR startup_delay ,
+if any.
+
+.SH EXIT STATUS
+.P
+.B 0
+if execution completed normally, non-zero in case of an error. In the
+latter case,
+.B luna-control
+will output an error message for the user.
+
+.SH ENVIRONMENT
+.P
+\fBluna-control\fR uses SSH to connect to the hosts defined as clients
+and servers. It is highly recommended to configure public key login,
+otherwise you will have to enter passwords for each SSH connection.
+
+Requires Net::OpenSSH,
+.BR start-stop-daemon (8)
+
+TODO
+
+.SH NOTES
+
+.P
+For notes on how to install the low level LUNA tool on the client and
+server hosts, please see the
+.BR luna (1)
+manual page and the README. All further configuration for using
+\fBluna-control\fR is done on the control host only.
+
+.SH EXAMPLE
+.P
+A valid configuration file may look like this:
+
+.RS
+.nf
+.sp
+default_exec=/usr/local/bin/luna
+[conn]
+client=192.0.2.7
+server=192.0.2.8
+server_output=test-server.log
+client_output=test-client.log
+echo=true
+generator=gaussian
+generator_args=max=400,sigma=30
+.fi
+.RE
+
+The resulting command on the client would be:
+
+.RS
+.P
+luna -c 192.0.2.8 -e -g gaussian -a max=400,sigma=30
+.RE
+
+.SH SEE ALSO
+.P
+.BR luna (1),
+.BR ssh (1)

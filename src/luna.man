@@ -1,6 +1,6 @@
 .\" This file is part of the Lightweight Universal Network Analyzer (LUNA)
 .\"
-.\" Copyright (c) 2013 Fiona Klute
+.\" Copyright (c) 2013, 2014 Fiona Klute
 .\"
 .\" LUNA is free software: you can redistribute it and/or modify it
 .\" under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with LUNA. If not, see <http://www.gnu.org/licenses/>.
-.TH LUNA 1 2014-06-14 "LUNA" "LUNA Manual"
+.TH LUNA 1 2014-06-15 "LUNA" "LUNA Manual"
 
 .SH NAME
 luna \- generate and record packets to measure network performance
@@ -244,9 +244,9 @@ luna -c 192.0.2.7 -g gaussian -a max=400,sigma=30
 
 .SH SEE ALSO
 .P
-capabilities(7)
+.BR luna-control (1)
+for a high level control tool that can automate multiple connections.
+Please see the LUNA source code for analysis tools.
 
 .P
-References to documentation for other LUNA components will be added as
-it is written. At the moment, please see the LUNA source code for
-analysis and remote control tools.
+.BR capabilities (7)
