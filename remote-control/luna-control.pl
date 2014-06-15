@@ -45,7 +45,7 @@ while(defined(my $i = <CONF>))
     next if ($i =~ /^\#.*$/ or $i =~ /^$/);
 
     # check for section header
-    if ($i =~ /\[(\w*)\]/)
+    if ($i =~ /\[(\w+)\]/)
     {
 	$current = &init_conn($1);
 	push(@conns, $current);
@@ -53,7 +53,7 @@ while(defined(my $i = <CONF>))
     }
 
     # normal variable assignment
-    if ($i =~ /^\s*(\w*)=(.*)$/)
+    if ($i =~ /^\s*(\w+)=(.*)$/)
     {
 	if (not defined $current)
 	{
