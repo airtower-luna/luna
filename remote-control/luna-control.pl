@@ -24,7 +24,10 @@ use Net::OpenSSH;
 
 my @conns;
 my @workers;
-my %general = ("default_exec" => "/usr/local/bin/luna");
+my %general = (
+    "default_exec" => "/usr/local/bin/luna",
+    "startup_delay" => undef
+    );
 
 my $conffile = $ARGV[0];
 die "Configuration file missing or not readable!\n" if (! -r $conffile);
@@ -80,6 +83,19 @@ foreach my $conn (@conns)
     foreach my $i (keys(%{$conn}))
     {
 	print $i."=".$conn->{$i}."\n";
+    }
+}
+
+# Set up start time: Start time is "now" plus the configured startup
+# delay. Connections may have their own additional delay.
+if (defined $general{startup_delay})
+{
+    my $start_time = time();
+    $start_time = $start_time + $general{startup_delay};
+    print "General start time: ".$start_time."\n";
+    foreach my $conn (@conns)
+    {
+	$conn->{start_time} = $start_time + $conn->{delay};
     }
 }
 
@@ -273,6 +289,12 @@ sub run_client
 	}
     }
 
+    # add start time, if defined
+    if (defined $conn->{start_time})
+    {
+	$command = $command." --start-time=".$conn->{start_time};
+    }
+
     # run client
     $ssh->system($command);
     print "Command \"".$command."\" failed: ". $ssh->error."\n"
@@ -325,12 +347,15 @@ sub init_conn
 	 # local output files
 	 "server_output" => undef,
 	 "client_output" => undef,
+	 # connection specific delay, additional to $general{startup_delay}
+	 "delay" => 0,
 	 # Variables below this point are internal, not for configuration
 	 "server_ssh" => undef,
 	 "server_pidfile" => undef,
 	 "server_outfile" => undef,
 	 "client_ssh" => undef,
 	 "client_outfile" => undef,
+	 "start_time" => undef,
 	);
     return \%conn;
 }
