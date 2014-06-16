@@ -14,7 +14,7 @@
 .\"
 .\" You should have received a copy of the GNU General Public License
 .\" along with LUNA. If not, see <http://www.gnu.org/licenses/>.
-.TH LUNA-CONTROL 1 2014-06-15 "LUNA" "LUNA Manual"
+.TH LUNA-CONTROL 1 2014-06-16 "LUNA" "LUNA Manual"
 
 .SH NAME
 luna-control \- run one or more LUNA transmissions as defined in a
@@ -64,7 +64,7 @@ All variables after the section definition belong to that section, up
 to either another section definition or the end of file.
 
 Names of variables and sections may contain letters, numbers and
-underscores (\fB\\w\fR in Perl regex syntax). Empty lines and lines
+underscores (\fB\\w\fR in Perl regexp syntax). Empty lines and lines
 starting with \fB#\fR are ignored. Section headers must be the only
 thing in their line. Variable assignments may be indented if desired,
 but whitespace at line ends is prohibited.
@@ -82,15 +82,27 @@ These variables must be set before any connection sections.
 
 .TP
 .B default_exec
-TODO, default value: /usr/local/bin/luna
+The default path to the \fBluna\fR binary on client and server hosts,
+can be overridden for individual hosts using \fBclient_exec\fR and
+\fBserver_exec\fR. Default value: /usr/local/bin/luna
 
 .TP
 .B startup_delay
-TODO
+If \fBstartup_delay\fR is set, \fBluna-control\fR will configure
+clients to start sending at a fixed time. This time is calculated as
+the time on the control host right before starting connection
+handlers, plus \fBstartup_delay\fR seconds, modified by the
+connection-specific \fBdelay\fR (if any). Note that LUNA relies on
+each host's clock for time measurement, so the quality of the
+synchronization depends on proper clock synchronization across
+hosts. The value of \fBstartup_delay\fR must be large enough to
+accommodate SSH connection setup to both client and server hosts to be
+effective. If not set, each connection will be started as soon as
+possible.
 
 .SS Connection Section
 
-TODO
+Each connection section may contain the following variables:
 
 .TP
 .B server
@@ -139,26 +151,28 @@ Set to true if the client should request echo packets.
 
 .TP
 .B server_exec
-TODO, defaults to default_exec
+The path to the \fBluna\fR binary on the server, if not set,
+\fBdefault_exec\fR is used.
 
 .TP
 .B client_exec
-TODO, defaults to default_exec
+The path to the \fBluna\fR binary on the client, if not set,
+\fBdefault_exec\fR is used.
 
 .TP
 .B server_output
-Filename on the control host for the server output. Required.
+File name on the control host for the server output. Required.
 
 .TP
 .B client_output
-Filename on the control host for the client output. Required if
+File name on the control host for the client output. Required if
 \fBecho\fR is set to true.
 
 .TP
 .B delay
-TODO, connection specific delay, additional to
-.BR startup_delay ,
-if any.
+Connection specific delay until transmission start, relative to the
+common start time calculated from \fBstartup_delay\fR. If
+\fBstartup_delay\fR is not set, \fBdelay\fR has no effect.
 
 .SH EXIT STATUS
 .P
@@ -174,10 +188,10 @@ will output an error message for the user.
 and servers. It is highly recommended to configure public key login,
 otherwise you will have to enter passwords for each SSH connection.
 
-Requires Net::OpenSSH,
+The Perl module \fBNet::OpenSSH\fR is required on the control host to
+manage SSH connections. The Debian style
 .BR start-stop-daemon (8)
-
-TODO
+command is required on all hosts configured as servers.
 
 .SH NOTES
 
@@ -207,12 +221,15 @@ generator_args=max=400,sigma=30
 .fi
 .RE
 
-The resulting command on the client would be:
-
+The resulting command on the client (minus output settings) would be:
 .RS
 .P
 luna -c 192.0.2.8 -e -g gaussian -a max=400,sigma=30
 .RE
+.P
+During the measurement, output is written to temporary files on the
+hosts and transferred to the control host after the transmission is
+complete. Client output is only written if echo is enabled.
 
 .SH SEE ALSO
 .P
