@@ -161,6 +161,7 @@ int main(int argc, char *argv[])
 		switch (opt)
 		{
 		case 'p':
+			ASSERT_UNINIT(port, "-p");
 			port = strdup(optarg);
 			CHKALLOC(port);
 			break;
@@ -180,6 +181,7 @@ int main(int argc, char *argv[])
 					"never both!\n");
 				exit(EXIT_INVALID);
 			}
+			ASSERT_UNINIT(host, "-c");
 			host = strdup(optarg);
 			CHKALLOC(host);
 			client = 1;
@@ -198,10 +200,12 @@ int main(int argc, char *argv[])
 			time = atoi(optarg);
 			break;
 		case 'g': // generator to use (client only)
+			ASSERT_UNINIT(generator, "-g");
 			generator = strdup(optarg);
 			CHKALLOC(generator);
 			break;
 		case 'a': // arguments for the generator (client only)
+			ASSERT_UNINIT(gen_args, "-a");
 			gen_args = strdup(optarg);
 			CHKALLOC(gen_args);
 			break;
@@ -209,6 +213,7 @@ int main(int argc, char *argv[])
 			echo = 1;
 			break;
 		case 'o': // data output file
+			ASSERT_UNINIT(datafile, "-o");
 			datafile = strdup(optarg);
 			CHKALLOC(datafile);
 			break;
@@ -217,6 +222,7 @@ int main(int argc, char *argv[])
 			clk_id = CLOCK_REALTIME;
 			break;
 		case OPT_CLOCK:
+			ASSERT_UNINIT(clock, "--clock");
 			clock = strdup(optarg);
 			CHKALLOC(clock);
 			break;

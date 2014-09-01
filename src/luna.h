@@ -72,6 +72,17 @@
 #define CHKALLOC(a) chkalloc(a, __FILE__, __LINE__)
 void chkalloc(void *ptr, char *file, int line);
 
+/* macro to check if a pointer that should be NULL is already
+ * initialized */
+#define ASSERT_UNINIT(str, name)					\
+	if (str != NULL)						\
+	{								\
+		fprintf(stderr,						\
+			"Invalid argument: Multiple assignments to "	\
+			"%s!\n", name);					\
+		exit(EXIT_INVALID);					\
+	}								\
+
 /* based on timeradd in <sys/time.h> */
 #define timespecadd(a, b, result)					\
 	do								\
