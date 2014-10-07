@@ -42,7 +42,7 @@
 #define ADDR_STR_LEN 100
 
 /* changed to 0 by SIGTERM to stop the receive loop */
-int work = 1;
+volatile sig_atomic_t work = 1;
 
 int run_server(struct addrinfo *addr, int flags, const char* datafile)
 {
