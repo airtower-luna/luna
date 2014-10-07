@@ -44,7 +44,7 @@
 
 /* List of known generators */
 #define KNOWN_GENERATORS_LENGTH 4
-static struct generator_type known_generators[] = {
+static const struct generator_type known_generators[] = {
 	{"static", &static_generator_create},
 	{"random_size", &rand_size_generator_create},
 	{"alt_time", &alternate_time_generator_create},
@@ -70,11 +70,12 @@ struct echo_thread_data
 
 
 
-int run_client(struct addrinfo *addr, int time,
-	       struct timespec start_time, clockid_t clk_id,
-	       int echo,
-	       char *generator_type, char *generator_args,
-	       const char *datafile)
+int run_client(struct addrinfo *addr, const int time,
+	       const struct timespec start_time, const clockid_t clk_id,
+	       const int echo,
+	       const char *const generator_type,
+	       const char *const generator_args,
+	       const char *const datafile)
 {
 	fprintf(stderr, "Generator: %s\n", generator_type);
 
@@ -90,7 +91,7 @@ int run_client(struct addrinfo *addr, int time,
 	/* initialize the requested generator */
 	for (int i = 0; i < KNOWN_GENERATORS_LENGTH; i++)
 	{
-		generator_option* gen_args =
+		generator_option *const gen_args =
 			split_generator_args(generator_args);
 		if (strcmp(generator_type, known_generators[i].name) == 0)
 			known_generators[i].create(&generator, gen_args);
@@ -110,7 +111,7 @@ int run_client(struct addrinfo *addr, int time,
 
 	/* Allocate buffer, based on upper size limit provided by the
 	 * generator */
-	char *buf = malloc(generator.max_size);
+	char *const buf = malloc(generator.max_size);
 	CHKALLOC(buf);
 	memset(buf, 7, generator.max_size);
 
@@ -151,11 +152,13 @@ int run_client(struct addrinfo *addr, int time,
 	/* current sequence number */
 	int seq = 0;
 	/* sequence number in the LUNA packet */
-	int *sequence = (int *) buf;
+	int *const sequence = (int *) buf;
 	/* time right before sending in the LUNA packet */
-	struct timespec *sendtime = (struct timespec *) (buf + sizeof(int));
+	struct timespec *const sendtime =
+		(struct timespec *) (buf + sizeof(int));
 	/* protocol flags field */
-	char *flags = (char *) (buf + sizeof(int) + sizeof(struct timespec));
+	char *const flags =
+		(char *) (buf + sizeof(int) + sizeof(struct timespec));
 	*flags = 0;
 	if (echo)
 		*flags = *flags | LUNA_FLAG_ECHO;
@@ -182,7 +185,7 @@ int run_client(struct addrinfo *addr, int time,
 		nexttick.tv_sec = start_time.tv_sec;
 		nexttick.tv_nsec = start_time.tv_nsec;
 	}
-	struct timespec end = {nexttick.tv_sec + time, nexttick.tv_nsec};
+	const struct timespec end = {nexttick.tv_sec + time, nexttick.tv_nsec};
 
 	/* Store page fault statistics to check if memory management
 	 * is working properly */
@@ -275,11 +278,11 @@ void* echo_thread(void *arg)
 	 * generation, because the kernel buffers them. Reduce
 	 * priority by up to ECHO_PRIO_OFFSET, as long as it remains
 	 * within the general priority limits. */
-	pthread_t self = pthread_self();
+	const pthread_t self = pthread_self();
 	int sched_policy = 0;
 	struct sched_param sched_param;
 	pthread_getschedparam(self, &sched_policy, &sched_param);
-	int min_prio = sched_get_priority_min(sched_policy);
+	const int min_prio = sched_get_priority_min(sched_policy);
 	if (sched_param.sched_priority - ECHO_PRIO_OFFSET < min_prio)
 		pthread_setschedprio(self, min_prio);
 	else
@@ -288,20 +291,21 @@ void* echo_thread(void *arg)
 
 	/* allocate receive buffer */
 	size_t buflen = MSG_BUF_SIZE;
-	char *buf = malloc(buflen);
+	char *const buf = malloc(buflen);
 	CHKALLOC(buf);
 	touch_page(buf, buflen);
 	/* ensure free() on cancellation */
 	pthread_cleanup_push(&free, buf);
 	ssize_t recvlen = 0;
 	int seq = 0;
-	struct sockaddr *addrbuf = malloc(ADDRBUF_SIZE);
+	struct sockaddr *const addrbuf = malloc(ADDRBUF_SIZE);
 	CHKALLOC(addrbuf);
 	touch_page(addrbuf, ADDRBUF_SIZE);
 	pthread_cleanup_push(&free, addrbuf);
 	socklen_t addrlen = 0;
 	/* timestamp related data */
-	struct timespec *sendtime = (struct timespec *) (buf + sizeof(int));
+	struct timespec *const sendtime =
+		(struct timespec *) (buf + sizeof(int));
 	struct timeval recvtime = {0, 0};
 	struct timeval rtt = {0, 0};
 
@@ -309,7 +313,7 @@ void* echo_thread(void *arg)
 	tzset();
 	struct tm tm;
 	localtime_r(&(rtt.tv_sec), &tm);
-	char *timestr = calloc(T_TIME_BUF, sizeof(char));
+	char *const timestr = calloc(T_TIME_BUF, sizeof(char));
 	CHKALLOC(timestr);
 	touch_page(timestr, T_TIME_BUF);
 	pthread_cleanup_push(&free, timestr);

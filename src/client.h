@@ -31,10 +31,11 @@
  * generator_type: name of the generator to use
  * generator_args: parameters for the generator
  */
-int run_client(struct addrinfo *addr, int time,
-	       struct timespec start_time, clockid_t clk_id,
-	       int echo,
-	       char *generator_type, char *generator_args,
-	       const char *datafile);
+int run_client(struct addrinfo *addr, const int time,
+	       const struct timespec start_time, const clockid_t clk_id,
+	       const int echo,
+	       const char *const generator_type,
+	       const char *const generator_args,
+	       const char *const datafile);
 
 #endif /* __LUNA_CLIENT_H__ */
