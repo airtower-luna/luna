@@ -26,7 +26,8 @@
 #define SERVER_TSV_OUTPUT 2
 #define SERVER_SIGTERM_EXIT 4
 
-int run_server(struct addrinfo *addr, int flags, const char* datafile);
+int run_server(struct addrinfo *const addr, const int flags,
+	       const char *const datafile);
 
 void term_server(int signum);
 

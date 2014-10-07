@@ -44,15 +44,16 @@
 /* changed to 0 by SIGTERM to stop the receive loop */
 volatile sig_atomic_t work = 1;
 
-int run_server(struct addrinfo *addr, int flags, const char* datafile)
+int run_server(struct addrinfo *const addr, const int flags,
+	       const char *const datafile)
 {
 	/* inet6_only one must be a real variable so it can be used in
 	 * setsockopt. */
-	int inet6_only = flags & SERVER_IPV6_ONLY;
+	const int inet6_only = flags & SERVER_IPV6_ONLY;
 
 	/* create the socket */
 	int sock;
-	struct addrinfo *rp;
+	const struct addrinfo *rp;
 	for (rp = addr; rp != NULL; rp = rp->ai_next)
 	{
 		sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
@@ -100,38 +101,38 @@ int run_server(struct addrinfo *addr, int flags, const char* datafile)
 		}
 	}
 
-	size_t buflen = MSG_BUF_SIZE;
-	char *buf = malloc(buflen);
+	const size_t buflen = MSG_BUF_SIZE;
+	char *const buf = malloc(buflen);
 	CHKALLOC(buf);
 	touch_page(buf, buflen);
 	ssize_t recvlen = 0;
 	int seq = 0;
-	struct sockaddr *addrbuf = malloc(ADDRBUF_SIZE);
+	struct sockaddr *const addrbuf = malloc(ADDRBUF_SIZE);
 	CHKALLOC(addrbuf);
 	touch_page(addrbuf, ADDRBUF_SIZE);
 	socklen_t addrlen = 0;
-	char *addrstr = malloc(ADDR_STR_LEN);
+	char *const addrstr = malloc(ADDR_STR_LEN);
 	CHKALLOC(addrstr);
 	touch_page(addrstr, ADDR_STR_LEN);
-	char *portstr = malloc(ADDR_STR_LEN);
+	char *const portstr = malloc(ADDR_STR_LEN);
 	CHKALLOC(portstr);
 	touch_page(portstr, ADDR_STR_LEN);
 
 	/* timestamp related data */
 	struct timeval ptime;
-	char *tsstr = calloc(T_TIME_BUF, sizeof(char));
+	char *const tsstr = calloc(T_TIME_BUF, sizeof(char));
 	CHKALLOC(tsstr);
 	touch_page(tsstr, T_TIME_BUF);
 #ifdef ENABLE_KUTIME
 	struct timeval stime;
-	char *tscstr = calloc(T_TIME_BUF, sizeof(char));
+	char *const tscstr = calloc(T_TIME_BUF, sizeof(char));
 	CHKALLOC(tscstr);
 	touch_page(tscstr, T_TIME_BUF);
 #endif
 	/* *tm will be used to point to localtime's statically
 	 * allocated memory, does not need to be allocated/freed
 	 * manually */
-	struct tm *tm;
+	const struct tm *tm;
 	/* Call localtime to make sure its internal memory structures
 	 * get initialized. The result doesn't matter. */
 	localtime(&(ptime.tv_sec));
