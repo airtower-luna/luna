@@ -70,7 +70,7 @@
 
 /* macro and function to check if memory allocation was successful */
 #define CHKALLOC(a) chkalloc(a, __FILE__, __LINE__)
-void chkalloc(void *ptr, char *file, int line);
+void chkalloc(void *const ptr, const char *const file, const int line);
 
 /* macro to check if a pointer that should be NULL is already
  * initialized */
@@ -102,10 +102,11 @@ void chkalloc(void *ptr, char *file, int line);
 
 /* Compare two struct rusage data sets to see if any page faults
  * occurred in between */
-int check_pfaults(struct rusage *pre, struct rusage *post);
+int check_pfaults(const struct rusage *const pre,
+		  const struct rusage *const post);
 
 /* Touch each page that may be part of mem. The caller is responsible
  * for passing the correct size. */
-int touch_page(void *mem, size_t size);
+int touch_page(void *const mem, const size_t size);
 
 #endif /* __LUNA_LUNA_H__ */

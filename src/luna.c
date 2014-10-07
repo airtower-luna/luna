@@ -55,7 +55,7 @@
 
 /* valid command line options for getopt */
 #define CLI_OPTS "sc:p:46Tt:g:a:eo:"
-struct option long_opts[] = {
+const struct option long_opts[] = {
 	{"server",	no_argument,		NULL,	's'},
 	{"client",	required_argument,	NULL,	'c'},
 	{"port",	required_argument,	NULL,	'p'},
@@ -72,7 +72,7 @@ struct option long_opts[] = {
 	{NULL,		0,			NULL,	0}
 };
 
-void chkalloc(void *ptr, char *file, int line)
+void chkalloc(void *const ptr, const char *const file, const int line)
 {
 	if (ptr == NULL)
 	{
@@ -85,7 +85,8 @@ void chkalloc(void *ptr, char *file, int line)
 
 
 
-int check_pfaults(struct rusage *pre, struct rusage *post)
+int check_pfaults(const struct rusage *const pre,
+		  const struct rusage *const post)
 {
 	if (pre->ru_majflt != post->ru_majflt
 	    || pre->ru_minflt != post->ru_minflt)
@@ -96,7 +97,7 @@ int check_pfaults(struct rusage *pre, struct rusage *post)
 
 
 
-int touch_page(void *mem, size_t size)
+int touch_page(void *const mem, const size_t size)
 {
 	/* get page size (once) */
 	static long page_size = 0;
