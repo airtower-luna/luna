@@ -136,9 +136,10 @@ int run_server(struct addrinfo *addr, int flags, const char* datafile)
 	 * get initialized. The result doesn't matter. */
 	localtime(&(ptime.tv_sec));
 
-	/* set up output */
-	char *time_trans = calloc(3, sizeof(char));
-	CHKALLOC(time_trans);
+	/* Set up output. Allocating memory for time_trans is not
+	 * necessary because the following if/else will point it at a
+	 * fixed string ("%s" or "%T"). */
+	const char *time_trans;
 	if (flags & SERVER_TSV_OUTPUT)
 	{
 #ifdef ENABLE_KUTIME
