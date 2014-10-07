@@ -115,7 +115,7 @@ int destroy_block_circle(struct packet_block *block);
  * expected in the format name=value,name2=value2,... In the last
  * element of the array both name and value are set to NULL to allow
  * detecting the end of the array. */
-generator_option *split_generator_args(char *args);
+generator_option *split_generator_args(const char *const args);
 
 /* Free a generator_option[], including the strings pointed to by the
  * elements. */

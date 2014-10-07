@@ -109,7 +109,7 @@ int destroy_block_circle(struct packet_block *block)
 
 
 
-generator_option *split_generator_args(char *args)
+generator_option *split_generator_args(const char *const args)
 {
 	if (args == NULL)
 		return NULL;
