@@ -41,7 +41,8 @@
  * required) */
 #define ADDR_STR_LEN 100
 
-/* changed to 0 by SIGTERM to stop the receive loop */
+/* changed to 0 by the termination handler to stop the receive loop
+ * (if the SERVER_GRACEFUL_EXIT flag is set) */
 volatile sig_atomic_t work = 1;
 
 int run_server(struct addrinfo *const addr, const int flags,
@@ -80,13 +81,15 @@ int run_server(struct addrinfo *const addr, const int flags,
 	}
 	freeaddrinfo(addr); // no longer required
 
-	/* configure graceful exit on SIGTERM, if requested */
+	/* configure graceful exit on termination signals (SIGTERM,
+	 * SIGINT), if requested */
 	if (flags & SERVER_GRACEFUL_EXIT)
 	{
 		struct sigaction act;
 		memset(&act, 0, sizeof(struct sigaction));
 		act.sa_handler = term_server;
 		sigaction(SIGTERM, &act, NULL);
+		sigaction(SIGINT, &act, NULL);
 	}
 
 	/* Open output file if specified */
@@ -175,8 +178,7 @@ int run_server(struct addrinfo *const addr, const int flags,
 				"Ignoring packet.\n", recvlen);
 			continue;
 		}
-		/* This only occurs when recvfrom() is cancelled by
-		 * SIGTERM. */
+		/* This only occurs when recvfrom() is interrupted. */
 		if (recvlen == -1)
 			continue;
 
