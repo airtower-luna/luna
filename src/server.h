@@ -24,7 +24,7 @@
 /* option flags for the server */
 #define SERVER_IPV6_ONLY 1
 #define SERVER_TSV_OUTPUT 2
-#define SERVER_SIGTERM_EXIT 4
+#define SERVER_GRACEFUL_EXIT 4
 
 int run_server(struct addrinfo *const addr, const int flags,
 	       const char *const datafile);

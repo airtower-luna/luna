@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 
 	int server = 0;
 	int client = 0;
-	int flags = SERVER_SIGTERM_EXIT;
+	int flags = SERVER_GRACEFUL_EXIT;
 	int time = 1;
 	struct timespec start_time = {0, 0};
 	clockid_t clk_id = CLOCK_MONOTONIC;

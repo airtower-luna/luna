@@ -81,7 +81,7 @@ int run_server(struct addrinfo *const addr, const int flags,
 	freeaddrinfo(addr); // no longer required
 
 	/* configure graceful exit on SIGTERM, if requested */
-	if (flags & SERVER_SIGTERM_EXIT)
+	if (flags & SERVER_GRACEFUL_EXIT)
 	{
 		struct sigaction act;
 		memset(&act, 0, sizeof(struct sigaction));
