@@ -20,6 +20,7 @@
 
 #include <arpa/inet.h>
 #include <errno.h>
+#include <linux/sockios.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <signal.h>
