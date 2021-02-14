@@ -1,0 +1,40 @@
+name: CI build
+on:
+  pull_request:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - uses: actions/checkout@v2
+      - name: install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install autoconf-archive build-essential libgsl0-dev
+      - name: autoreconf
+        run: autoreconf -fiv
+      - name: configure
+        run: ./configure
+      - name: store config.log
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: config-log
+          path: config.log
+      - name: make
+        run: make -j4
+      - name: add capabilities to src/luna binary
+        run: |
+          sudo setcap cap_sys_nice,cap_ipc_lock=pe src/luna
+      - name: minimal test
+        run: |
+          srvlog=$(mktemp)
+          ./src/luna -s -o ${srvlog} &
+          pid=${!}
+          ./src/luna -c localhost
+          kill -TERM ${pid}
+          cat "${srvlog}"
+          test $(grep "Received packet" "${srvlog}" | wc -l) -gt 950
