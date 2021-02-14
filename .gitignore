@@ -16,6 +16,7 @@ stamp-h1
 missing
 configure
 depcomp
+INSTALL
 install-sh
 test-driver
 compile
