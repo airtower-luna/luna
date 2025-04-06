@@ -18,18 +18,18 @@
 # -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.65])
-AC_INIT([luna], [0.1], [fiona2.klute@uni-dortmund.de])
+AC_PREREQ([2.72])
+AC_INIT([luna],[0.1],[fiona2.klute@uni-dortmund.de])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/luna.c])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
-AC_PROG_CC_C99
+AC_PROG_CC
 AC_PROG_INSTALL
 
 # Checks for libraries.
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 # realtime stuff
 LIBRT=""
 AC_CHECK_LIB(rt, clock_getres, [LIBRT="-lrt"])
@@ -40,8 +40,8 @@ AC_SUBST(LIBGSL_LIBS)
 AC_SUBST(LIBGSL_CFLAGS)
 
 # enable pthreads
-ACX_PTHREAD
-LIBS="$LIBS $PTHREAD_LIBS"
+AX_PTHREAD
+LIBS="$PTHREAD_LIBS $LIBS"
 CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 CC="$PTHREAD_CC"
 
