@@ -23,6 +23,7 @@
 #include <linux/sockios.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,9 +107,19 @@ int run_client(struct addrinfo *addr, const int time,
 		exit(EXIT_INVALID);
 	}
 
+	/* also used for echo thread, if any */
+	pthread_attr_t thread_attrs;
+	pthread_attr_init(&thread_attrs);
+
+	pthread_attr_setstacksize(&thread_attrs, 2 * PTHREAD_STACK_MIN);
 	pthread_t gen_thread;
-	/* TODO: Error handling */
-	pthread_create(&gen_thread, NULL, &run_generator, &generator);
+	int ret = pthread_create(&gen_thread, &thread_attrs, &run_generator, &generator);
+	if (ret != 0)
+	{
+		fprintf(stderr, "creating generator thread failed: %s\n",
+			strerror(ret));
+		exit(1);
+	}
 
 	/* Allocate buffer, based on upper size limit provided by the
 	 * generator */
@@ -147,8 +158,14 @@ int run_client(struct addrinfo *addr, const int time,
 		e_data->sock = sock;
 		e_data->datafile = datafile;
 		sem_init(&(e_data->sem), 0, 0); /* TODO: Error handling */
-		pthread_create(&e_thread, NULL, &echo_thread, e_data);
+		ret = pthread_create(&e_thread, &thread_attrs, &echo_thread, e_data);
+		if (ret != 0) {
+			fprintf(stderr, "creating echo thread failed: %s\n",
+				strerror(ret));
+			exit(1);
+		}
 	}
+	pthread_attr_destroy(&thread_attrs);
 
 	/* current sequence number */
 	int seq = 0;
