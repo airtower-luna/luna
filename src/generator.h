@@ -99,13 +99,13 @@ struct generator_type
  * This function is meant to run as a dedicated generator thread,
  * using a generator_t* as the only parameter.
  */
-void* run_generator(void *arg);
+void* run_generator(void *const arg);
 
 
 
 /* Create a circular buffer of count packet blocks, with block_len
  * elements each. Returns a pointer to the first block. */
-struct packet_block *create_block_circle(int count, int block_len);
+struct packet_block *create_block_circle(const int count, const int block_len);
 
 /* Destry a circular buffer of count packet blocks. The function
  * follows the next pointers to delete all elements of the circle. */

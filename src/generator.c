@@ -24,9 +24,9 @@
 #include "luna.h"
 #include "generator.h"
 
-void* run_generator(void *arg)
+void* run_generator(void *const arg)
 {
-	struct generator_t *generator = (struct generator_t *) arg;
+	struct generator_t *const generator = (struct generator_t *) arg;
 
 	/* The generator thread initially inherits its priority from
 	 * the sending thread. However, realtime behavior is more
@@ -35,7 +35,7 @@ void* run_generator(void *arg)
 	 * RT priority is above the minimum, reduce it by one to make
 	 * sure that the generator will never block the sending
 	 * thread. */
-	pthread_t self = pthread_self();
+	const pthread_t self = pthread_self();
 	int sched_policy = 0;
 	struct sched_param sched_param;
 	pthread_getschedparam(self, &sched_policy, &sched_param);
@@ -67,12 +67,12 @@ void* run_generator(void *arg)
 
 
 
-struct packet_block *create_block_circle(int count, int block_len)
+struct packet_block *create_block_circle(const int count, const int block_len)
 {
 	struct packet_block *block = malloc(sizeof(struct packet_block));
 	CHKALLOC(block);
 	packet_block_init(block, block_len);
-	struct packet_block *first = block;
+	struct packet_block *const first = block;
 
 	for (int i = 1; i < count; i++)
 	{
