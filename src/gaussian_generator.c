@@ -55,7 +55,7 @@ struct gaussian_generator_attr
  * max (m): maximum packet size in bytes (must be at least 4)
  * sigma (s): standard deviation of packet size in bytes (double)
  */
-int gaussian_generator_base(generator_t *this, generator_option *args)
+static int gaussian_generator_base(generator_t *this, generator_option *args)
 {
 	this->attr = malloc(sizeof(struct gaussian_generator_attr));
 	CHKALLOC(this->attr);
@@ -91,12 +91,14 @@ int gaussian_generator_base(generator_t *this, generator_option *args)
 		attr->max = MIN_PACKET_SIZE;
 	attr->mean = attr->max / 2;
 	if (attr->sigma <= 0.0)
-		attr->sigma = attr->mean / 3;
+		attr->sigma = attr->mean / 3.0;
 
 	this->max_size = attr->max;
 
 	attr->interval.tv_sec = interval / US_PER_S;
 	attr->interval.tv_nsec = (interval % US_PER_S) * 1000;
+
+	return 0;
 }
 
 
@@ -114,6 +116,8 @@ int gaussian_generator_create(generator_t *this, generator_option *args)
 	gsl_rng_env_setup();
 	attr->rng_type = gsl_rng_default;
 	attr->rng = gsl_rng_alloc(attr->rng_type);
+
+	return 0;
 }
 
 

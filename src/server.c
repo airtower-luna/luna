@@ -19,7 +19,6 @@
 #include <config.h>
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <linux/sockios.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -261,6 +260,7 @@ int run_server(struct addrinfo *const addr, const int flags,
 	if (datafile != NULL)
 		fclose(dataout);
 	close(sock);
+	return 0;
 }
 
 

@@ -19,7 +19,6 @@
 #include <config.h>
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <linux/sockios.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -281,6 +280,7 @@ int run_client(struct addrinfo *addr, const int time,
 
 	/* close socket after echo thread has terminated */
 	close(sock);
+	return 0;
 }
 
 
@@ -412,6 +412,7 @@ void* echo_thread(void *arg)
 	pthread_cleanup_pop(1);
 	pthread_cleanup_pop(1);
 	pthread_cleanup_pop(1);
+	return NULL;
 }
 
 

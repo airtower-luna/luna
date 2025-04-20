@@ -107,6 +107,6 @@ int check_pfaults(const struct rusage *const pre,
 
 /* Touch each page that may be part of mem. The caller is responsible
  * for passing the correct size. */
-int touch_page(void *const mem, const size_t size);
+void touch_page(void *const mem, const size_t size);
 
 #endif /* __LUNA_LUNA_H__ */

@@ -53,7 +53,7 @@ struct static_generator_attr
  * interval (i): time between two packets (µs)
  * size (s): packet size in bytes (must be at least 4)
  */
-int simple_generator_base(generator_t *this, generator_option *args)
+static int simple_generator_base(generator_t *this, generator_option *args)
 {
 	int size = MIN_PACKET_SIZE;
 	int interval = 1000;
@@ -86,6 +86,7 @@ int simple_generator_base(generator_t *this, generator_option *args)
 	attr->size = size;
 	attr->interval.tv_sec = interval / US_PER_S;
 	attr->interval.tv_nsec = (interval % US_PER_S) * 1000;
+	return 0;
 }
 
 
@@ -96,7 +97,7 @@ int static_generator_create(generator_t *this, generator_option *args)
 	this->fill_block = NULL;
 	this->destroy_generator = &static_generator_destroy;
 
-	simple_generator_base(this, args);
+	return simple_generator_base(this, args);
 }
 
 
@@ -107,7 +108,7 @@ int alternate_time_generator_create(generator_t *this, generator_option *args)
 	this->fill_block = NULL;
 	this->destroy_generator = &static_generator_destroy;
 
-	simple_generator_base(this, args);
+	return simple_generator_base(this, args);
 }
 
 
@@ -118,7 +119,7 @@ int rand_size_generator_create(generator_t *this, generator_option *args)
 	this->fill_block = &rand_size_generator_fill_block;
 	this->destroy_generator = &static_generator_destroy;
 
-	simple_generator_base(this, args);
+	return simple_generator_base(this, args);
 }
 
 

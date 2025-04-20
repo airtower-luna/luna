@@ -19,7 +19,6 @@
 #include <config.h>
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <getopt.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -97,7 +96,7 @@ int check_pfaults(const struct rusage *const pre,
 
 
 
-int touch_page(void *const mem, const size_t size)
+void touch_page(void *const mem, const size_t size)
 {
 	/* get page size (once) */
 	static long page_size = 0;
